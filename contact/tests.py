@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from .forms import ContactForm
 from .models import ContactMessage
 
 
@@ -29,5 +30,13 @@ class ContactMessageModelTests(TestCase):
         )
 
         self.assertEqual(str(message), 'Ali Ahmadi - Question')
+
+
+class ContactFormTests(TestCase):
+    def test_contact_form_uses_persian_labels_and_widgets(self):
+        form = ContactForm()
+
+        self.assertEqual(form.fields['full_name'].label, 'نام و نام خانوادگی')
+        self.assertEqual(form.fields['message'].widget.attrs['placeholder'], 'پیام خود را بنویسید')
 
 # Create your tests here.

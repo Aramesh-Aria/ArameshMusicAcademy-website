@@ -135,7 +135,7 @@ class ScheduleViewTests(TestCase):
         self.assertNotContains(response, '11:00')
 
     def test_schedule_orders_sessions_by_persian_weekday_order(self):
-        friday_session = ClassSession.objects.create(
+        ClassSession.objects.create(
             course=self.course,
             teacher=self.teacher,
             weekday=Weekday.FRIDAY,
@@ -143,7 +143,7 @@ class ScheduleViewTests(TestCase):
             end_time=time(10, 0),
             is_active=True,
         )
-        saturday_session = ClassSession.objects.create(
+        ClassSession.objects.create(
             course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
@@ -153,11 +153,30 @@ class ScheduleViewTests(TestCase):
         )
 
         response = self.client.get(reverse('schedules:schedule'))
-        sections = response.context['weekday_sections']
+        row = response.context['schedule_rows'][0]
 
-        self.assertEqual(sections[0]['value'], Weekday.SATURDAY)
-        self.assertEqual(sections[-1]['value'], Weekday.FRIDAY)
-        self.assertEqual(sections[0]['sessions'], [saturday_session])
-        self.assertEqual(sections[-1]['sessions'], [friday_session])
+        self.assertEqual(row['cells'][0]['weekday'], Weekday.SATURDAY)
+        self.assertEqual(row['cells'][-1]['weekday'], Weekday.FRIDAY)
+        self.assertEqual(row['cells'][0]['sessions'][0].start_time, time(11, 0))
+        self.assertEqual(row['cells'][-1]['sessions'][0].start_time, time(9, 0))
+
+    def test_schedule_context_contains_course_teacher_rows(self):
+        ClassSession.objects.create(
+            course=self.course,
+            teacher=self.teacher,
+            weekday=Weekday.SATURDAY,
+            start_time=time(9, 0),
+            end_time=time(10, 0),
+            is_active=True,
+        )
+
+        response = self.client.get(reverse('schedules:schedule'))
+        rows = response.context['schedule_rows']
+
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]['course'], self.course)
+        self.assertEqual(rows[0]['teacher'], self.teacher)
+        self.assertEqual(rows[0]['cells'][0]['weekday'], Weekday.SATURDAY)
+        self.assertEqual(len(rows[0]['cells'][0]['sessions']), 1)
 
 # Create your tests here.
