@@ -12,7 +12,7 @@ class ScheduleView(TemplateView):
             ClassSession.objects
             .filter(is_active=True, teacher__is_active=True)
             .select_related('course', 'teacher')
-            .order_by('weekday', 'start_time')
+            .order_by('weekday_order', 'start_time')
         )
         sessions_by_weekday = {weekday.value: [] for weekday in WEEKDAY_ORDER}
 

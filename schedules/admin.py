@@ -5,8 +5,9 @@ from .models import ClassSession, Course
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'created_at', 'updated_at')
     search_fields = ('name',)
+    readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(ClassSession)
@@ -15,6 +16,7 @@ class ClassSessionAdmin(admin.ModelAdmin):
         'course',
         'teacher',
         'weekday',
+        'weekday_order',
         'start_time',
         'end_time',
         'capacity',
@@ -28,7 +30,7 @@ class ClassSessionAdmin(admin.ModelAdmin):
         'teacher__last_name',
         'notes',
     )
-    readonly_fields = ('created_at', 'updated_at')
-    ordering = ('weekday', 'start_time')
+    readonly_fields = ('weekday_order', 'created_at', 'updated_at')
+    ordering = ('weekday_order', 'start_time')
 
 # Register your models here.
