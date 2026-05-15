@@ -1,5 +1,6 @@
-from datetime import date, time
+from datetime import time
 
+import jdatetime
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -15,7 +16,7 @@ class ClassSessionModelTests(TestCase):
         self.teacher = Teacher.objects.create(
             first_name='Sara',
             last_name='Karimi',
-            date_of_birth=date(1984, 3, 20),
+            date_of_birth=jdatetime.date(1363, 1, 1),
             birth_province='Tehran',
             birth_city='Tehran',
             education='Music MA',
@@ -44,7 +45,7 @@ class ScheduleViewTests(TestCase):
         self.teacher = Teacher.objects.create(
             first_name='Reza',
             last_name='Moradi',
-            date_of_birth=date(1980, 5, 1),
+            date_of_birth=jdatetime.date(1359, 2, 11),
             birth_province='Fars',
             birth_city='Shiraz',
             education='Music BA',

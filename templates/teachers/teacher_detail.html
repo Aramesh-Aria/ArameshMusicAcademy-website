@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load jformat %}
 
 {% block title %}{{ teacher.full_name }} | آموزشگاه موسیقی آرامش{% endblock %}
 
@@ -15,7 +16,7 @@
     </p>
     <dl>
         <dt>تاریخ تولد</dt>
-        <dd>{{ teacher.date_of_birth }}</dd>
+        <dd>{{ teacher.date_of_birth|jformat:"%A %d %B %Y" }}</dd>
         <dt>محل تولد</dt>
         <dd>{{ teacher.birth_province }}، {{ teacher.birth_city }}</dd>
         <dt>تحصیلات</dt>

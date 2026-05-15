@@ -1,5 +1,4 @@
-from datetime import date
-
+import jdatetime
 from django.test import TestCase
 from django.urls import reverse
 
@@ -11,7 +10,7 @@ class TeacherModelTests(TestCase):
         teacher = Teacher(
             first_name='Ali',
             last_name='Ahmadi',
-            date_of_birth=date(1985, 1, 1),
+            date_of_birth=jdatetime.date(1363, 10, 11),
             birth_province='Tehran',
             birth_city='Tehran',
             education='Music BA',
@@ -30,7 +29,7 @@ class TeacherViewTests(TestCase):
         teacher = Teacher.objects.create(
             first_name=first_name,
             last_name=last_name,
-            date_of_birth=date(1985, 1, 1),
+            date_of_birth=jdatetime.date(1363, 10, 11),
             birth_province='Tehran',
             birth_city='Tehran',
             education='Music BA',

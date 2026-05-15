@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django_jalali.db import models as jmodels
 
 
 class Instrument(models.Model):
@@ -15,10 +16,12 @@ class Instrument(models.Model):
 
 
 class Teacher(models.Model):
+    objects = jmodels.jManager()
+
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     instruments = models.ManyToManyField(Instrument, related_name='teachers')
-    date_of_birth = models.DateField()
+    date_of_birth = jmodels.jDateField()
     birth_province = models.CharField(max_length=100)
     birth_city = models.CharField(max_length=100)
     education = models.CharField(max_length=255)

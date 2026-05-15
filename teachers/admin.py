@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django_jalali.admin.filters import JDateFieldListFilter
+import django_jalali.admin as jadmin  # noqa: F401
 
 from .models import Instrument, Teacher
 
@@ -20,7 +22,13 @@ class TeacherAdmin(admin.ModelAdmin):
         'display_order',
         'updated_at',
     )
-    list_filter = ('is_active', 'instruments', 'birth_province', 'birth_city')
+    list_filter = (
+        'is_active',
+        'instruments',
+        'birth_province',
+        'birth_city',
+        ('date_of_birth', JDateFieldListFilter),
+    )
     search_fields = ('first_name', 'last_name', 'education', 'biography')
     filter_horizontal = ('instruments',)
     readonly_fields = ('created_at', 'updated_at')
