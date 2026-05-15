@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}اساتید | آموزشگاه موسیقی آرامش{% endblock %}
+
+{% block content %}
+<h1>اساتید</h1>
+
+{% for teacher in teachers %}
+    <article>
+        <a href="{{ teacher.get_absolute_url }}">
+            {% if teacher.profile_image %}
+                <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.full_name }}" width="180">
+            {% endif %}
+            <h2>{{ teacher.full_name }}</h2>
+        </a>
+        <p>
+            {% for instrument in teacher.instruments.all %}
+                {{ instrument.name }}{% if not forloop.last %}، {% endif %}
+            {% empty %}
+                ساز ثبت نشده است.
+            {% endfor %}
+        </p>
+    </article>
+{% empty %}
+    <p>هنوز استادی ثبت نشده است.</p>
+{% endfor %}
+{% endblock %}

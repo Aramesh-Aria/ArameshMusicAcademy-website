@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ teacher.full_name }} | آموزشگاه موسیقی آرامش{% endblock %}
+
+{% block content %}
+<article>
+    {% if teacher.profile_image %}
+        <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.full_name }}" width="240">
+    {% endif %}
+    <h1>{{ teacher.full_name }}</h1>
+    <p>
+        {% for instrument in teacher.instruments.all %}
+            {{ instrument.name }}{% if not forloop.last %}، {% endif %}
+        {% endfor %}
+    </p>
+    <dl>
+        <dt>تاریخ تولد</dt>
+        <dd>{{ teacher.date_of_birth }}</dd>
+        <dt>محل تولد</dt>
+        <dd>{{ teacher.birth_province }}، {{ teacher.birth_city }}</dd>
+        <dt>تحصیلات</dt>
+        <dd>{{ teacher.education }}</dd>
+    </dl>
+    <p>{{ teacher.biography|linebreaks }}</p>
+</article>
+{% endblock %}

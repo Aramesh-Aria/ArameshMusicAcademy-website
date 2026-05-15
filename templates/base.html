@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'pages:home' %}">خانه</a>
+            <a href="{% url 'teachers:teacher_list' %}">اساتید</a>
+            <a href="{% url 'schedules:schedule' %}">برنامه کلاس‌ها</a>
+            <a href="{% url 'pages:about' %}">درباره ما</a>
+            <a href="{% url 'contact:contact' %}">تماس با ما</a>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

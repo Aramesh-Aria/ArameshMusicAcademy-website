@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}برنامه کلاس‌ها | آموزشگاه موسیقی آرامش{% endblock %}
+
+{% block content %}
+<h1>برنامه کلاس‌ها</h1>
+
+{% for section in weekday_sections %}
+    <section>
+        <h2>{{ section.label }}</h2>
+        {% for session in section.sessions %}
+            <article>
+                <h3>{{ session.course.name }}</h3>
+                <p>{{ session.teacher.full_name }}</p>
+                <p>{{ session.start_time|time:'H:i' }} تا {{ session.end_time|time:'H:i' }}</p>
+                {% if session.capacity %}
+                    <p>ظرفیت: {{ session.capacity }}</p>
+                {% endif %}
+                {% if session.notes %}
+                    <p>{{ session.notes }}</p>
+                {% endif %}
+            </article>
+        {% empty %}
+            <p>کلاسی برای این روز ثبت نشده است.</p>
+        {% endfor %}
+    </section>
+{% endfor %}
+{% endblock %}
