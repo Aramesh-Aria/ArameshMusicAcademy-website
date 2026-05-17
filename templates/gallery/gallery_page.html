@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if current_page %}
+        {{ current_page.title }} | گالری تصاویر
+    {% else %}
+        گالری تصاویر
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<h1>
+    {% if current_page %}
+        {{ current_page.title }}
+    {% else %}
+        گالری تصاویر
+    {% endif %}
+</h1>
+
+{% if breadcrumbs %}
+    <nav aria-label="breadcrumb">
+        <a href="{% url 'gallery:gallery_root' %}">گالری تصاویر</a>
+        {% for page in breadcrumbs %}
+            /
+            <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        {% endfor %}
+    </nav>
+{% endif %}
+
+{% if current_page.description %}
+    <p>{{ current_page.description }}</p>
+{% endif %}
+
+{% if child_pages %}
+    <section>
+        <h2>پوشه‌ها</h2>
+        <ul>
+            {% for page in child_pages %}
+                <li>
+                    <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+
+{% if images %}
+    <section>
+        <h2>تصاویر</h2>
+        {% for image in images %}
+            <article>
+                <img src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" width="240">
+                {% if image.title %}
+                    <h3>{{ image.title }}</h3>
+                {% endif %}
+                {% if image.caption %}
+                    <p>{{ image.caption }}</p>
+                {% endif %}
+            </article>
+        {% endfor %}
+    </section>
+{% elif current_page and not child_pages %}
+    <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
+{% endif %}
+{% endblock %}

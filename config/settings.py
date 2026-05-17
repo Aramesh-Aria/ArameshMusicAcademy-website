@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'teachers',
     'schedules',
     'contact',
+    'gallery',
 ]
 
 MIDDLEWARE = [
