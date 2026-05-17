@@ -35,8 +35,10 @@ class ClassSessionModelTests(TestCase):
             end_time=time(11, 0),
         )
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(ValidationError) as context:
             session.full_clean()
+
+        self.assertIn('ساعت پایان باید بعد از ساعت شروع باشد.', context.exception.message_dict['end_time'])
 
     def test_capacity_must_be_positive_when_set(self):
         session = ClassSession(

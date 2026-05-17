@@ -29,7 +29,15 @@ WEEKDAY_SORT_VALUES = {
 
 
 class Course(models.Model):
-    name = models.CharField('نام کلاس', max_length=120, unique=True)
+    name = models.CharField(
+        'نام کلاس',
+        max_length=120,
+        unique=True,
+        help_text='برای هر کلاس یک نام یکتا وارد کنید.',
+        error_messages={
+            'unique': 'کلاسی با این نام قبلا ثبت شده است.',
+        },
+    )
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 
@@ -48,20 +56,22 @@ class ClassSession(models.Model):
         on_delete=models.PROTECT,
         related_name='class_sessions',
         verbose_name='کلاس',
+        help_text='کلاسی که این جلسه به آن تعلق دارد.',
     )
     teacher = models.ForeignKey(
         'teachers.Teacher',
         on_delete=models.PROTECT,
         related_name='class_sessions',
         verbose_name='استاد',
+        help_text='استادی که این جلسه را برگزار می‌کند.',
     )
-    weekday = models.CharField('روز هفته', max_length=3, choices=Weekday.choices)
+    weekday = models.CharField('روز هفته', max_length=3, choices=Weekday.choices, help_text='روز برگزاری این جلسه را انتخاب کنید.')
     weekday_order = models.PositiveSmallIntegerField('ترتیب روز هفته', default=0, editable=False)
-    start_time = models.TimeField('ساعت شروع')
-    end_time = models.TimeField('ساعت پایان')
-    capacity = models.PositiveIntegerField('ظرفیت', null=True, blank=True)
-    is_active = models.BooleanField('فعال', default=True)
-    notes = models.TextField('توضیحات', blank=True)
+    start_time = models.TimeField('ساعت شروع', help_text='ساعت آغاز جلسه.')
+    end_time = models.TimeField('ساعت پایان', help_text='ساعت پایان جلسه.')
+    capacity = models.PositiveIntegerField('ظرفیت', null=True, blank=True, help_text='در صورت مشخص بودن، ظرفیت این جلسه را وارد کنید.')
+    is_active = models.BooleanField('فعال', default=True, help_text='فقط جلسه‌های فعال در برنامه سایت نمایش داده می‌شوند.')
+    notes = models.TextField('توضیحات', blank=True, help_text='در صورت نیاز توضیح کوتاه درباره این جلسه بنویسید.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 
@@ -77,11 +87,11 @@ class ClassSession(models.Model):
         super().clean()
         if self.start_time and self.end_time and self.end_time <= self.start_time:
             raise ValidationError({
-                'end_time': 'End time must be after start time.',
+                'end_time': 'ساعت پایان باید بعد از ساعت شروع باشد.',
             })
         if self.capacity is not None and self.capacity < 1:
             raise ValidationError({
-                'capacity': 'Capacity must be at least 1.',
+                'capacity': 'ظرفیت باید حداقل ۱ باشد.',
             })
         if not all([self.teacher_id, self.weekday, self.start_time, self.end_time]):
             return
@@ -98,7 +108,7 @@ class ClassSession(models.Model):
 
         if self.is_active and overlapping_sessions.exists():
             raise ValidationError(
-                'This teacher already has an active class session that overlaps this time.'
+                'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
             )
 
     def save(self, *args, **kwargs):

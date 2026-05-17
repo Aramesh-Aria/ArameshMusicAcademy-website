@@ -5,12 +5,15 @@ from django.utils.text import slugify
 
 
 class GalleryPage(models.Model):
-    title = models.CharField('عنوان', max_length=150)
+    title = models.CharField('عنوان', max_length=150, help_text='نامی که در لیست گالری و صفحه نمایش داده می‌شود.')
     slug = models.SlugField(
         'نام در آدرس',
         max_length=150,
         blank=True,
         help_text='اگر خالی بماند، به صورت خودکار از عنوان ساخته می‌شود.',
+        error_messages={
+            'invalid': 'نام در آدرس فقط می‌تواند شامل حروف، عدد، خط فاصله و زیرخط باشد.',
+        },
     )
     parent = models.ForeignKey(
         'self',
@@ -19,12 +22,13 @@ class GalleryPage(models.Model):
         verbose_name='گالری والد',
         null=True,
         blank=True,
+        help_text='برای ساخت زیرگالری، صفحه والد را انتخاب کنید.',
     )
-    description = models.TextField('توضیحات', blank=True)
-    intro_text = models.TextField('متن معرفی', blank=True)
-    cover_image = models.ImageField('تصویر کاور', upload_to='gallery/covers/', blank=True)
-    is_active = models.BooleanField('فعال', default=True)
-    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0)
+    description = models.TextField('توضیحات', blank=True, help_text='توضیح کوتاه مدیریتی یا توضیح عمومی صفحه گالری.')
+    intro_text = models.TextField('متن معرفی', blank=True, help_text='متنی که بالای تصاویر این گالری در سایت نمایش داده می‌شود.')
+    cover_image = models.ImageField('تصویر کاور', upload_to='gallery/covers/', blank=True, help_text='تصویر شاخص این صفحه گالری.')
+    is_active = models.BooleanField('فعال', default=True, help_text='فقط گالری‌های فعال در سایت قابل مشاهده هستند.')
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در لیست گالری‌ها.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 
@@ -91,12 +95,13 @@ class GalleryImage(models.Model):
         on_delete=models.CASCADE,
         related_name='images',
         verbose_name='صفحه گالری',
+        help_text='تصویر به کدام صفحه گالری تعلق دارد.',
     )
-    title = models.CharField('عنوان', max_length=150, blank=True)
-    image = models.ImageField('تصویر', upload_to='gallery/')
-    caption = models.TextField('توضیح تصویر', blank=True)
-    is_active = models.BooleanField('فعال', default=True)
-    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0)
+    title = models.CharField('عنوان', max_length=150, blank=True, help_text='در صورت نیاز برای این تصویر عنوان وارد کنید.')
+    image = models.ImageField('تصویر', upload_to='gallery/', help_text='فایل تصویر را بارگذاری کنید.')
+    caption = models.TextField('توضیح تصویر', blank=True, help_text='متن کوتاه زیر تصویر یا توضیح تکمیلی.')
+    is_active = models.BooleanField('فعال', default=True, help_text='فقط تصاویر فعال در سایت نمایش داده می‌شوند.')
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در گالری.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 

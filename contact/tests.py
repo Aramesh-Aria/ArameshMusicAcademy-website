@@ -39,4 +39,16 @@ class ContactFormTests(TestCase):
         self.assertEqual(form.fields['full_name'].label, 'نام و نام خانوادگی')
         self.assertEqual(form.fields['message'].widget.attrs['placeholder'], 'پیام خود را بنویسید')
 
+    def test_contact_form_invalid_email_uses_persian_message(self):
+        form = ContactForm(data={
+            'full_name': 'Ali Ahmadi',
+            'email': 'invalid-email',
+            'phone': '09120000000',
+            'subject': 'Question',
+            'message': 'I want more information.',
+        })
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('ایمیل وارد شده معتبر نیست.', form.errors['email'])
+
 # Create your tests here.
