@@ -40,6 +40,11 @@ class GalleryPageModelTests(TestCase):
         with self.assertRaises(ValidationError):
             duplicate_page.full_clean()
 
+    def test_slug_is_generated_from_title_when_blank(self):
+        page = GalleryPage.objects.create(title='کنسرت سال ۱۴۰۵', slug='')
+
+        self.assertTrue(page.slug)
+
 
 class GalleryViewTests(TestCase):
     def test_gallery_root_lists_active_top_level_pages(self):

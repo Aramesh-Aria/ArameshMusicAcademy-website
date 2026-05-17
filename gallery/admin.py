@@ -41,12 +41,12 @@ class GalleryPageAdmin(admin.ModelAdmin):
     list_filter = ('is_active', 'parent')
     search_fields = ('title', 'slug', 'description')
     prepopulated_fields = {'slug': ('title',)}
-    readonly_fields = ('slug_path_display', 'created_at', 'updated_at')
+    readonly_fields = ('cover_image_preview', 'slug_path_display', 'created_at', 'updated_at')
     ordering = ('parent__title', 'display_order', 'title')
     inlines = (GalleryImageInline,)
     fieldsets = (
         ('اطلاعات صفحه', {
-            'fields': ('title', 'slug', 'parent', 'description')
+            'fields': ('title', 'slug', 'parent', 'description', 'intro_text', 'cover_image', 'cover_image_preview')
         }),
         ('انتشار', {
             'fields': ('is_active', 'display_order')
@@ -61,6 +61,15 @@ class GalleryPageAdmin(admin.ModelAdmin):
         if not obj.pk:
             return 'بعد از ذخیره ساخته می‌شود.'
         return obj.slug_path
+
+    @admin.display(description='پیش‌نمایش کاور')
+    def cover_image_preview(self, obj):
+        if not obj.cover_image:
+            return 'بدون تصویر'
+        return format_html(
+            '<img src="{}" style="width: 120px; height: 80px; object-fit: cover;" />',
+            obj.cover_image.url,
+        )
 
 
 @admin.register(GalleryImage)

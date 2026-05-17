@@ -31,6 +31,16 @@
     <p>{{ current_page.description }}</p>
 {% endif %}
 
+{% if current_page and current_page.cover_image %}
+    <p>
+        <img src="{{ current_page.cover_image.url }}" alt="{{ current_page.title }}" width="320">
+    </p>
+{% endif %}
+
+{% if current_page and current_page.intro_text %}
+    <p>{{ current_page.intro_text|linebreaks }}</p>
+{% endif %}
+
 {% if child_pages %}
     <section>
         <h2>پوشه‌ها</h2>

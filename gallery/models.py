@@ -1,11 +1,17 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class GalleryPage(models.Model):
     title = models.CharField('عنوان', max_length=150)
-    slug = models.SlugField('نام در آدرس', max_length=150)
+    slug = models.SlugField(
+        'نام در آدرس',
+        max_length=150,
+        blank=True,
+        help_text='اگر خالی بماند، به صورت خودکار از عنوان ساخته می‌شود.',
+    )
     parent = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
@@ -15,6 +21,8 @@ class GalleryPage(models.Model):
         blank=True,
     )
     description = models.TextField('توضیحات', blank=True)
+    intro_text = models.TextField('متن معرفی', blank=True)
+    cover_image = models.ImageField('تصویر کاور', upload_to='gallery/covers/', blank=True)
     is_active = models.BooleanField('فعال', default=True)
     display_order = models.PositiveIntegerField('ترتیب نمایش', default=0)
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
@@ -36,13 +44,16 @@ class GalleryPage(models.Model):
 
     def clean(self):
         super().clean()
+        if not self.slug and self.title:
+            self.slug = slugify(self.title, allow_unicode=True)
+
         if self.pk is not None and self.parent_id == self.pk:
-            raise ValidationError({'parent': 'A gallery page cannot be its own parent.'})
+            raise ValidationError({'parent': 'یک صفحه گالری نمی‌تواند والد خودش باشد.'})
 
         parent = self.parent
         while parent:
             if parent.pk == self.pk:
-                raise ValidationError({'parent': 'A gallery page cannot use one of its children as parent.'})
+                raise ValidationError({'parent': 'یک صفحه گالری نمی‌تواند یکی از فرزندان خودش را به عنوان والد انتخاب کند.'})
             parent = parent.parent
 
         duplicate_slug_query = GalleryPage.objects.filter(
@@ -53,8 +64,13 @@ class GalleryPage(models.Model):
             duplicate_slug_query = duplicate_slug_query.exclude(pk=self.pk)
         if self.slug and duplicate_slug_query.exists():
             raise ValidationError({
-                'slug': 'This address name is already used in this gallery level. Choose a different one.',
+                'slug': 'این نام در آدرس قبلا در همین سطح از گالری استفاده شده است. نام دیگری انتخاب کنید.',
             })
+
+    def save(self, *args, **kwargs):
+        if not self.slug and self.title:
+            self.slug = slugify(self.title, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     @property
     def slug_path(self):
@@ -93,5 +109,3 @@ class GalleryImage(models.Model):
         if self.title:
             return self.title
         return f'تصویر {self.gallery_page}'
-
-# Create your models here.

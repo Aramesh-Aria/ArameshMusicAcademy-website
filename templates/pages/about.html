@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}درباره ما | آموزشگاه موسیقی آرامش{% endblock %}
+{% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 
 {% block content %}
-<h1>درباره ما</h1>
-<p>محتوای این صفحه بعدا هنگام انتخاب قالب و آماده‌سازی متن نهایی تکمیل می‌شود.</p>
+<h1>{{ page_title }}</h1>
+<p>{{ page_body|linebreaks }}</p>
 {% endblock %}

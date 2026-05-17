@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}خانه | آموزشگاه موسیقی آرامش{% endblock %}
+{% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 
 {% block content %}
-<h1>آموزشگاه موسیقی آرامش</h1>
-<p>این صفحه فعلا به عنوان نقطه شروع بک‌اند و معماری Django نگه داشته شده است.</p>
+<h1>{{ page_title }}</h1>
+<p>{{ page_body|linebreaks }}</p>
 {% endblock %}
