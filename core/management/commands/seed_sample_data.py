@@ -1,11 +1,11 @@
 from datetime import time
 from io import BytesIO
 
-import jdatetime
 from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
 from PIL import Image, ImageDraw
 
+from gallery.models import GalleryImage, GalleryPage
 from schedules.models import ClassSession, Course, Weekday
 from teachers.models import Instrument, Teacher
 
@@ -18,6 +18,7 @@ class Command(BaseCommand):
         teachers = self.create_teachers(instruments)
         courses = self.create_courses()
         self.create_class_sessions(courses, teachers)
+        self.create_gallery_sample_data()
 
         self.stdout.write(self.style.SUCCESS('Sample academy data is ready.'))
 
@@ -34,10 +35,6 @@ class Command(BaseCommand):
                 'first_name': 'سارا',
                 'last_name': 'کریمی',
                 'instruments': ['پیانو'],
-                'date_of_birth': jdatetime.date(1365, 2, 12),
-                'birth_province': 'تهران',
-                'birth_city': 'تهران',
-                'education': 'کارشناسی ارشد نوازندگی پیانو',
                 'biography': 'مدرس پیانو با تمرکز بر تکنیک، سلفژ و اجرای کلاسیک.',
                 'display_order': 1,
                 'image_color': '#6A8D73',
@@ -46,10 +43,6 @@ class Command(BaseCommand):
                 'first_name': 'رضا',
                 'last_name': 'مرادی',
                 'instruments': ['گیتار'],
-                'date_of_birth': jdatetime.date(1360, 7, 5),
-                'birth_province': 'فارس',
-                'birth_city': 'شیراز',
-                'education': 'کارشناسی موسیقی',
                 'biography': 'مدرس گیتار کلاسیک و پاپ با تجربه اجرای صحنه‌ای.',
                 'display_order': 2,
                 'image_color': '#8E6C88',
@@ -58,10 +51,6 @@ class Command(BaseCommand):
                 'first_name': 'نگار',
                 'last_name': 'احمدی',
                 'instruments': ['ویولن', 'آواز'],
-                'date_of_birth': jdatetime.date(1368, 11, 20),
-                'birth_province': 'اصفهان',
-                'birth_city': 'اصفهان',
-                'education': 'کارشناسی ارشد آهنگسازی',
                 'biography': 'مدرس ویولن و آواز با رویکرد مرحله‌ای برای هنرجویان مبتدی.',
                 'display_order': 3,
                 'image_color': '#C08457',
@@ -91,14 +80,14 @@ class Command(BaseCommand):
 
     def create_class_sessions(self, courses, teachers):
         session_data = [
-            ('کلاس پیانو', 'سارا کریمی', Weekday.SATURDAY, time(9, 0), time(10, 0), 8),
-            ('کلاس گیتار', 'رضا مرادی', Weekday.SATURDAY, time(10, 0), time(11, 0), 10),
-            ('کلاس ویولن', 'نگار احمدی', Weekday.SUNDAY, time(9, 0), time(10, 0), 6),
-            ('کلاس آواز', 'نگار احمدی', Weekday.MONDAY, time(11, 0), time(12, 0), 8),
-            ('کلاس پیانو', 'سارا کریمی', Weekday.WEDNESDAY, time(16, 0), time(17, 0), 8),
+            ('کلاس پیانو', 'سارا کریمی', Weekday.SATURDAY, time(9, 0), time(10, 0)),
+            ('کلاس گیتار', 'رضا مرادی', Weekday.SATURDAY, time(10, 0), time(11, 0)),
+            ('کلاس ویولن', 'نگار احمدی', Weekday.SUNDAY, time(9, 0), time(10, 0)),
+            ('کلاس آواز', 'نگار احمدی', Weekday.MONDAY, time(11, 0), time(12, 0)),
+            ('کلاس پیانو', 'سارا کریمی', Weekday.WEDNESDAY, time(16, 0), time(17, 0)),
         ]
 
-        for course_name, teacher_name, weekday, start_time, end_time, capacity in session_data:
+        for course_name, teacher_name, weekday, start_time, end_time in session_data:
             ClassSession.objects.update_or_create(
                 course=courses[course_name],
                 teacher=teachers[teacher_name],
@@ -106,7 +95,6 @@ class Command(BaseCommand):
                 start_time=start_time,
                 defaults={
                     'end_time': end_time,
-                    'capacity': capacity,
                     'is_active': True,
                     'notes': '',
                 },
@@ -128,3 +116,135 @@ class Command(BaseCommand):
             ContentFile(image_buffer.getvalue()),
             save=True,
         )
+
+    def create_gallery_sample_data(self):
+        page_data = [
+            {
+                'title': 'گالری تصاویر',
+                'slug': 'gallery-root',
+                'parent': None,
+                'description': 'نمونه ساختار اولیه برای گالری سایت.',
+                'intro_text': 'این بخش شامل پوشه‌های نمونه برای شروع مدیریت گالری است.',
+                'display_order': 1,
+                'cover_color': '#7D2A1D',
+            },
+            {
+                'title': 'کنسرت‌های آموزشگاه',
+                'slug': 'academy-concerts',
+                'parent_slug': 'gallery-root',
+                'description': 'تصاویر اجراها و برنامه‌های داخلی آموزشگاه.',
+                'intro_text': 'عکس‌های مربوط به اجراهای هنرجویان و اساتید.',
+                'display_order': 1,
+                'cover_color': '#A14A28',
+            },
+            {
+                'title': 'کنسرت سال ۱۴۰۴',
+                'slug': 'concert-1404',
+                'parent_slug': 'academy-concerts',
+                'description': 'تصاویر منتخب از کنسرت سال ۱۴۰۴.',
+                'intro_text': 'نمونه‌ای از تصاویر رویداد سال ۱۴۰۴.',
+                'display_order': 1,
+                'cover_color': '#C76C3A',
+            },
+            {
+                'title': 'آموزشگاه و متفرقه',
+                'slug': 'academy-misc',
+                'parent_slug': 'gallery-root',
+                'description': 'تصاویر محیط آموزشگاه و برنامه‌های عمومی.',
+                'intro_text': 'عکس‌هایی از کلاس‌ها، محیط و رویدادهای غیررسمی.',
+                'display_order': 2,
+                'cover_color': '#546A7B',
+            },
+        ]
+
+        pages_by_slug = {}
+        for data in page_data:
+            cover_color = data.pop('cover_color')
+            parent_slug = data.pop('parent_slug', None)
+            parent = pages_by_slug.get(parent_slug) if parent_slug else None
+            page, _ = GalleryPage.objects.update_or_create(
+                slug=data['slug'],
+                parent=parent,
+                defaults={
+                    'title': data['title'],
+                    'description': data['description'],
+                    'intro_text': data['intro_text'],
+                    'display_order': data['display_order'],
+                    'is_active': True,
+                },
+            )
+            self.ensure_gallery_cover_image(page, cover_color)
+            pages_by_slug[data['slug']] = page
+
+        image_data = [
+            {
+                'page_slug': 'concert-1404',
+                'title': 'اجرای گروهی هنرجویان',
+                'caption': 'نمونه تصویر برای اجرای گروهی در سالن آموزشگاه.',
+                'display_order': 1,
+                'color': '#C08457',
+            },
+            {
+                'page_slug': 'concert-1404',
+                'title': 'پشت صحنه کنسرت',
+                'caption': 'آماده‌سازی هنرجویان قبل از اجرا.',
+                'display_order': 2,
+                'color': '#8E6C88',
+            },
+            {
+                'page_slug': 'academy-misc',
+                'title': 'فضای کلاس پیانو',
+                'caption': 'نمونه تصویر از فضای داخلی کلاس‌ها.',
+                'display_order': 1,
+                'color': '#6A8D73',
+            },
+        ]
+
+        for data in image_data:
+            page = pages_by_slug[data['page_slug']]
+            image, _ = GalleryImage.objects.get_or_create(
+                gallery_page=page,
+                title=data['title'],
+                defaults={
+                    'caption': data['caption'],
+                    'display_order': data['display_order'],
+                    'is_active': True,
+                },
+            )
+            image.caption = data['caption']
+            image.display_order = data['display_order']
+            image.is_active = True
+            self.ensure_gallery_image_file(image, data['color'])
+
+    def ensure_gallery_cover_image(self, page, color):
+        if page.cover_image:
+            return
+
+        image_buffer = self.build_labeled_image(page.title, color, size=(960, 420))
+        page.cover_image.save(
+            f'gallery-cover-{page.slug}.jpg',
+            ContentFile(image_buffer.getvalue()),
+            save=True,
+        )
+
+    def ensure_gallery_image_file(self, image, color):
+        if image.image:
+            image.save(update_fields=['caption', 'display_order', 'is_active', 'updated_at'])
+            return
+
+        label = image.title or image.gallery_page.title
+        image_buffer = self.build_labeled_image(label, color, size=(960, 640))
+        image.image.save(
+            f'gallery-image-{image.gallery_page.slug}-{image.display_order}.jpg',
+            ContentFile(image_buffer.getvalue()),
+            save=True,
+        )
+
+    def build_labeled_image(self, label, color, size):
+        image = Image.new('RGB', size, color)
+        draw = ImageDraw.Draw(image)
+        short_label = label[:24]
+        draw.text((40, 40), short_label, fill='white')
+        image_buffer = BytesIO()
+        image.save(image_buffer, format='JPEG')
+        return image_buffer

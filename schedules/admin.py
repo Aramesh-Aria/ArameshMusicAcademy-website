@@ -19,7 +19,6 @@ class ClassSessionAdmin(admin.ModelAdmin):
         'weekday_order',
         'start_time',
         'end_time',
-        'capacity',
         'is_active',
         'updated_at',
     )

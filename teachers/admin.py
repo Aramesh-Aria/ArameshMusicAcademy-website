@@ -1,7 +1,5 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from django_jalali.admin.filters import JDateFieldListFilter
-import django_jalali.admin as jadmin  # noqa: F401
 
 from .models import Instrument, Teacher
 
@@ -19,8 +17,6 @@ class TeacherAdmin(admin.ModelAdmin):
         'profile_image_preview',
         'full_name',
         'instrument_list',
-        'birth_place',
-        'birth_city',
         'is_active',
         'display_order',
         'updated_at',
@@ -28,11 +24,8 @@ class TeacherAdmin(admin.ModelAdmin):
     list_filter = (
         'is_active',
         'instruments',
-        'birth_province',
-        'birth_city',
-        ('date_of_birth', JDateFieldListFilter),
     )
-    search_fields = ('first_name', 'last_name', 'education', 'biography')
+    search_fields = ('first_name', 'last_name', 'biography')
     filter_horizontal = ('instruments',)
     readonly_fields = ('profile_image_preview', 'created_at', 'updated_at')
     ordering = ('display_order', 'last_name', 'first_name')
@@ -41,15 +34,12 @@ class TeacherAdmin(admin.ModelAdmin):
             'fields': (
                 'first_name',
                 'last_name',
-                'date_of_birth',
-                'birth_province',
-                'birth_city',
                 'profile_image',
                 'profile_image_preview',
             )
         }),
         ('پروفایل آموزشی', {
-            'fields': ('instruments', 'education', 'biography')
+            'fields': ('instruments', 'biography')
         }),
         ('انتشار', {
             'fields': ('is_active', 'display_order')
@@ -62,10 +52,6 @@ class TeacherAdmin(admin.ModelAdmin):
     @admin.display(description='سازها')
     def instrument_list(self, obj):
         return ', '.join(instrument.name for instrument in obj.instruments.all())
-
-    @admin.display(description='محل تولد')
-    def birth_place(self, obj):
-        return f'{obj.birth_province}، {obj.birth_city}'
 
     @admin.display(description='تصویر')
     def profile_image_preview(self, obj):

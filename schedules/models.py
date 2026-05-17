@@ -69,7 +69,6 @@ class ClassSession(models.Model):
     weekday_order = models.PositiveSmallIntegerField('ترتیب روز هفته', default=0, editable=False)
     start_time = models.TimeField('ساعت شروع', help_text='ساعت آغاز جلسه.')
     end_time = models.TimeField('ساعت پایان', help_text='ساعت پایان جلسه.')
-    capacity = models.PositiveIntegerField('ظرفیت', null=True, blank=True, help_text='در صورت مشخص بودن، ظرفیت این جلسه را وارد کنید.')
     is_active = models.BooleanField('فعال', default=True, help_text='فقط جلسه‌های فعال در برنامه سایت نمایش داده می‌شوند.')
     notes = models.TextField('توضیحات', blank=True, help_text='در صورت نیاز توضیح کوتاه درباره این جلسه بنویسید.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
@@ -88,10 +87,6 @@ class ClassSession(models.Model):
         if self.start_time and self.end_time and self.end_time <= self.start_time:
             raise ValidationError({
                 'end_time': 'ساعت پایان باید بعد از ساعت شروع باشد.',
-            })
-        if self.capacity is not None and self.capacity < 1:
-            raise ValidationError({
-                'capacity': 'ظرفیت باید حداقل ۱ باشد.',
             })
         if not all([self.teacher_id, self.weekday, self.start_time, self.end_time]):
             return

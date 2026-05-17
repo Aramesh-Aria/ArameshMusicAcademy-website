@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-from django_jalali.db import models as jmodels
 
 
 class Instrument(models.Model):
@@ -26,8 +25,6 @@ class Instrument(models.Model):
 
 
 class Teacher(models.Model):
-    objects = jmodels.jManager()
-
     first_name = models.CharField('نام', max_length=100, help_text='نام استاد را وارد کنید.')
     last_name = models.CharField('نام خانوادگی', max_length=100, help_text='نام خانوادگی استاد را وارد کنید.')
     instruments = models.ManyToManyField(
@@ -36,10 +33,6 @@ class Teacher(models.Model):
         verbose_name='سازها',
         help_text='یک یا چند ساز که این استاد تدریس می‌کند را انتخاب کنید.',
     )
-    date_of_birth = jmodels.jDateField('تاریخ تولد', help_text='تاریخ تولد را به صورت شمسی وارد کنید.')
-    birth_province = models.CharField('استان محل تولد', max_length=100, help_text='استان محل تولد استاد.')
-    birth_city = models.CharField('شهر محل تولد', max_length=100, help_text='شهر محل تولد استاد.')
-    education = models.CharField('تحصیلات', max_length=255, help_text='مدرک یا سابقه آموزشی استاد.')
     biography = models.TextField('بیوگرافی', help_text='توضیح کوتاه یا کامل درباره سابقه و فعالیت‌های استاد.')
     profile_image = models.ImageField('تصویر پروفایل', upload_to='teachers/', help_text='تصویر پرتره استاد را بارگذاری کنید.')
     is_active = models.BooleanField('فعال', default=True, help_text='فقط اساتید فعال در سایت نمایش داده می‌شوند.')

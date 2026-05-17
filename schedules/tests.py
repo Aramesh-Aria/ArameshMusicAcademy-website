@@ -1,6 +1,5 @@
 from datetime import time
 
-import jdatetime
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
@@ -16,10 +15,6 @@ class ClassSessionModelTests(TestCase):
         self.teacher = Teacher.objects.create(
             first_name='Sara',
             last_name='Karimi',
-            date_of_birth=jdatetime.date(1363, 1, 1),
-            birth_province='Tehran',
-            birth_city='Tehran',
-            education='Music MA',
             biography='Biography',
             profile_image='teachers/sara.jpg',
         )
@@ -39,19 +34,6 @@ class ClassSessionModelTests(TestCase):
             session.full_clean()
 
         self.assertIn('ساعت پایان باید بعد از ساعت شروع باشد.', context.exception.message_dict['end_time'])
-
-    def test_capacity_must_be_positive_when_set(self):
-        session = ClassSession(
-            course=self.course,
-            teacher=self.teacher,
-            weekday=Weekday.SATURDAY,
-            start_time=time(12, 0),
-            end_time=time(13, 0),
-            capacity=0,
-        )
-
-        with self.assertRaises(ValidationError):
-            session.full_clean()
 
     def test_active_sessions_for_same_teacher_cannot_overlap(self):
         ClassSession.objects.create(
@@ -101,10 +83,6 @@ class ScheduleViewTests(TestCase):
         self.teacher = Teacher.objects.create(
             first_name='Reza',
             last_name='Moradi',
-            date_of_birth=jdatetime.date(1359, 2, 11),
-            birth_province='Fars',
-            birth_city='Shiraz',
-            education='Music BA',
             biography='Biography',
             profile_image='teachers/reza.jpg',
         )
