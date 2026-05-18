@@ -89,21 +89,23 @@
               <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
               <div class="contact-details">
                 <span class="method-label">آدرس</span>
-                <p>تهران، خیابان نمونه، آموزشگاه موسیقی آرامش</p>
+                <p>{{ site_address }}</p>
               </div>
             </div>
             <div class="contact-method">
               <div class="contact-icon"><i class="bi bi-envelope"></i></div>
               <div class="contact-details">
                 <span class="method-label">ایمیل</span>
-                <p dir="ltr">info@arameshmusicacademy.com</p>
+                <p dir="ltr">{{ site_email }}</p>
               </div>
             </div>
             <div class="contact-method">
               <div class="contact-icon"><i class="bi bi-telephone"></i></div>
               <div class="contact-details">
                 <span class="method-label">تلفن</span>
-                <p dir="ltr">+98 21 1234 5678</p>
+                {% for phone in site_phones %}
+                  <p dir="ltr">{{ phone }}</p>
+                {% endfor %}
               </div>
             </div>
             <div class="contact-method">

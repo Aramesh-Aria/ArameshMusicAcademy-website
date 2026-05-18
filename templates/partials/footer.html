@@ -4,10 +4,14 @@
       <div class="col-lg-4 col-md-6 footer-about">
         <a href="{% url 'pages:home' %}" class="d-flex align-items-center"><span class="sitename">آموزشگاه موسیقی آرامش</span></a>
         <div class="footer-contact pt-3">
-          <p>تهران، خیابان نمونه</p>
+          <p>{{ site_address }}</p>
           <p>ایران</p>
-          <p class="mt-3"><strong>تلفن:</strong> <span dir="ltr">+98 21 1234 5678</span></p>
-          <p><strong>ایمیل:</strong> <span dir="ltr">info@arameshmusicacademy.com</span></p>
+          <p class="mt-3"><strong>تلفن:</strong> 
+            {% for phone in site_phones %}
+              <span dir="ltr">{{ phone }}</span>{% if not forloop.last %} - {% endif %}
+            {% endfor %}
+          </p>
+          <p><strong>ایمیل:</strong> <span dir="ltr">{{ site_email }}</span></p>
         </div>
       </div>
       <div class="col-lg-2 col-md-3 footer-links">
@@ -39,6 +43,6 @@
     </div>
   </div>
   <div class="container copyright text-center mt-4">
-    <p>© <span>کلیه حقوق برای</span> <strong class="px-1 sitename">آموزشگاه موسیقی آرامش</strong> <span>محفوظ است</span></p>
+    <p>© {{ current_year }} <span>کلیه حقوق برای</span> <strong class="px-1 sitename">آموزشگاه موسیقی آرامش</strong> <span>محفوظ است</span></p>
   </div>
 </footer>

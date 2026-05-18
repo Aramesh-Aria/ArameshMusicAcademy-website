@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'gallery.context_processors.gallery_nav_tree',
+                'core.context_processors.site_info',
             ],
         },
     },
@@ -134,3 +135,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Site Information
+SITE_EMAIL = 'info@arameshmusicacademy.com'
+SITE_PHONES = ['+98 21 1234 5678', '+98 21 8765 4321']
+SITE_ADDRESS = 'تهران، خیابان نمونه، آموزشگاه موسیقی آرامش'
