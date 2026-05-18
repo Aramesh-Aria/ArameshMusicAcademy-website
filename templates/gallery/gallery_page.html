@@ -1,75 +1,105 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}
-    {% if current_page %}
-        {{ current_page.title }} | گالری تصاویر
-    {% else %}
-        گالری تصاویر
-    {% endif %}
+{% block title %}{% if current_page %}{{ current_page.title }} | گالری تصاویر{% else %}گالری تصاویر{% endif %}{% endblock %}
+
+{% block page_header %}
+<div class="page-title" data-aos="fade">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">{% if current_page %}{{ current_page.title }}{% else %}گالری تصاویر{% endif %}</h1>
+    <nav class="breadcrumbs">
+      <ol>
+        <li><a href="{% url 'pages:home' %}">خانه</a></li>
+        <li><a href="{% url 'gallery:gallery_root' %}">گالری</a></li>
+        {% for page in breadcrumbs %}
+          {% if forloop.last %}
+            <li class="current">{{ page.title }}</li>
+          {% else %}
+            <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+          {% endif %}
+        {% endfor %}
+      </ol>
+    </nav>
+  </div>
+</div>
 {% endblock %}
 
 {% block content %}
-<h1>
-    {% if current_page %}
-        {{ current_page.title }}
-    {% else %}
-        گالری تصاویر
-    {% endif %}
-</h1>
+<section id="portfolio" class="portfolio section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>گالری</h2>
+    <p>مرور تصاویر و رویدادها</p>
+  </div>
 
-{% if breadcrumbs %}
-    <nav aria-label="breadcrumb">
-        <a href="{% url 'gallery:gallery_root' %}">گالری تصاویر</a>
-        {% for page in breadcrumbs %}
-            /
-            <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+  <div class="container" data-aos="fade-up">
+    {% if current_page and current_page.intro_text %}<p>{{ current_page.intro_text|linebreaks }}</p>{% endif %}
+
+    <div class="row gy-4 portfolio-grid">
+      {% if child_pages %}
+        {% for page in child_pages %}
+        <div class="col-lg-4 col-md-6 portfolio-item">
+          <div class="portfolio-card">
+            <div class="image-container">
+              <a href="{{ page.get_absolute_url }}" aria-label="ورود به گالری {{ page.title }}">
+                {% if page.cover_image %}
+                  <img src="{{ page.cover_image.url }}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
+                {% else %}
+                  <img src="{% static 'assets/img/portfolio/portfolio-5.webp' %}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
+                {% endif %}
+              </a>
+              <div class="overlay">
+                <div class="overlay-content">
+                  {% if page.cover_image %}
+                  <a href="{{ page.cover_image.url }}" class="glightbox zoom-link" title="{{ page.title }}">
+                    <i class="bi bi-zoom-in"></i>
+                  </a>
+                  {% endif %}
+                  <a href="{{ page.get_absolute_url }}" class="details-link" title="مشاهده گالری">
+                    <i class="bi bi-arrow-left"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="content">
+              <h3>{{ page.title }}</h3>
+              <p>{{ page.description|default:'برای مشاهده تصاویر این بخش وارد شوید.'|truncatechars:70 }}</p>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-    </nav>
-{% endif %}
+      {% endif %}
 
-{% if current_page.description %}
-    <p>{{ current_page.description }}</p>
-{% endif %}
-
-{% if current_page and current_page.cover_image %}
-    <p>
-        <img src="{{ current_page.cover_image.url }}" alt="{{ current_page.title }}" width="320">
-    </p>
-{% endif %}
-
-{% if current_page and current_page.intro_text %}
-    <p>{{ current_page.intro_text|linebreaks }}</p>
-{% endif %}
-
-{% if child_pages %}
-    <section>
-        <h2>پوشه‌ها</h2>
-        <ul>
-            {% for page in child_pages %}
-                <li>
-                    <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </section>
-{% endif %}
-
-{% if images %}
-    <section>
-        <h2>تصاویر</h2>
+      {% if images %}
         {% for image in images %}
-            <article>
-                <img src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" width="240">
-                {% if image.title %}
-                    <h3>{{ image.title }}</h3>
-                {% endif %}
-                {% if image.caption %}
-                    <p>{{ image.caption }}</p>
-                {% endif %}
-            </article>
+        <div class="col-lg-4 col-md-6 portfolio-item">
+          <div class="portfolio-card">
+            <div class="image-container">
+              <img src="{{ image.image.url }}" class="img-fluid" alt="{{ image.title|default:current_page.title }}" loading="lazy">
+              <div class="overlay">
+                <div class="overlay-content">
+                  <a
+                    href="{{ image.image.url }}"
+                    class="glightbox zoom-link"
+                    data-gallery="gallery-preview"
+                    title="{{ image.title|default:current_page.title }}">
+                    <i class="bi bi-zoom-in"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="content">
+              <h3>{{ image.title|default:current_page.title }}</h3>
+              <p>{{ image.caption|default:'برای مشاهده بزرگ‌تر روی دکمه پیش‌نمایش کلیک کنید.'|truncatechars:80 }}</p>
+            </div>
+          </div>
+        </div>
         {% endfor %}
-    </section>
-{% elif current_page and not child_pages %}
-    <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
-{% endif %}
+      {% elif current_page and not child_pages %}
+      <div class="col-12">
+      <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
 {% endblock %}

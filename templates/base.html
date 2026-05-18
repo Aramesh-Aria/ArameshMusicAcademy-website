@@ -1,23 +1,61 @@
-<!doctype html>
+{% load static %}
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
+
+    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+    <style>
+        :root { --default-font: "Vazirmatn", sans-serif; }
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        body { position: relative; }
+        img, video, iframe { max-width: 100%; }
+        .navmenu a.active { color: var(--accent-color); }
+        .form-error { color: #b42318; font-size: 0.9rem; margin-top: 4px; display: block; }
+    </style>
+    {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <header>
-        <nav>
-            <a href="{% url 'pages:home' %}">خانه</a>
-            <a href="{% url 'teachers:teacher_list' %}">اساتید</a>
-            <a href="{% url 'schedules:schedule' %}">برنامه کلاس‌ها</a>
-            <a href="{% url 'gallery:gallery_root' %}">گالری تصاویر</a>
-            <a href="{% url 'pages:about' %}">درباره ما</a>
-            <a href="{% url 'contact:contact' %}">تماس با ما</a>
-        </nav>
-    </header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<body class="{% block body_class %}starter-page-page{% endblock %}">
+{% include 'partials/header.html' %}
+
+<main class="main">
+  {% block page_header %}{% endblock %}
+  {% block content %}{% endblock %}
+</main>
+
+{% include 'partials/footer.html' %}
+
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+<div id="preloader"><div></div><div></div><div></div><div></div></div>
+
+<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+<script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+<script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+<script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+<script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+<script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+<script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+<script src="{% static 'assets/js/main.js' %}"></script>
+{% block page_specific_js %}{% endblock %}
 </body>
 </html>

@@ -1,0 +1,44 @@
+<footer id="footer" class="footer light-background">
+  <div class="container footer-top">
+    <div class="row gy-4">
+      <div class="col-lg-4 col-md-6 footer-about">
+        <a href="{% url 'pages:home' %}" class="d-flex align-items-center"><span class="sitename">آموزشگاه موسیقی آرامش</span></a>
+        <div class="footer-contact pt-3">
+          <p>تهران، خیابان نمونه</p>
+          <p>ایران</p>
+          <p class="mt-3"><strong>تلفن:</strong> <span dir="ltr">+98 21 1234 5678</span></p>
+          <p><strong>ایمیل:</strong> <span dir="ltr">info@arameshmusicacademy.com</span></p>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-3 footer-links">
+        <h4>دسترسی سریع</h4>
+        <ul>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'pages:home' %}">خانه</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'pages:about' %}">درباره ما</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'teachers:teacher_list' %}">اساتید</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'contact:contact' %}">تماس با ما</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-2 col-md-3 footer-links">
+        <h4>دوره‌ها</h4>
+        <ul>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">پیانو</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">گیتار</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">ویولن</a></li>
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">آواز</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4 col-md-12">
+        <h4>شبکه‌های اجتماعی</h4>
+        <p>برای اطلاع از برنامه کلاس‌ها و رویدادهای جدید، صفحات ما را دنبال کنید.</p>
+            <div class="social-links d-flex">
+            <a href=""><i class="bi bi-telegram"></i></a>
+            <a href=""><i class="bi bi-instagram"></i></a>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="container copyright text-center mt-4">
+    <p>© <span>کلیه حقوق برای</span> <strong class="px-1 sitename">آموزشگاه موسیقی آرامش</strong> <span>محفوظ است</span></p>
+  </div>
+</footer>

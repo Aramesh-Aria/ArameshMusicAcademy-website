@@ -1,0 +1,23 @@
+<nav id="navmenu" class="navmenu">
+  <ul>
+    <li><a href="{% url 'pages:home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">خانه</a></li>
+    <li><a href="{% url 'pages:about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">درباره ما</a></li>
+    <li class="dropdown">
+      <a href="{% url 'gallery:gallery_root' %}" class="{% if request.resolver_match.namespace == 'gallery' %}active{% endif %}">
+        <span>گالری</span> <i class="bi bi-chevron-down toggle-dropdown"></i>
+      </a>
+      <ul>
+        <li><a href="{% url 'gallery:gallery_root' %}">همه گالری‌ها</a></li>
+        {% for node in gallery_nav_tree %}
+          {% include 'partials/gallery_dropdown_item.html' with node=node %}
+        {% empty %}
+          <li><a href="{% url 'gallery:gallery_root' %}">گالری خالی است</a></li>
+        {% endfor %}
+      </ul>
+    </li>
+    <li><a href="{% url 'teachers:teacher_list' %}" class="{% if request.resolver_match.namespace == 'teachers' %}active{% endif %}">اساتید</a></li>
+    <li><a href="{% url 'schedules:schedule' %}" class="{% if request.resolver_match.namespace == 'schedules' %}active{% endif %}">برنامه کلاس‌ها</a></li>
+    <li><a href="{% url 'contact:contact' %}" class="{% if request.resolver_match.namespace == 'contact' %}active{% endif %}">تماس با ما</a></li>
+  </ul>
+  <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+</nav>

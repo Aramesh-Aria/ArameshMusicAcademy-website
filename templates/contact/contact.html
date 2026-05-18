@@ -2,11 +2,139 @@
 
 {% block title %}تماس با ما | آموزشگاه موسیقی آرامش{% endblock %}
 
+{% block page_header %}
+<div class="page-title" data-aos="fade">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">تماس با ما</h1>
+    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">تماس با ما</li></ol></nav>
+  </div>
+</div>
+{% endblock %}
+
 {% block content %}
-<h1>تماس با ما</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">ارسال پیام</button>
-</form>
+<section id="contact" class="contact section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>تماس</h2>
+    <p>نیاز به راهنمایی دارید؟ با ما در ارتباط باشید</p>
+  </div>
+
+  <div class="container" data-aos="fade-up" data-aos-delay="100">
+    <div class="row align-items-stretch g-4">
+      <div class="col-lg-7 order-lg-1 order-2" data-aos="fade-right" data-aos-delay="200">
+        <div class="contact-form-container">
+          <div class="form-intro">
+            <h2>گفت‌وگو را شروع کنیم</h2>
+            <p>برای دریافت مشاوره ثبت‌نام، انتخاب مسیر آموزشی یا هماهنگی کلاس خصوصی، فرم زیر را تکمیل کنید.</p>
+          </div>
+
+          <form method="post" class="contact-form" novalidate>
+            {% csrf_token %}
+            
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger mb-4">
+                {% for error in form.non_field_errors %}
+                  {{ error }}
+                {% endfor %}
+              </div>
+            {% endif %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-field">
+                  {{ form.full_name }}
+                  {% if form.full_name.errors %}<span class="form-error">{{ form.full_name.errors|striptags }}</span>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-field">
+                  {{ form.email }}
+                  {% if form.email.errors %}<span class="form-error">{{ form.email.errors|striptags }}</span>{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-field">
+                  {{ form.phone }}
+                  {% if form.phone.errors %}<span class="form-error">{{ form.phone.errors|striptags }}</span>{% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-field">
+                  {{ form.subject }}
+                  {% if form.subject.errors %}<span class="form-error">{{ form.subject.errors|striptags }}</span>{% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div class="form-field message-field">
+              {{ form.message }}
+              {% if form.message.errors %}<span class="form-error">{{ form.message.errors|striptags }}</span>{% endif %}
+            </div>
+
+            <button type="submit" class="send-button">ارسال پیام <span class="button-arrow">←</span></button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-5 order-lg-2 order-1" data-aos="fade-left" data-aos-delay="300">
+        <div class="contact-sidebar">
+          <div class="contact-header">
+            <h3>Get in Touch</h3>
+            <p>تیم آموزشگاه برای پاسخ‌گویی به سوالات شما درباره دوره‌ها، سطح‌بندی و زمان‌بندی کلاس‌ها آماده است.</p>
+          </div>
+
+          <div class="contact-methods">
+            <div class="contact-method">
+              <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
+              <div class="contact-details">
+                <span class="method-label">آدرس</span>
+                <p>تهران، خیابان نمونه، آموزشگاه موسیقی آرامش</p>
+              </div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-icon"><i class="bi bi-envelope"></i></div>
+              <div class="contact-details">
+                <span class="method-label">ایمیل</span>
+                <p dir="ltr">info@arameshmusicacademy.com</p>
+              </div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-icon"><i class="bi bi-telephone"></i></div>
+              <div class="contact-details">
+                <span class="method-label">تلفن</span>
+                <p dir="ltr">+98 21 1234 5678</p>
+              </div>
+            </div>
+            <div class="contact-method">
+              <div class="contact-icon"><i class="bi bi-clock"></i></div>
+              <div class="contact-details">
+                <span class="method-label">ساعت پاسخ‌گویی</span>
+                <p>شنبه تا چهارشنبه: ۹ تا ۱۸<br>پنج‌شنبه: ۱۰ تا ۱۴</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="connect-section">
+            <span class="connect-label">موقعیت آموزشگاه</span>
+            <div class="ratio ratio-4x3 rounded-3 overflow-hidden border">
+              <iframe
+                src="https://www.google.com/maps?q=Aramesh%20Music%20Academy%2C%2035.7457756%2C51.331922&hl=fa&z=17&output=embed"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="موقعیت آموزشگاه موسیقی آرامش"></iframe>
+            </div>
+            <a
+              href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z/data=!3m1!4b1!4m6!3m5!1s0x3f8dfd180b638fef:0x23f699b845bbd465!8m2!3d35.7457756!4d51.331922!16s%2Fg%2F11jgdggtl1?entry=ttu"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="send-button d-inline-flex align-items-center mt-3">
+              باز کردن مسیر در نقشه
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

@@ -2,7 +2,26 @@
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 
+{% block page_header %}
+<div class="page-title" data-aos="fade">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">{{ page_title }}</h1>
+    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">درباره ما</li></ol></nav>
+  </div>
+</div>
+{% endblock %}
+
 {% block content %}
-<h1>{{ page_title }}</h1>
-<p>{{ page_body|linebreaks }}</p>
+<section class="service-details section">
+  <div class="container" data-aos="fade-up">
+    <div class="row">
+      <div class="col-lg-10 mx-auto">
+        <div class="service-intro">
+          <h2>داستان آموزشگاه</h2>
+          <p class="lead">{{ page_body|linebreaks }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}

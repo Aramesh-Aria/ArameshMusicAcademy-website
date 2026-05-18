@@ -1,0 +1,18 @@
+<header id="header" class="header sticky-top" >
+  <div dir="ltr" class="topbar d-flex align-items-center dark-background">
+    <div class="container d-flex justify-content-center justify-content-md-between">
+      <div class="contact-info d-flex align-items-center">
+        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:info@arameshmusicacademy.com">info@arameshmusicacademy.com</a></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><span>+98 21 1234 5678</span></i>
+      </div>
+    </div>
+  </div>
+  <div class="branding d-flex align-items-cente">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+      <a href="{% url 'pages:home' %}" class="logo d-flex align-items-center">
+        <h1 class="sitename">آموزشگاه موسیقی آرامش</h1>
+      </a>
+      {% include 'partials/navbar.html' %}
+    </div>
+  </div>
+</header>

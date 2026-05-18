@@ -2,47 +2,50 @@
 
 {% block title %}برنامه کلاس‌ها | آموزشگاه موسیقی آرامش{% endblock %}
 
-{% block content %}
-<section class="schedule-board">
-    <h1 class="schedule-board__title">زمانبندی کلاس‌های تخصصی بزرگسالان</h1>
+{% block page_header %}
+<div class="page-title" data-aos="fade">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">برنامه کلاس‌ها</h1>
+    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">برنامه کلاس‌ها</li></ol></nav>
+  </div>
+</div>
+{% endblock %}
 
+{% block content %}
+<section class="section">
+  <div class="container" data-aos="fade-up">
+    <h2 class="mb-4">زمان‌بندی کلاس‌های تخصصی</h2>
     {% if schedule_rows %}
-    <table class="schedule-table">
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle text-center">
         <thead>
-            <tr>
-                <th>کلاس‌ها</th>
-                <th>اساتید</th>
-                {% for weekday in weekdays %}
-                    <th>{{ weekday.label }}</th>
-                {% endfor %}
-            </tr>
+          <tr>
+            <th>کلاس‌ها</th>
+            <th>اساتید</th>
+            {% for weekday in weekdays %}<th>{{ weekday.label }}</th>{% endfor %}
+          </tr>
         </thead>
         <tbody>
-            {% for row in schedule_rows %}
-                <tr>
-                    <th class="schedule-table__course">{{ row.course.name }}</th>
-                    <th class="schedule-table__teacher">{{ row.teacher.full_name }}</th>
-                    {% for cell in row.cells %}
-                        <td class="{% if cell.sessions %}schedule-table__filled{% else %}schedule-table__empty{% endif %}">
-                            {% for session in cell.sessions %}
-                                <div class="schedule-session">
-                                    <div>{{ session.start_time|time:'H:i' }}</div>
-                                    <div>{{ session.end_time|time:'H:i' }}</div>
-                                    {% if session.notes %}
-                                        <span class="schedule-session__note">{{ session.notes }}</span>
-                                    {% endif %}
-                                </div>
-                            {% empty %}
-                                -
-                            {% endfor %}
-                        </td>
-                    {% endfor %}
-                </tr>
+          {% for row in schedule_rows %}
+          <tr>
+            <th>{{ row.course.name }}</th>
+            <th>{{ row.teacher.full_name }}</th>
+            {% for cell in row.cells %}
+            <td>
+              {% for session in cell.sessions %}
+                <div>{{ session.start_time|time:'H:i' }} - {{ session.end_time|time:'H:i' }}</div>
+                {% if session.notes %}<small>{{ session.notes }}</small>{% endif %}
+              {% empty %}-{% endfor %}
+            </td>
             {% endfor %}
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
     {% else %}
-        <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
+      <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
     {% endif %}
+  </div>
 </section>
 {% endblock %}

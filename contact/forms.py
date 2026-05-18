@@ -43,3 +43,6 @@ class ContactForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field_name, field_errors in self.error_messages.items():
             self.fields[field_name].error_messages.update(field_errors)
+        for field_name, field in self.fields.items():
+            base_class = 'form-input message-input' if field_name == 'message' else 'form-input'
+            field.widget.attrs['class'] = base_class

@@ -2,17 +2,34 @@
 
 {% block title %}{{ teacher.full_name }} | آموزشگاه موسیقی آرامش{% endblock %}
 
+{% block page_header %}
+<div class="page-title" data-aos="fade">
+  <div class="container d-lg-flex justify-content-between align-items-center">
+    <h1 class="mb-2 mb-lg-0">{{ teacher.full_name }}</h1>
+    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li><a href="{% url 'teachers:teacher_list' %}">اساتید</a></li><li class="current">{{ teacher.full_name }}</li></ol></nav>
+  </div>
+</div>
+{% endblock %}
+
 {% block content %}
-<article>
-    {% if teacher.profile_image %}
-        <img src="{{ teacher.profile_image.url }}" alt="{{ teacher.full_name }}" width="240">
-    {% endif %}
-    <h1>{{ teacher.full_name }}</h1>
-    <p>
-        {% for instrument in teacher.instruments.all %}
+<section class="service-details section">
+  <div class="container" data-aos="fade-up">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-4">
+        {% if teacher.profile_image %}
+          <img src="{{ teacher.profile_image.url }}" class="img-fluid rounded" alt="{{ teacher.full_name }}">
+        {% endif %}
+      </div>
+      <div class="col-lg-8">
+        <h2>{{ teacher.full_name }}</h2>
+        <p>
+          {% for instrument in teacher.instruments.all %}
             {{ instrument.name }}{% if not forloop.last %}، {% endif %}
-        {% endfor %}
-    </p>
-    <p>{{ teacher.biography|linebreaks }}</p>
-</article>
+          {% endfor %}
+        </p>
+        <div>{{ teacher.biography|linebreaks }}</div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
