@@ -138,6 +138,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Site Information
-SITE_EMAIL = 'info@arameshmusicacademy.com'
-SITE_PHONES = ['+98 21 1234 5678', '+98 21 8765 4321']
-SITE_ADDRESS = 'تهران، خیابان نمونه، آموزشگاه موسیقی آرامش'
+SITE_EMAIL = 'info@aramesh-academy.ir'
+SITE_PHONES = ['+98 21 4445 7746', '+98 990 233 8431', '+98 21 4445 7748', '+98 21 4613 3707']
+SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '
