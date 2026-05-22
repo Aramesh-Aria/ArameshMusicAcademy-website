@@ -3248,6 +3248,29 @@ section,
   transform: translateX(5px);
 }
 
+.captcha-field img {
+  border-radius: 4px;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.captcha-field input {
+  width: 100%;
+  max-width: 200px;
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+  background: transparent;
+  padding: 10px 0;
+  font-size: 16px;
+  color: var(--default-color);
+  transition: all 0.3s ease;
+}
+
+.captcha-field input:focus {
+  outline: none;
+  border-bottom-color: var(--accent-color);
+}
+
 .contact .contact-sidebar {
   background: color-mix(in srgb, var(--accent-color), transparent 97%);
   height: 100%;

@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'schedules',
     'contact',
     'gallery',
+    'captcha',
 ]
 
 MIDDLEWARE = [

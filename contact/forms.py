@@ -1,9 +1,11 @@
 from django import forms
+from captcha.fields import CaptchaField
 
 from .models import ContactMessage
 
 
 class ContactForm(forms.ModelForm):
+    captcha = CaptchaField(label='کد امنیتی', error_messages={'invalid': 'کد امنیتی وارد شده صحیح نیست.'})
     error_messages = {
         'full_name': {'required': 'لطفا نام و نام خانوادگی را وارد کنید.'},
         'email': {
@@ -42,7 +44,8 @@ class ContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for field_name, field_errors in self.error_messages.items():
-            self.fields[field_name].error_messages.update(field_errors)
+            if field_name in self.fields:
+                self.fields[field_name].error_messages.update(field_errors)
         for field_name, field in self.fields.items():
             base_class = 'form-input message-input' if field_name == 'message' else 'form-input'
             field.widget.attrs['class'] = base_class

@@ -72,6 +72,13 @@
               {% if form.message.errors %}<span class="form-error">{{ form.message.errors|striptags }}</span>{% endif %}
             </div>
 
+            <div class="form-field captcha-field mb-4">
+              <label for="{{ form.captcha.id_for_label }}" class="mb-2 d-block">{{ form.captcha.label }}</label>
+              {{ form.captcha }}
+              {% if form.captcha.errors %}<span class="form-error d-block mt-1">{{ form.captcha.errors|striptags }}</span>{% endif %}
+              <small class="text-muted d-block mt-1">تصویر بالا را به دقت وارد کنید.</small>
+            </div>
+
             <button type="submit" class="send-button">ارسال پیام <span class="button-arrow">←</span></button>
           </form>
         </div>

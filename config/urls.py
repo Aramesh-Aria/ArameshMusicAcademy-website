@@ -26,6 +26,7 @@ urlpatterns = [
     path('schedule/', include('schedules.urls')),
     path('gallery/', include('gallery.urls')),
     path('contact/', include('contact.urls')),
+    path('captcha/', include('captcha.urls')),
 ]
 
 if settings.DEBUG:
