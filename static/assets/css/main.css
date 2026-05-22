@@ -2571,8 +2571,16 @@ section,
 .team .member-name {
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--heading-color);
+  color: #000000;
   margin-bottom: 0.25rem;
+}
+
+.team .member-name a {
+  color: #000000;
+}
+
+.team .member-name a:hover {
+  color: var(--accent-color);
 }
 
 .team .member-role {

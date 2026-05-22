@@ -1,10 +1,15 @@
 from django.views.generic import TemplateView
 
 from .models import ClassSession, WEEKDAY_ORDER
+from pages.views import PageContentMixin
+from pages.models import SitePageContent
 
 
-class ScheduleView(TemplateView):
+class ScheduleView(PageContentMixin, TemplateView):
     template_name = 'schedules/schedule.html'
+    page_key = SitePageContent.SCHEDULE
+    default_title = 'برنامه کلاس‌ها'
+    default_body = ''
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

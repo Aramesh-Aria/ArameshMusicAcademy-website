@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}برنامه کلاس‌ها | آموزشگاه موسیقی آرامش{% endblock %}
+{% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 
 {% block page_header %}
 <div class="page-title" data-aos="fade">
   <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">برنامه کلاس‌ها</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">برنامه کلاس‌ها</li></ol></nav>
+    <h1 class="mb-2 mb-lg-0">{{ page_title }}</h1>
+    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">{{ page_title }}</li></ol></nav>
   </div>
 </div>
 {% endblock %}
@@ -45,6 +45,12 @@
     </div>
     {% else %}
       <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
+    {% endif %}
+
+    {% if page_body %}
+    <div class="mt-5 pt-4 border-top">
+      {{ page_body|safe|linebreaks }}
+    </div>
     {% endif %}
   </div>
 </section>

@@ -4,9 +4,11 @@ from django.db import models
 class SitePageContent(models.Model):
     HOME = 'home'
     ABOUT = 'about'
+    SCHEDULE = 'schedule'
     PAGE_CHOICES = (
         (HOME, 'خانه'),
         (ABOUT, 'درباره ما'),
+        (SCHEDULE, 'برنامه کلاس‌ها'),
     )
 
     page_key = models.CharField('کلید صفحه', max_length=20, choices=PAGE_CHOICES, unique=True, help_text='مشخص می‌کند این محتوا مربوط به کدام صفحه است.')
