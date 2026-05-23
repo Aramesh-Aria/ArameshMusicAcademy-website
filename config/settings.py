@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-w(p+t0x6&*4295%5nedht10@0yz)bbdth9&0jw8xe$tnk(sgyq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['aramesh-academy.runflare.run', 'api.runflare.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['aramesh-academy.runflare.run', 'api.runflare.com', 'localhost', '127.0.0.1','aramesh-academy.ir']
 
 
 # Application definition
