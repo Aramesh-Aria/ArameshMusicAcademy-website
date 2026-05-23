@@ -27,6 +27,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['aramesh-academy.runflare.run', 'api.runflare.com', 'localhost', '127.0.0.1','aramesh-academy.ir']
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://aramesh-academy.ir',
+    'https://aramesh-academy.runflare.run',
+]
+
 
 # Application definition
 
