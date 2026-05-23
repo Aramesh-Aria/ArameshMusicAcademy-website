@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView
 
-from .models import GalleryPage
+from gallery.models import GalleryPage
 
 
 class GalleryRootView(TemplateView):
@@ -51,5 +51,3 @@ class GalleryPageView(TemplateView):
             breadcrumbs.append(current_page)
             current_page = current_page.parent
         return list(reversed(breadcrumbs))
-
-# Create your views here.

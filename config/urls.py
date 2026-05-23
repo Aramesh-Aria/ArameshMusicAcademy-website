@@ -19,12 +19,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from gallery import urls as gallery_urls
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('pages.urls')),
     path('teachers/', include('teachers.urls')),
     path('schedule/', include('schedules.urls')),
-    path('gallery/', include('gallery.urls')),
+    path('gallery/', include(gallery_urls)),
     path('contact/', include('contact.urls')),
     path('captcha/', include('captcha.urls')),
 ]

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import GalleryPageView, GalleryRootView
+from gallery.views import GalleryPageView, GalleryRootView
 
 app_name = 'gallery'
 
