@@ -7,3 +7,4 @@ media/
 venv/
 .env
 .DS_Store
+static_dev/

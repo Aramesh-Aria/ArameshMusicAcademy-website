@@ -12,7 +12,7 @@ Class-based views
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    2. Add a URL to urlpatterns:  path('blog/', include('alg.urls'))
 """
 from django.conf import settings
 from django.conf.urls.static import static
@@ -32,4 +32,7 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    # Serve static files from the development directory
+    urlpatterns += static('/static/', document_root=settings.BASE_DIR / 'static_dev')
+    # Serve media files as configured in settings
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
