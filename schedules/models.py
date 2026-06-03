@@ -101,10 +101,10 @@ class ClassSession(models.Model):
         if self.pk:
             overlapping_sessions = overlapping_sessions.exclude(pk=self.pk)
 
-        if self.is_active and overlapping_sessions.exists():
-            raise ValidationError(
-                'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
-            )
+        # if self.is_active and overlapping_sessions.exists():
+        #     raise ValidationError(
+        #         'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
+        #     )
 
     def save(self, *args, **kwargs):
         self.weekday_order = WEEKDAY_SORT_VALUES[self.weekday]
