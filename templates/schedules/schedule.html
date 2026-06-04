@@ -33,7 +33,7 @@
             {% for cell in row.cells %}
             <td>
               {% for session in cell.sessions %}
-                <div>{{ session.start_time|time:'H:i' }} - {{ session.end_time|time:'H:i' }}</div>
+                <div>{{ session.end_time|time:'H:i' }} - {{ session.start_time|time:'H:i' }}</div>
                 {% if session.notes %}<small>{{ session.notes }}</small>{% endif %}
               {% empty %}-{% endfor %}
             </td>
