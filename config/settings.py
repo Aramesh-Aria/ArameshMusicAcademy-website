@@ -135,9 +135,9 @@ STATIC_ROOT = os.path.join(BASE_DIR, "public", "static")
 
 # Using a separate directory for STATICFILES_DIRS to avoid E002 conflict
 # If development needs access to static files, ensure they exist here.
-STATICFILES_DIRS = [
-    BASE_DIR / 'static_dev', 
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static_dev', 
+# ]
 
 STORAGES = {
     "default": {
