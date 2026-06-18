@@ -32,7 +32,8 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    # Serve static files from the development directory
+    # Serve static files from the development directory (only locally)
     urlpatterns += static('/static/', document_root=settings.BASE_DIR / 'static_dev')
-    # Serve media files as configured in settings
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Always serve media files (uploaded content must be accessible in production too)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

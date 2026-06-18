@@ -2,6 +2,130 @@
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 
+{% block extra_head %}
+<style>
+  /* ─── Schedule Table ─────────────────────────────────────────── */
+  .schedule-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,.08);
+  }
+
+  .schedule-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .93rem;
+    margin-bottom: 0;
+  }
+
+  /* Header */
+  .schedule-table thead tr {
+    background: var(--accent-color, #2c6fad);
+    color: #fff;
+  }
+  .schedule-table thead th {
+    padding: 14px 10px;
+    font-weight: 600;
+    font-size: .88rem;
+    letter-spacing: .02em;
+    border: none;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .schedule-table thead th:first-child {
+    border-radius: 0 12px 0 0;   /* RTL: top-right */
+  }
+  .schedule-table thead th:last-child {
+    border-radius: 12px 0 0 0;   /* RTL: top-left */
+  }
+
+  /* Body cells */
+  .schedule-table tbody td,
+  .schedule-table tbody th {
+    padding: 10px 12px;
+    vertical-align: middle;
+    text-align: center;
+    border: 1px solid rgba(0,0,0,.07);
+  }
+
+  /* Course name cell (merged) */
+  .cell-course {
+    font-weight: 700;
+    font-size: .95rem;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    letter-spacing: .04em;
+    border-left: 3px solid transparent;  /* accent stripe added per-color */
+    min-width: 40px;
+    padding: 14px 8px !important;
+  }
+
+  /* Teacher cell */
+  .cell-teacher {
+    font-weight: 500;
+    white-space: nowrap;
+    min-width: 110px;
+  }
+
+  /* Time chip */
+  .time-chip {
+    display: inline-block;
+    background: rgba(0,0,0,.06);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: .82rem;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    margin: 2px;
+    white-space: nowrap;
+  }
+  .time-chip small {
+    display: block;
+    font-size: .72rem;
+    opacity: .7;
+    margin-top: 2px;
+  }
+
+  /* Empty cell dash */
+  .cell-empty {
+    color: #ccc;
+    font-size: 1.1rem;
+  }
+
+  /* ─── 6 course colour bands ──────────────────────────────────── */
+  /* Each band: a subtle bg for the whole row + a bold left-border on the course cell */
+  .course-0 td, .course-0 th { background-color: #f0f7ff; }
+  .course-0 .cell-course      { border-left-color: #3b82f6; color: #1d4ed8; background-color: #dbeafe; }
+
+  .course-1 td, .course-1 th { background-color: #f0fdf4; }
+  .course-1 .cell-course      { border-left-color: #22c55e; color: #15803d; background-color: #dcfce7; }
+
+  .course-2 td, .course-2 th { background-color: #fdf4ff; }
+  .course-2 .cell-course      { border-left-color: #a855f7; color: #7e22ce; background-color: #f3e8ff; }
+
+  .course-3 td, .course-3 th { background-color: #fff7ed; }
+  .course-3 .cell-course      { border-left-color: #f97316; color: #c2410c; background-color: #ffedd5; }
+
+  .course-4 td, .course-4 th { background-color: #fefce8; }
+  .course-4 .cell-course      { border-left-color: #eab308; color: #854d0e; background-color: #fef9c3; }
+
+  .course-5 td, .course-5 th { background-color: #fff1f2; }
+  .course-5 .cell-course      { border-left-color: #f43f5e; color: #9f1239; background-color: #ffe4e6; }
+
+  /* Hover row highlight */
+  .schedule-table tbody tr:hover td,
+  .schedule-table tbody tr:hover th {
+    filter: brightness(.96);
+  }
+
+  /* Responsive: on very small screens allow horizontal scroll */
+  .schedule-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+</style>
+{% endblock %}
+
 {% block page_header %}
 <div class="page-title" data-aos="fade">
   <div class="container d-lg-flex justify-content-between align-items-center">
@@ -15,34 +139,60 @@
 <section class="section">
   <div class="container" data-aos="fade-up">
     <h2 class="mb-4">زمان‌بندی کلاس‌های تخصصی</h2>
+
     {% if schedule_rows %}
-    <div class="table-responsive">
-      <table class="table table-bordered align-middle text-center">
+    <div class="schedule-responsive schedule-wrapper">
+      <table class="schedule-table">
         <thead>
           <tr>
-            <th>کلاس‌ها</th>
-            <th>اساتید</th>
+            <th>کلاس</th>
+            <th>استاد</th>
             {% for weekday in weekdays %}<th>{{ weekday.label }}</th>{% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for row in schedule_rows %}
-          <tr>
-            <th>{{ row.course.name }}</th>
-            <th>{{ row.teacher.full_name }}</th>
+          <tr class="course-{{ row.color_index }}">
+
+            {# ── Course cell: only render once per group (rowspan) ── #}
+            {% if row.show_course %}
+            <th class="cell-course" rowspan="{{ row.course_rowspan }}">
+              {{ row.course.name }}
+            </th>
+            {% endif %}
+
+            {# ── Teacher ── #}
+            <td class="cell-teacher">{{ row.teacher.full_name }}</td>
+
+            {# ── Day cells ── #}
             {% for cell in row.cells %}
             <td>
               {% for session in cell.sessions %}
-                <div>{{ session.end_time|time:'H:i' }} - {{ session.start_time|time:'H:i' }}</div>
-                {% if session.notes %}<small>{{ session.notes }}</small>{% endif %}
-              {% empty %}-{% endfor %}
+                <div class="time-chip">
+                  {{ session.start_time|time:'H:i' }} – {{ session.end_time|time:'H:i' }}
+                  {% if session.notes %}<small>{{ session.notes }}</small>{% endif %}
+                </div>
+              {% empty %}
+                <span class="cell-empty">—</span>
+              {% endfor %}
             </td>
             {% endfor %}
+
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+
+    {# ── Colour legend ── #}
+    <div class="mt-3 d-flex flex-wrap gap-2 justify-content-end">
+      {% for row in schedule_rows %}{% if row.show_course %}
+      <span class="badge rounded-pill px-3 py-2 course-{{ row.color_index }}" style="font-size:.82rem; border:1px solid rgba(0,0,0,.1);">
+        {{ row.course.name }}
+      </span>
+      {% endif %}{% endfor %}
+    </div>
+
     {% else %}
       <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
     {% endif %}

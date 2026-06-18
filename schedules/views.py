@@ -37,20 +37,38 @@ class ScheduleView(PageContentMixin, TemplateView):
                 }
             rows_by_course_teacher[key]['cells'][session.weekday].append(session)
 
+        # Group rows by course to compute rowspans and assign color indices
+        all_rows = list(rows_by_course_teacher.values())
         schedule_rows = []
-        for row in rows_by_course_teacher.values():
-            schedule_rows.append({
-                'course': row['course'],
-                'teacher': row['teacher'],
-                'cells': [
-                    {
-                        'weekday': weekday.value,
-                        'label': weekday.label,
-                        'sessions': row['cells'][weekday.value],
-                    }
-                    for weekday in WEEKDAY_ORDER
-                ],
-            })
+        color_index = 0
+        i = 0
+        while i < len(all_rows):
+            course_id = all_rows[i]['course'].pk
+            # Find how many consecutive rows share the same course
+            j = i
+            while j < len(all_rows) and all_rows[j]['course'].pk == course_id:
+                j += 1
+            span = j - i
+
+            for k in range(i, j):
+                row = all_rows[k]
+                schedule_rows.append({
+                    'course': row['course'],
+                    'teacher': row['teacher'],
+                    'show_course': k == i,
+                    'course_rowspan': span if k == i else 1,
+                    'color_index': color_index % 6,
+                    'cells': [
+                        {
+                            'weekday': weekday.value,
+                            'label': weekday.label,
+                            'sessions': row['cells'][weekday.value],
+                        }
+                        for weekday in WEEKDAY_ORDER
+                    ],
+                })
+            i = j
+            color_index += 1
 
         context['weekdays'] = WEEKDAY_ORDER
         context['schedule_rows'] = schedule_rows
