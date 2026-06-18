@@ -5,8 +5,9 @@ from .models import ClassSession, Course
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at', 'updated_at')
+    list_display = ('name', 'display_order', 'created_at', 'updated_at')
     search_fields = ('name',)
+    list_editable = ('display_order',)
     readonly_fields = ('created_at', 'updated_at')
 
 

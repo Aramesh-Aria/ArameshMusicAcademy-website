@@ -18,6 +18,7 @@ class ScheduleView(PageContentMixin, TemplateView):
             .filter(is_active=True, teacher__is_active=True)
             .select_related('course', 'teacher')
             .order_by(
+                'course__display_order',
                 'course__name',
                 'teacher__display_order',
                 'teacher__last_name',

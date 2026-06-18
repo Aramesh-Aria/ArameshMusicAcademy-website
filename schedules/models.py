@@ -38,11 +38,12 @@ class Course(models.Model):
             'unique': 'کلاسی با این نام قبلا ثبت شده است.',
         },
     )
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش بالاتر در جدول برنامه‌ها.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ['display_order', 'name']
         verbose_name = 'کلاس'
         verbose_name_plural = 'کلاس‌ها'
 

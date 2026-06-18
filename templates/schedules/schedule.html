@@ -184,14 +184,7 @@
       </table>
     </div>
 
-    {# ── Colour legend ── #}
-    <div class="mt-3 d-flex flex-wrap gap-2 justify-content-end">
-      {% for row in schedule_rows %}{% if row.show_course %}
-      <span class="badge rounded-pill px-3 py-2 course-{{ row.color_index }}" style="font-size:.82rem; border:1px solid rgba(0,0,0,.1);">
-        {{ row.course.name }}
-      </span>
-      {% endif %}{% endfor %}
-    </div>
+
 
     {% else %}
       <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
