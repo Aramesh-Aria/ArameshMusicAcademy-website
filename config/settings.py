@@ -184,9 +184,18 @@ SITE_HOURS = [
 # Defaults to the console backend so local dev and tests never need real SMTP credentials.
 # In production, set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend and the
 # EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD env vars on Runflare.
+def _env_int(name, default):
+    """Read an int env var, falling back to default if it's missing or malformed.
+    A bad email value must never crash app startup."""
+    try:
+        return int(os.environ.get(name, default))
+    except (TypeError, ValueError):
+        return int(default)
+
+
 EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_PORT = _env_int('EMAIL_PORT', 587)
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
