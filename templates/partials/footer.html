@@ -26,7 +26,7 @@
       <div class="col-lg-2 col-md-3 footer-links">
         <h4>دوره‌ها</h4>
         <ul>
-          {% for instrument in site_instruments %}
+          {% for instrument in site_instruments|slice:":4" %}
           <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">{{ instrument.name }}</a></li>
           {% endfor %}
         </ul>
