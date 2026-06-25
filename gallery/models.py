@@ -74,7 +74,24 @@ class GalleryPage(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug and self.title:
             self.slug = slugify(self.title, allow_unicode=True)
+
+        try:
+            old = GalleryPage.objects.get(pk=self.pk)
+            old_cover = old.cover_image.name if old.cover_image else None
+        except GalleryPage.DoesNotExist:
+            old_cover = None
+
+        new_cover = self.cover_image.name if self.cover_image else None
+        cover_changed = old_cover != new_cover
+
         super().save(*args, **kwargs)
+
+        if cover_changed and self.cover_image:
+            from core.image_utils import process_image
+            result_name = process_image(self.cover_image, width=900, height=600, crop=True)
+            if result_name != self.cover_image.name:
+                GalleryPage.objects.filter(pk=self.pk).update(cover_image=result_name)
+                self.cover_image.name = result_name
 
     @property
     def slug_path(self):
@@ -109,6 +126,25 @@ class GalleryImage(models.Model):
         ordering = ['display_order', 'created_at']
         verbose_name = 'تصویر گالری'
         verbose_name_plural = 'تصاویر گالری'
+
+    def save(self, *args, **kwargs):
+        try:
+            old = GalleryImage.objects.get(pk=self.pk)
+            old_name = old.image.name if old.image else None
+        except GalleryImage.DoesNotExist:
+            old_name = None
+
+        new_name = self.image.name if self.image else None
+        image_changed = old_name != new_name
+
+        super().save(*args, **kwargs)
+
+        if image_changed and self.image:
+            from core.image_utils import process_image
+            result_name = process_image(self.image, width=1920, height=1920, crop=False)
+            if result_name != self.image.name:
+                GalleryImage.objects.filter(pk=self.pk).update(image=result_name)
+                self.image.name = result_name
 
     def __str__(self):
         if self.title:

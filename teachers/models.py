@@ -52,5 +52,24 @@ class Teacher(models.Model):
     def full_name(self):
         return f'{self.first_name} {self.last_name}'
 
+    def save(self, *args, **kwargs):
+        try:
+            old = Teacher.objects.get(pk=self.pk)
+            old_name = old.profile_image.name if old.profile_image else None
+        except Teacher.DoesNotExist:
+            old_name = None
+
+        new_name = self.profile_image.name if self.profile_image else None
+        image_changed = old_name != new_name
+
+        super().save(*args, **kwargs)
+
+        if image_changed and self.profile_image:
+            from core.image_utils import process_image
+            result_name = process_image(self.profile_image, width=600, height=600, crop=True)
+            if result_name != self.profile_image.name:
+                Teacher.objects.filter(pk=self.pk).update(profile_image=result_name)
+                self.profile_image.name = result_name
+
     def get_absolute_url(self):
         return reverse('teachers:teacher_detail', kwargs={'pk': self.pk})
