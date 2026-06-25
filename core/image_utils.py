@@ -15,6 +15,10 @@ def process_image(field_file, width, height, crop=False, quality=85):
     abs_path = field_file.path
     rel_name = field_file.name
 
+    # Nothing on disk to process (e.g. a DB row pointing at a missing file) — leave the name as-is.
+    if not os.path.exists(abs_path):
+        return rel_name
+
     img = Image.open(abs_path)
 
     # Normalize to RGB — handles PNG transparency, CMYK camera exports, palette images, etc.

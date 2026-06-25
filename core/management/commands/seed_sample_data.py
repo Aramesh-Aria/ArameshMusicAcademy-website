@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from PIL import Image, ImageDraw
 
 from gallery.models import GalleryImage, GalleryPage
-from schedules.models import ClassSession, Course, Weekday
+from schedules.models import ClassSession, Weekday
 from teachers.models import Instrument, Teacher
 
 
@@ -16,8 +16,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         instruments = self.create_instruments()
         teachers = self.create_teachers(instruments)
-        courses = self.create_courses()
-        self.create_class_sessions(courses, teachers)
+        self.create_class_sessions(instruments, teachers)
         self.create_gallery_sample_data()
 
         self.stdout.write(self.style.SUCCESS('Sample academy data is ready.'))
@@ -71,25 +70,17 @@ class Command(BaseCommand):
             teachers[teacher.full_name] = teacher
         return teachers
 
-    def create_courses(self):
-        course_names = ['کلاس پیانو', 'کلاس گیتار', 'کلاس ویولن', 'کلاس آواز']
-        return {
-            name: Course.objects.get_or_create(name=name)[0]
-            for name in course_names
-        }
-
-    def create_class_sessions(self, courses, teachers):
+    def create_class_sessions(self, instruments, teachers):
         session_data = [
-            ('کلاس پیانو', 'سارا کریمی', Weekday.SATURDAY, time(9, 0), time(10, 0)),
-            ('کلاس گیتار', 'رضا مرادی', Weekday.SATURDAY, time(10, 0), time(11, 0)),
-            ('کلاس ویولن', 'نگار احمدی', Weekday.SUNDAY, time(9, 0), time(10, 0)),
-            ('کلاس آواز', 'نگار احمدی', Weekday.MONDAY, time(11, 0), time(12, 0)),
-            ('کلاس پیانو', 'سارا کریمی', Weekday.WEDNESDAY, time(16, 0), time(17, 0)),
+            ('سارا کریمی', ['پیانو'], Weekday.SATURDAY, time(9, 0), time(10, 0)),
+            ('رضا مرادی', ['گیتار'], Weekday.SATURDAY, time(10, 0), time(11, 0)),
+            ('نگار احمدی', ['ویولن', 'آواز'], Weekday.SUNDAY, time(9, 0), time(10, 0)),
+            ('نگار احمدی', ['آواز'], Weekday.MONDAY, time(11, 0), time(12, 0)),
+            ('سارا کریمی', ['پیانو'], Weekday.WEDNESDAY, time(16, 0), time(17, 0)),
         ]
 
-        for course_name, teacher_name, weekday, start_time, end_time in session_data:
-            ClassSession.objects.update_or_create(
-                course=courses[course_name],
+        for teacher_name, instrument_names, weekday, start_time, end_time in session_data:
+            session, _ = ClassSession.objects.update_or_create(
                 teacher=teachers[teacher_name],
                 weekday=weekday,
                 start_time=start_time,
@@ -99,6 +90,7 @@ class Command(BaseCommand):
                     'notes': '',
                 },
             )
+            session.instruments.set(instruments[name] for name in instrument_names)
 
     def ensure_teacher_image(self, teacher, color):
         if teacher.profile_image:

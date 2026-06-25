@@ -16,63 +16,49 @@ class ScheduleView(PageContentMixin, TemplateView):
         sessions = (
             ClassSession.objects
             .filter(is_active=True, teacher__is_active=True)
-            .select_related('course', 'teacher')
+            .select_related('teacher')
+            .prefetch_related('instruments')
             .order_by(
-                'course__display_order',
-                'course__name',
                 'teacher__display_order',
                 'teacher__last_name',
                 'weekday_order',
                 'start_time',
             )
         )
-        rows_by_course_teacher = {}
 
+        rows_by_teacher = {}
         for session in sessions:
-            key = (session.course_id, session.teacher_id)
-            if key not in rows_by_course_teacher:
-                rows_by_course_teacher[key] = {
-                    'course': session.course,
+            key = session.teacher_id
+            if key not in rows_by_teacher:
+                rows_by_teacher[key] = {
                     'teacher': session.teacher,
+                    'instruments': {},
                     'cells': {weekday.value: [] for weekday in WEEKDAY_ORDER},
                 }
-            rows_by_course_teacher[key]['cells'][session.weekday].append(session)
+            rows_by_teacher[key]['cells'][session.weekday].append(session)
+            for instrument in session.instruments.all():
+                rows_by_teacher[key]['instruments'][instrument.pk] = instrument
 
-        # Group rows by course to compute rowspans and assign color indices
-        all_rows = list(rows_by_course_teacher.values())
         schedule_rows = []
-        color_index = 0
-        i = 0
-        while i < len(all_rows):
-            course_id = all_rows[i]['course'].pk
-            # Find how many consecutive rows share the same course
-            j = i
-            while j < len(all_rows) and all_rows[j]['course'].pk == course_id:
-                j += 1
-            span = j - i
-
-            for k in range(i, j):
-                row = all_rows[k]
-                schedule_rows.append({
-                    'course': row['course'],
-                    'teacher': row['teacher'],
-                    'show_course': k == i,
-                    'course_rowspan': span if k == i else 1,
-                    'color_index': color_index % 6,
-                    'cells': [
-                        {
-                            'weekday': weekday.value,
-                            'label': weekday.label,
-                            'sessions': row['cells'][weekday.value],
-                        }
-                        for weekday in WEEKDAY_ORDER
-                    ],
-                })
-            i = j
-            color_index += 1
+        for color_index, row in enumerate(rows_by_teacher.values()):
+            instruments = sorted(
+                row['instruments'].values(),
+                key=lambda instrument: instrument.name,
+            )
+            schedule_rows.append({
+                'teacher': row['teacher'],
+                'instruments': instruments,
+                'color_index': color_index % 6,
+                'cells': [
+                    {
+                        'weekday': weekday.value,
+                        'label': weekday.label,
+                        'sessions': row['cells'][weekday.value],
+                    }
+                    for weekday in WEEKDAY_ORDER
+                ],
+            })
 
         context['weekdays'] = WEEKDAY_ORDER
         context['schedule_rows'] = schedule_rows
         return context
-
-# Create your views here.

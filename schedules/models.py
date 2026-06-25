@@ -28,43 +28,19 @@ WEEKDAY_SORT_VALUES = {
 }
 
 
-class Course(models.Model):
-    name = models.CharField(
-        'نام کلاس',
-        max_length=120,
-        unique=True,
-        help_text='برای هر کلاس یک نام یکتا وارد کنید.',
-        error_messages={
-            'unique': 'کلاسی با این نام قبلا ثبت شده است.',
-        },
-    )
-    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش بالاتر در جدول برنامه‌ها.')
-    created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
-    updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
-
-    class Meta:
-        ordering = ['display_order', 'name']
-        verbose_name = 'کلاس'
-        verbose_name_plural = 'کلاس‌ها'
-
-    def __str__(self):
-        return self.name
-
-
 class ClassSession(models.Model):
-    course = models.ForeignKey(
-        Course,
-        on_delete=models.PROTECT,
-        related_name='class_sessions',
-        verbose_name='کلاس',
-        help_text='کلاسی که این جلسه به آن تعلق دارد.',
-    )
     teacher = models.ForeignKey(
         'teachers.Teacher',
         on_delete=models.PROTECT,
         related_name='class_sessions',
         verbose_name='استاد',
         help_text='استادی که این جلسه را برگزار می‌کند.',
+    )
+    instruments = models.ManyToManyField(
+        'teachers.Instrument',
+        related_name='class_sessions',
+        verbose_name='سازها',
+        help_text='یک یا چند سازی که استاد در این جلسه تدریس می‌کند را انتخاب کنید.',
     )
     weekday = models.CharField('روز هفته', max_length=3, choices=Weekday.choices, help_text='روز برگزاری این جلسه را انتخاب کنید.')
     weekday_order = models.PositiveSmallIntegerField('ترتیب روز هفته', default=0, editable=False)
@@ -81,7 +57,7 @@ class ClassSession(models.Model):
         verbose_name_plural = 'جلسه‌های کلاس'
 
     def __str__(self):
-        return f'{self.course} with {self.teacher} - {self.get_weekday_display()} {self.start_time:%H:%M}'
+        return f'{self.teacher} - {self.get_weekday_display()} {self.start_time:%H:%M}'
 
     def clean(self):
         super().clean()
@@ -102,10 +78,10 @@ class ClassSession(models.Model):
         if self.pk:
             overlapping_sessions = overlapping_sessions.exclude(pk=self.pk)
 
-        # if self.is_active and overlapping_sessions.exists():
-        #     raise ValidationError(
-        #         'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
-        #     )
+        if self.is_active and overlapping_sessions.exists():
+            raise ValidationError(
+                'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
+            )
 
     def save(self, *args, **kwargs):
         self.weekday_order = WEEKDAY_SORT_VALUES[self.weekday]

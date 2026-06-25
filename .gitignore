@@ -9,3 +9,6 @@ venv/
 .DS_Store
 static_dev/
 claude.md
+context.md
+/docs
+IMPLEMENTATION-PLAN.md

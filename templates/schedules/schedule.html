@@ -48,23 +48,27 @@
     border: 1px solid rgba(0,0,0,.07);
   }
 
-  /* Course name cell (merged) */
-  .cell-course {
-    font-weight: 700;
-    font-size: .95rem;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    letter-spacing: .04em;
-    border-left: 3px solid transparent;  /* accent stripe added per-color */
-    min-width: 40px;
-    padding: 14px 8px !important;
-  }
-
   /* Teacher cell */
   .cell-teacher {
-    font-weight: 500;
+    font-weight: 700;
+    font-size: .95rem;
     white-space: nowrap;
-    min-width: 110px;
+    min-width: 120px;
+    border-right: 3px solid transparent;  /* accent stripe added per-color (RTL) */
+  }
+
+  /* Instruments cell */
+  .cell-instruments {
+    min-width: 130px;
+  }
+  .instrument-chip {
+    display: inline-block;
+    background: rgba(0,0,0,.06);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: .82rem;
+    margin: 2px;
+    white-space: nowrap;
   }
 
   /* Time chip */
@@ -92,25 +96,25 @@
     font-size: 1.1rem;
   }
 
-  /* ─── 6 course colour bands ──────────────────────────────────── */
-  /* Each band: a subtle bg for the whole row + a bold left-border on the course cell */
+  /* ─── 6 teacher colour bands ─────────────────────────────────── */
+  /* Each band: a subtle bg for the whole row + a bold accent on the teacher cell */
   .course-0 td, .course-0 th { background-color: #f0f7ff; }
-  .course-0 .cell-course      { border-left-color: #3b82f6; color: #1d4ed8; background-color: #dbeafe; }
+  .course-0 .cell-teacher     { border-right-color: #3b82f6; color: #1d4ed8; background-color: #dbeafe; }
 
   .course-1 td, .course-1 th { background-color: #f0fdf4; }
-  .course-1 .cell-course      { border-left-color: #22c55e; color: #15803d; background-color: #dcfce7; }
+  .course-1 .cell-teacher     { border-right-color: #22c55e; color: #15803d; background-color: #dcfce7; }
 
   .course-2 td, .course-2 th { background-color: #fdf4ff; }
-  .course-2 .cell-course      { border-left-color: #a855f7; color: #7e22ce; background-color: #f3e8ff; }
+  .course-2 .cell-teacher     { border-right-color: #a855f7; color: #7e22ce; background-color: #f3e8ff; }
 
   .course-3 td, .course-3 th { background-color: #fff7ed; }
-  .course-3 .cell-course      { border-left-color: #f97316; color: #c2410c; background-color: #ffedd5; }
+  .course-3 .cell-teacher     { border-right-color: #f97316; color: #c2410c; background-color: #ffedd5; }
 
   .course-4 td, .course-4 th { background-color: #fefce8; }
-  .course-4 .cell-course      { border-left-color: #eab308; color: #854d0e; background-color: #fef9c3; }
+  .course-4 .cell-teacher     { border-right-color: #eab308; color: #854d0e; background-color: #fef9c3; }
 
   .course-5 td, .course-5 th { background-color: #fff1f2; }
-  .course-5 .cell-course      { border-left-color: #f43f5e; color: #9f1239; background-color: #ffe4e6; }
+  .course-5 .cell-teacher     { border-right-color: #f43f5e; color: #9f1239; background-color: #ffe4e6; }
 
   /* Hover row highlight */
   .schedule-table tbody tr:hover td,
@@ -145,8 +149,8 @@
       <table class="schedule-table">
         <thead>
           <tr>
-            <th>کلاس</th>
             <th>استاد</th>
+            <th>سازها</th>
             {% for weekday in weekdays %}<th>{{ weekday.label }}</th>{% endfor %}
           </tr>
         </thead>
@@ -154,15 +158,17 @@
           {% for row in schedule_rows %}
           <tr class="course-{{ row.color_index }}">
 
-            {# ── Course cell: only render once per group (rowspan) ── #}
-            {% if row.show_course %}
-            <th class="cell-course" rowspan="{{ row.course_rowspan }}">
-              {{ row.course.name }}
-            </th>
-            {% endif %}
-
             {# ── Teacher ── #}
-            <td class="cell-teacher">{{ row.teacher.full_name }}</td>
+            <th class="cell-teacher" scope="row">{{ row.teacher.full_name }}</th>
+
+            {# ── Instruments ── #}
+            <td class="cell-instruments">
+              {% for instrument in row.instruments %}
+                <span class="instrument-chip">{{ instrument.name }}</span>
+              {% empty %}
+                <span class="cell-empty">—</span>
+              {% endfor %}
+            </td>
 
             {# ── Day cells ── #}
             {% for cell in row.cells %}

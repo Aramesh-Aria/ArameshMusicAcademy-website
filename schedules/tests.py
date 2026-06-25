@@ -6,24 +6,22 @@ from django.urls import reverse
 
 from teachers.models import Instrument, Teacher
 
-from .models import ClassSession, Course, Weekday
+from .models import ClassSession, Weekday
 
 
 class ClassSessionModelTests(TestCase):
     def setUp(self):
-        instrument = Instrument.objects.create(name='Piano')
+        self.instrument = Instrument.objects.create(name='Piano')
         self.teacher = Teacher.objects.create(
             first_name='Sara',
             last_name='Karimi',
             biography='Biography',
             profile_image='teachers/sara.jpg',
         )
-        self.teacher.instruments.add(instrument)
-        self.course = Course.objects.create(name='Piano')
+        self.teacher.instruments.add(self.instrument)
 
     def test_end_time_must_be_after_start_time(self):
         session = ClassSession(
-            course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
             start_time=time(12, 0),
@@ -37,7 +35,6 @@ class ClassSessionModelTests(TestCase):
 
     def test_active_sessions_for_same_teacher_cannot_overlap(self):
         ClassSession.objects.create(
-            course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
             start_time=time(9, 0),
@@ -45,7 +42,6 @@ class ClassSessionModelTests(TestCase):
             is_active=True,
         )
         overlapping_session = ClassSession(
-            course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
             start_time=time(9, 30),
@@ -54,11 +50,10 @@ class ClassSessionModelTests(TestCase):
         )
 
         with self.assertRaises(ValidationError):
-            overlapping_session.full_clean()
+            overlapping_session.full_clean(exclude=['instruments'])
 
     def test_inactive_sessions_can_overlap(self):
         ClassSession.objects.create(
-            course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
             start_time=time(9, 0),
@@ -66,7 +61,6 @@ class ClassSessionModelTests(TestCase):
             is_active=True,
         )
         overlapping_session = ClassSession(
-            course=self.course,
             teacher=self.teacher,
             weekday=Weekday.SATURDAY,
             start_time=time(9, 30),
@@ -74,33 +68,33 @@ class ClassSessionModelTests(TestCase):
             is_active=False,
         )
 
-        overlapping_session.full_clean()
+        overlapping_session.full_clean(exclude=['instruments'])
 
 
 class ScheduleViewTests(TestCase):
     def setUp(self):
-        instrument = Instrument.objects.create(name='Guitar')
+        self.instrument = Instrument.objects.create(name='Guitar')
         self.teacher = Teacher.objects.create(
             first_name='Reza',
             last_name='Moradi',
             biography='Biography',
             profile_image='teachers/reza.jpg',
         )
-        self.teacher.instruments.add(instrument)
-        self.course = Course.objects.create(name='Guitar')
+        self.teacher.instruments.add(self.instrument)
+
+    def _make_session(self, **kwargs):
+        session = ClassSession.objects.create(teacher=self.teacher, **kwargs)
+        session.instruments.add(self.instrument)
+        return session
 
     def test_schedule_displays_persian_weekdays_and_active_sessions(self):
-        ClassSession.objects.create(
-            course=self.course,
-            teacher=self.teacher,
+        self._make_session(
             weekday=Weekday.SATURDAY,
             start_time=time(9, 0),
             end_time=time(10, 0),
             is_active=True,
         )
-        ClassSession.objects.create(
-            course=self.course,
-            teacher=self.teacher,
+        self._make_session(
             weekday=Weekday.SUNDAY,
             start_time=time(11, 0),
             end_time=time(12, 0),
@@ -115,17 +109,13 @@ class ScheduleViewTests(TestCase):
         self.assertNotContains(response, '11:00')
 
     def test_schedule_orders_sessions_by_persian_weekday_order(self):
-        ClassSession.objects.create(
-            course=self.course,
-            teacher=self.teacher,
+        self._make_session(
             weekday=Weekday.FRIDAY,
             start_time=time(9, 0),
             end_time=time(10, 0),
             is_active=True,
         )
-        ClassSession.objects.create(
-            course=self.course,
-            teacher=self.teacher,
+        self._make_session(
             weekday=Weekday.SATURDAY,
             start_time=time(11, 0),
             end_time=time(12, 0),
@@ -140,10 +130,8 @@ class ScheduleViewTests(TestCase):
         self.assertEqual(row['cells'][0]['sessions'][0].start_time, time(11, 0))
         self.assertEqual(row['cells'][-1]['sessions'][0].start_time, time(9, 0))
 
-    def test_schedule_context_contains_course_teacher_rows(self):
-        ClassSession.objects.create(
-            course=self.course,
-            teacher=self.teacher,
+    def test_schedule_context_contains_teacher_rows_with_instruments(self):
+        self._make_session(
             weekday=Weekday.SATURDAY,
             start_time=time(9, 0),
             end_time=time(10, 0),
@@ -154,9 +142,7 @@ class ScheduleViewTests(TestCase):
         rows = response.context['schedule_rows']
 
         self.assertEqual(len(rows), 1)
-        self.assertEqual(rows[0]['course'], self.course)
         self.assertEqual(rows[0]['teacher'], self.teacher)
+        self.assertEqual(rows[0]['instruments'], [self.instrument])
         self.assertEqual(rows[0]['cells'][0]['weekday'], Weekday.SATURDAY)
         self.assertEqual(len(rows[0]['cells'][0]['sessions']), 1)
-
-# Create your tests here.
