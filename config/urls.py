@@ -17,7 +17,8 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 
 from gallery import urls as gallery_urls
 
@@ -35,5 +36,8 @@ if settings.DEBUG:
     # Serve static files from the development directory (only locally)
     urlpatterns += static('/static/', document_root=settings.BASE_DIR / 'static_dev')
 
-# Always serve media files (uploaded content must be accessible in production too)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve media files via Django's serve view — works regardless of DEBUG setting
+# (the static() helper returns an empty list when DEBUG=False, so can't be used here)
+urlpatterns += [
+    re_path(r'^public/media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
