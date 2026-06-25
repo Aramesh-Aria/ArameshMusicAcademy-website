@@ -1,7 +1,30 @@
+import re
+from urllib.parse import parse_qs, urlparse
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
+
+
+def youtube_video_id(url):
+    """Extract the 11-char video id from any common YouTube URL form."""
+    parsed = urlparse(url)
+    host = parsed.netloc.lower()
+    if 'youtu.be' in host:
+        return parsed.path.lstrip('/').split('/')[0] or None
+    if 'youtube' in host:
+        if parsed.path.startswith(('/embed/', '/shorts/')):
+            return parsed.path.split('/')[2] or None
+        query_id = parse_qs(parsed.query).get('v', [None])[0]
+        return query_id
+    return None
+
+
+def aparat_video_hash(url):
+    """Extract the video hash from an Aparat URL (aparat.com/v/HASH or embed form)."""
+    match = re.search(r'/v/([A-Za-z0-9]+)', url) or re.search(r'/videohash/([A-Za-z0-9]+)', url)
+    return match.group(1) if match else None
 
 
 class GalleryPage(models.Model):
@@ -150,3 +173,59 @@ class GalleryImage(models.Model):
         if self.title:
             return self.title
         return f'تصویر {self.gallery_page}'
+
+
+class Video(models.Model):
+    YOUTUBE = 'youtube'
+    APARAT = 'aparat'
+    PLATFORM_CHOICES = (
+        (YOUTUBE, 'یوتیوب'),
+        (APARAT, 'آپارات'),
+    )
+
+    gallery_page = models.ForeignKey(
+        GalleryPage,
+        on_delete=models.CASCADE,
+        related_name='videos',
+        verbose_name='صفحه گالری',
+        help_text='ویدیو به کدام صفحه گالری تعلق دارد.',
+    )
+    title = models.CharField('عنوان', max_length=150, help_text='عنوان ویدیو.')
+    platform = models.CharField('سرویس', max_length=10, choices=PLATFORM_CHOICES, help_text='ویدیو از کدام سرویس جاسازی می‌شود.')
+    video_url = models.URLField(
+        'آدرس ویدیو',
+        help_text='آدرس صفحه ویدیو در یوتیوب یا آپارات را وارد کنید (نه کد جاسازی).',
+    )
+    caption = models.TextField('توضیح', blank=True, help_text='توضیح کوتاه زیر ویدیو.')
+    is_active = models.BooleanField('فعال', default=True, help_text='فقط ویدیوهای فعال در سایت نمایش داده می‌شوند.')
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر.')
+    created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
+    updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', 'created_at']
+        verbose_name = 'ویدیو'
+        verbose_name_plural = 'ویدیوها'
+
+    def __str__(self):
+        return self.title
+
+    def clean(self):
+        super().clean()
+        if not self.video_url:
+            return
+        if self.platform == self.YOUTUBE and not youtube_video_id(self.video_url):
+            raise ValidationError({'video_url': 'آدرس یوتیوب معتبر نیست.'})
+        if self.platform == self.APARAT and not aparat_video_hash(self.video_url):
+            raise ValidationError({'video_url': 'آدرس آپارات معتبر نیست.'})
+
+    @property
+    def embed_url(self):
+        """The iframe src for embedding this video, or None if it can't be parsed."""
+        if self.platform == self.YOUTUBE:
+            video_id = youtube_video_id(self.video_url)
+            return f'https://www.youtube.com/embed/{video_id}' if video_id else None
+        if self.platform == self.APARAT:
+            video_hash = aparat_video_hash(self.video_url)
+            return f'https://www.aparat.com/video/video/embed/videohash/{video_hash}/vt/frame' if video_hash else None
+        return None

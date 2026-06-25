@@ -51,4 +51,22 @@ class TeacherViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-# Create your tests here.
+    def test_teacher_detail_lists_active_sessions(self):
+        from datetime import time
+
+        from schedules.models import ClassSession, Weekday
+
+        teacher = self.make_teacher('Sara', 'Karimi')
+        session = ClassSession.objects.create(
+            teacher=teacher,
+            weekday=Weekday.SATURDAY,
+            start_time=time(9, 0),
+            end_time=time(10, 0),
+            is_active=True,
+        )
+        session.instruments.add(self.instrument)
+
+        response = self.client.get(teacher.get_absolute_url())
+
+        self.assertIn(session, list(response.context['teacher_sessions']))
+        self.assertContains(response, 'برنامه کلاس‌ها')

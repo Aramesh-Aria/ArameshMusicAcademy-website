@@ -2,7 +2,44 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import GalleryImage, GalleryPage
+from .models import GalleryImage, GalleryPage, Video
+
+
+class VideoModelTests(TestCase):
+    def setUp(self):
+        self.page = GalleryPage.objects.create(title='Concerts', slug='concerts')
+
+    def test_youtube_watch_url_builds_embed_url(self):
+        video = Video.objects.create(
+            gallery_page=self.page, title='Concert', platform=Video.YOUTUBE,
+            video_url='https://www.youtube.com/watch?v=abc123XYZ_0',
+        )
+        self.assertEqual(video.embed_url, 'https://www.youtube.com/embed/abc123XYZ_0')
+
+    def test_youtube_short_url_builds_embed_url(self):
+        video = Video(
+            gallery_page=self.page, title='Concert', platform=Video.YOUTUBE,
+            video_url='https://youtu.be/abc123XYZ_0',
+        )
+        self.assertEqual(video.embed_url, 'https://www.youtube.com/embed/abc123XYZ_0')
+
+    def test_aparat_url_builds_embed_url(self):
+        video = Video(
+            gallery_page=self.page, title='Concert', platform=Video.APARAT,
+            video_url='https://www.aparat.com/v/AbCdE',
+        )
+        self.assertEqual(
+            video.embed_url,
+            'https://www.aparat.com/video/video/embed/videohash/AbCdE/vt/frame',
+        )
+
+    def test_invalid_youtube_url_fails_validation(self):
+        video = Video(
+            gallery_page=self.page, title='Concert', platform=Video.YOUTUBE,
+            video_url='https://example.com/not-a-video',
+        )
+        with self.assertRaises(ValidationError):
+            video.full_clean()
 
 
 class GalleryPageModelTests(TestCase):

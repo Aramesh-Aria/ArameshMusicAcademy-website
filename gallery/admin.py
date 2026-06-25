@@ -1,7 +1,13 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import GalleryImage, GalleryPage
+from .models import GalleryImage, GalleryPage, Video
+
+
+class VideoInline(admin.TabularInline):
+    model = Video
+    extra = 1
+    fields = ('title', 'platform', 'video_url', 'caption', 'is_active', 'display_order')
 
 
 class GalleryImageInline(admin.TabularInline):
@@ -43,7 +49,7 @@ class GalleryPageAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     readonly_fields = ('cover_image_preview', 'slug_path_display', 'created_at', 'updated_at')
     ordering = ('parent__title', 'display_order', 'title')
-    inlines = (GalleryImageInline,)
+    inlines = (GalleryImageInline, VideoInline)
     fieldsets = (
         ('اطلاعات صفحه', {
             'fields': ('title', 'slug', 'parent', 'description', 'intro_text', 'cover_image', 'cover_image_preview')
@@ -96,4 +102,11 @@ class GalleryImageAdmin(admin.ModelAdmin):
             obj.image.url,
         )
 
-# Register your models here.
+
+@admin.register(Video)
+class VideoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'platform', 'gallery_page', 'is_active', 'display_order', 'updated_at')
+    list_filter = ('is_active', 'platform', 'gallery_page')
+    search_fields = ('title', 'caption', 'gallery_page__title')
+    readonly_fields = ('created_at', 'updated_at')
+    ordering = ('gallery_page', 'display_order', 'created_at')

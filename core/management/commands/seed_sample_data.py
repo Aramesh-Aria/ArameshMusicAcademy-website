@@ -147,6 +147,15 @@ class Command(BaseCommand):
                 'display_order': 2,
                 'cover_color': '#546A7B',
             },
+            {
+                'title': 'فضای آموزشگاه',
+                'slug': 'academy-space',
+                'parent': None,
+                'description': 'تصاویر فضای فیزیکی و کلاس‌های آموزشگاه برای صفحه درباره ما.',
+                'intro_text': 'نمایی از محیط آموزشی و کلاس‌های آموزشگاه.',
+                'display_order': 3,
+                'cover_color': '#3F5E5A',
+            },
         ]
 
         pages_by_slug = {}
@@ -189,6 +198,20 @@ class Command(BaseCommand):
                 'caption': 'نمونه تصویر از فضای داخلی کلاس‌ها.',
                 'display_order': 1,
                 'color': '#6A8D73',
+            },
+            {
+                'page_slug': 'academy-space',
+                'title': 'سالن تمرین',
+                'caption': 'نمونه تصویر از سالن تمرین آموزشگاه.',
+                'display_order': 1,
+                'color': '#3F5E5A',
+            },
+            {
+                'page_slug': 'academy-space',
+                'title': 'اتاق کلاس',
+                'caption': 'نمونه تصویر از اتاق کلاس‌های خصوصی.',
+                'display_order': 2,
+                'color': '#7D6B57',
             },
         ]
 

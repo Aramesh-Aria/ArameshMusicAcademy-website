@@ -6,6 +6,16 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
 
+    {% block analytics %}{% if google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ google_analytics_id }}');
+    </script>
+    {% endif %}{% endblock %}
+
     <meta name="description" content="{% block meta_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب. برای مشاوره و ثبت‌نام با ما در تماس باشید.' }}{% endblock %}">
 
     {# ── Open Graph (link previews on Telegram, WhatsApp, etc.) ── #}

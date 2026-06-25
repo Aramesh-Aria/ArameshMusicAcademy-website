@@ -38,4 +38,10 @@ class TeacherDetailView(DetailView):
             context['meta_description'] = (
                 f'{teacher.full_name} مدرس {instruments} در آموزشگاه موسیقی آرامش.'
             )
+        context['teacher_sessions'] = (
+            teacher.class_sessions
+            .filter(is_active=True)
+            .prefetch_related('instruments')
+            .order_by('weekday_order', 'start_time')
+        )
         return context

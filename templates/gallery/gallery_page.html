@@ -94,12 +94,38 @@
           </div>
         </div>
         {% endfor %}
-      {% elif current_page and not child_pages %}
+      {% elif current_page and not child_pages and not videos %}
       <div class="col-12">
       <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
       </div>
       {% endif %}
     </div>
+
+    {% if videos %}
+    <div class="row gy-4 mt-2">
+      {% for video in videos %}
+        {% if video.embed_url %}
+        <div class="col-lg-6">
+          <div class="portfolio-card">
+            <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
+              <iframe
+                src="{{ video.embed_url }}"
+                title="{{ video.title }}"
+                loading="lazy"
+                allowfullscreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                referrerpolicy="strict-origin-when-cross-origin"></iframe>
+            </div>
+            <div class="content">
+              <h3>{{ video.title }}</h3>
+              {% if video.caption %}<p>{{ video.caption|truncatechars:80 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
 </section>
 {% endblock %}

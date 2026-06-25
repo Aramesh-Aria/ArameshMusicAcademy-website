@@ -184,3 +184,9 @@ DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', SITE_EMAIL)
 
 # Where new contact-form submissions are emailed.
 CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', SITE_EMAIL)
+
+# Slug of the GalleryPage whose images are shown on the About page (academy's physical space).
+ABOUT_GALLERY_SLUG = os.environ.get('ABOUT_GALLERY_SLUG', 'academy-space')
+
+# Google Analytics 4 measurement ID (e.g. G-XXXXXXXXXX). Empty = analytics disabled.
+GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID', '')

@@ -29,6 +29,7 @@ class GalleryPageView(TemplateView):
         context['breadcrumbs'] = self.get_breadcrumbs(current_page)
         context['child_pages'] = current_page.children.filter(is_active=True)
         context['images'] = current_page.images.filter(is_active=True)
+        context['videos'] = current_page.videos.filter(is_active=True)
         description = current_page.description or current_page.intro_text
         if description:
             context['meta_description'] = ' '.join(description.split())[:160]

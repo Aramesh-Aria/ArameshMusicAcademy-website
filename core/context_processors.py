@@ -12,4 +12,5 @@ def site_info(request):
         'site_phone_primary': phones[0] if len(phones) > 0 else '',
         'site_address': getattr(settings, 'SITE_ADDRESS', 'تهران، خیابان نمونه، آموزشگاه موسیقی آرامش'),
         'current_year': datetime.now().year,
+        'google_analytics_id': getattr(settings, 'GOOGLE_ANALYTICS_ID', ''),
     }
