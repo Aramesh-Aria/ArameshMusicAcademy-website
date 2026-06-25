@@ -62,6 +62,20 @@ class GalleryPageAdmin(admin.ModelAdmin):
         }),
     )
 
+    def get_form(self, request, obj=None, **kwargs):
+        request._editing_gallery_page = obj
+        return super().get_form(request, obj, **kwargs)
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        # Only top-level pages may be chosen as a parent, which caps nesting at 2 levels.
+        if db_field.name == 'parent':
+            queryset = GalleryPage.objects.filter(parent__isnull=True)
+            obj = getattr(request, '_editing_gallery_page', None)
+            if obj is not None:
+                queryset = queryset.exclude(pk=obj.pk)
+            kwargs['queryset'] = queryset
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
     @admin.display(description='مسیر کامل')
     def slug_path_display(self, obj):
         if not obj.pk:

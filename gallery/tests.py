@@ -42,6 +42,27 @@ class VideoModelTests(TestCase):
             video.full_clean()
 
 
+class GalleryPageAdminTests(TestCase):
+    def test_parent_choices_limited_to_top_level_pages(self):
+        from django.contrib.admin.sites import AdminSite
+        from django.test import RequestFactory
+
+        from .admin import GalleryPageAdmin
+
+        root = GalleryPage.objects.create(title='Concerts', slug='concerts')
+        child = GalleryPage.objects.create(title='Year 1403', slug='year-1403', parent=root)
+
+        admin_instance = GalleryPageAdmin(GalleryPage, AdminSite())
+        request = RequestFactory().get('/admin/gallery/gallerypage/add/')
+        request._editing_gallery_page = None
+        parent_field = GalleryPage._meta.get_field('parent')
+        formfield = admin_instance.formfield_for_foreignkey(parent_field, request)
+
+        choices = list(formfield.queryset)
+        self.assertIn(root, choices)        # top-level page is selectable as a parent
+        self.assertNotIn(child, choices)    # a child page cannot become a parent (caps depth at 2)
+
+
 class GalleryPageModelTests(TestCase):
     def test_unsaved_root_gallery_page_can_be_cleaned(self):
         page = GalleryPage(title='Concerts', slug='concerts')

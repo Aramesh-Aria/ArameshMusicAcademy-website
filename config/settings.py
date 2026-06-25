@@ -170,6 +170,16 @@ SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7746', '+98 990 233 8431', '+98 21 4445 7748', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '
 
+# Social media (leave empty to hide the link). Override via env vars if needed.
+SITE_INSTAGRAM = os.environ.get('SITE_INSTAGRAM', 'https://www.instagram.com/arameshmusic.academy/')
+SITE_TELEGRAM = os.environ.get('SITE_TELEGRAM', 'https://t.me/arameshmusicacademyconcert')
+
+# Working hours shown on the contact page — one entry per displayed line.
+SITE_HOURS = [
+    'شنبه تا چهارشنبه: ۱۰ تا ۲۱ (به غیر از ایام تعطیل)',
+    'پنج‌شنبه: ۱۰ تا ۱۴',
+]
+
 # Email
 # Defaults to the console backend so local dev and tests never need real SMTP credentials.
 # In production, set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend and the

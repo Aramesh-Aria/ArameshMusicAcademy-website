@@ -22,22 +22,25 @@
           <li><i class="bi bi-chevron-right"></i> <a href="{% url 'contact:contact' %}">تماس با ما</a></li>
         </ul>
       </div>
+      {% if site_instruments %}
       <div class="col-lg-2 col-md-3 footer-links">
         <h4>دوره‌ها</h4>
         <ul>
-          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">پیانو</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">گیتار</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">ویولن</a></li>
-          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">آواز</a></li>
+          {% for instrument in site_instruments %}
+          <li><i class="bi bi-chevron-right"></i> <a href="{% url 'schedules:schedule' %}">{{ instrument.name }}</a></li>
+          {% endfor %}
         </ul>
       </div>
+      {% endif %}
       <div class="col-lg-4 col-md-12">
         <h4>شبکه‌های اجتماعی</h4>
         <p>برای اطلاع از برنامه کلاس‌ها و رویدادهای جدید، صفحات ما را دنبال کنید.</p>
-            <div class="social-links d-flex">
-            <a href="https://t.me/arameshmusicacademyconcert"><i class="bi bi-telegram"></i></a>
-            <a href="https://www.instagram.com/arameshmusic.academy/"><i class="bi bi-instagram"></i></a>
+          {% if site_telegram or site_instagram %}
+          <div class="social-links d-flex">
+            {% if site_telegram %}<a href="{{ site_telegram }}" target="_blank" rel="noopener noreferrer"><i class="bi bi-telegram"></i></a>{% endif %}
+            {% if site_instagram %}<a href="{{ site_instagram }}" target="_blank" rel="noopener noreferrer"><i class="bi bi-instagram"></i></a>{% endif %}
           </div>
+          {% endif %}
       </div>
     </div>
   </div>

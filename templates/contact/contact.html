@@ -119,7 +119,7 @@
               <div class="contact-icon"><i class="bi bi-clock"></i></div>
               <div class="contact-details">
                 <span class="method-label">ساعت پاسخ‌گویی</span>
-                <p>شنبه تا چهارشنبه: ۱۰ تا ۲۱ (به غیر از ایام تعطیل)<br>پنج‌شنبه: ۱۰ تا ۱۴</p>
+                <p>{% for line in site_hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
               </div>
             </div>
           </div>
