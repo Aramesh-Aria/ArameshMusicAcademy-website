@@ -21,7 +21,11 @@
         </div>
         <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
           <div class="hero-image">
-            <img src="{% static 'assets/img/home_pic.webp' %}" alt="آموزشگاه موسیقی" class="img-fluid">
+            {% if page_hero_image %}
+              <img src="{{ page_hero_image.url }}" alt="آموزشگاه موسیقی آرامش" class="img-fluid">
+            {% else %}
+              <img src="{% static 'assets/img/home_pic.webp' %}" alt="آموزشگاه موسیقی آرامش" class="img-fluid">
+            {% endif %}
           </div>
         </div>
       </div>
@@ -42,6 +46,108 @@
         <div class="service-item"><h3>فضای آموزشی استاندارد</h3><p>محیط مناسب برای یادگیری پیوسته موسیقی.</p></div>
       </div>
     </div>
+  </div>
+</section>
+
+{# ── Teacher preview ── #}
+{% if featured_teachers %}
+<section class="team section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>اساتید ما</h2>
+    <p>آموزش زیر نظر اساتید مجرب و فعال در عرصه اجرا</p>
+  </div>
+  <div class="container" data-aos="fade-up">
+    <div class="row gy-4 justify-content-center">
+      {% for teacher in featured_teachers %}
+      <div class="col-lg-4 col-md-6">
+        <div class="member-card">
+          <div class="member-image-wrapper">
+            <a href="{{ teacher.get_absolute_url }}" aria-label="مشاهده پروفایل {{ teacher.full_name }}">
+              {% if teacher.profile_image %}
+                <img src="{{ teacher.profile_image.url }}" class="img-fluid" alt="{{ teacher.full_name }}">
+              {% else %}
+                <img src="{% static 'assets/img/person/person-m-2.webp' %}" class="img-fluid" alt="{{ teacher.full_name }}">
+              {% endif %}
+            </a>
+          </div>
+          <div class="member-content">
+            <h4 class="member-name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h4>
+            <span class="member-role">
+              {% for instrument in teacher.instruments.all %}
+                {{ instrument.name }}{% if not forloop.last %}، {% endif %}
+              {% endfor %}
+            </span>
+            {% if teacher.biography %}
+              <p class="member-bio">{{ teacher.biography|truncatechars:120 }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'teachers:teacher_list' %}" class="btn-primary">مشاهده همه اساتید</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── Testimonials ── #}
+{% if testimonials %}
+<section class="testimonials section light-background">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>نظر هنرجویان و والدین</h2>
+    <p>تجربه کسانی که مسیر یادگیری موسیقی را با ما طی کرده‌اند</p>
+  </div>
+  <div class="container" data-aos="fade-up">
+    <div class="row gy-4">
+      {% for testimonial in testimonials %}
+      <div class="col-lg-4 col-md-6">
+        <div class="testimonial-item h-100 p-4 rounded-3 shadow-sm bg-white">
+          <i class="bi bi-quote" style="font-size:2rem;color:var(--accent-color,#2c6fad)"></i>
+          <p class="mt-2">{{ testimonial.quote }}</p>
+          <div class="mt-3">
+            <strong>{{ testimonial.author_name }}</strong>
+            {% if testimonial.relation %}<div class="text-muted small">{{ testimonial.relation }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── Gallery preview ── #}
+{% if gallery_preview_images %}
+<section class="gallery section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>نگاهی به آموزشگاه</h2>
+    <p>تصاویری از کلاس‌ها، اجراها و فضای آموزشی</p>
+  </div>
+  <div class="container" data-aos="fade-up">
+    <div class="row g-3">
+      {% for image in gallery_preview_images %}
+      <div class="col-lg-4 col-md-6">
+        <a href="{{ image.gallery_page.get_absolute_url }}" class="d-block rounded-3 overflow-hidden">
+          <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:image.gallery_page.title }}" style="aspect-ratio:3/2;object-fit:cover">
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="text-center mt-4">
+      <a href="{% url 'gallery:gallery_root' %}" class="btn-primary">مشاهده گالری</a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ── Contact call-to-action ── #}
+<section class="cta-section section">
+  <div class="container text-center" data-aos="fade-up">
+    <h2>آماده شروع هستید؟</h2>
+    <p>برای مشاوره رایگان، انتخاب ساز و هماهنگی کلاس با ما در تماس باشید.</p>
+    <a href="{% url 'contact:contact' %}" class="btn-primary mt-2"><i class="bi bi-envelope"></i> تماس با ما</a>
   </div>
 </section>
 {% endblock %}

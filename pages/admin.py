@@ -14,6 +14,9 @@ class SitePageContentAdmin(admin.ModelAdmin):
         ('صفحه', {
             'fields': ('page_key', 'title', 'body')
         }),
+        ('سئو و تصویر', {
+            'fields': ('meta_description', 'hero_image')
+        }),
         ('انتشار', {
             'fields': ('is_active',)
         }),

@@ -28,4 +28,14 @@ class TeacherDetailView(DetailView):
             .prefetch_related('instruments')
         )
 
-# Create your views here.
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        teacher = self.object
+        if teacher.biography:
+            context['meta_description'] = ' '.join(teacher.biography.split())[:160]
+        else:
+            instruments = '، '.join(i.name for i in teacher.instruments.all())
+            context['meta_description'] = (
+                f'{teacher.full_name} مدرس {instruments} در آموزشگاه موسیقی آرامش.'
+            )
+        return context

@@ -6,6 +6,16 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
 
+    <meta name="description" content="{% block meta_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب. برای مشاوره و ثبت‌نام با ما در تماس باشید.' }}{% endblock %}">
+
+    {# ── Open Graph (link previews on Telegram, WhatsApp, etc.) ── #}
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="آموزشگاه موسیقی آرامش">
+    <meta property="og:title" content="{% block og_title %}{{ page_title|default:'آموزشگاه موسیقی آرامش' }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/img/home_pic.webp' %}{% endblock %}">
+
     <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
     <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
 

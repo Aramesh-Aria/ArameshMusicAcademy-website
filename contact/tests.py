@@ -1,3 +1,5 @@
+from captcha.models import CaptchaStore
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
@@ -6,18 +8,32 @@ from .models import ContactMessage
 
 
 class ContactViewTests(TestCase):
-    def test_contact_form_saves_message(self):
+    def _solved_captcha(self):
+        """Create a real captcha and return its (hashkey, correct response)."""
+        key = CaptchaStore.generate_key()
+        response = CaptchaStore.objects.get(hashkey=key).response
+        return key, response
+
+    def test_contact_form_saves_message_and_sends_notification(self):
+        captcha_key, captcha_response = self._solved_captcha()
         response = self.client.post(reverse('contact:contact'), {
             'full_name': 'Ali Ahmadi',
             'email': 'ali@example.com',
             'phone': '09120000000',
             'subject': 'Question',
             'message': 'I want more information.',
+            'captcha_0': captcha_key,
+            'captcha_1': captcha_response,
         })
 
         self.assertRedirects(response, reverse('contact:contact_success'))
         self.assertEqual(ContactMessage.objects.count(), 1)
         self.assertEqual(ContactMessage.objects.get().full_name, 'Ali Ahmadi')
+
+        # The academy is notified, with the visitor's address as reply-to.
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('ali@example.com', mail.outbox[0].reply_to)
+        self.assertIn('Question', mail.outbox[0].subject)
 
 
 class ContactMessageModelTests(TestCase):

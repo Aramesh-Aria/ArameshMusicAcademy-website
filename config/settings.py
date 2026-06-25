@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'django_jalali',
     'core',
     'pages',
@@ -49,6 +50,7 @@ INSTALLED_APPS = [
     'schedules',
     'contact',
     'gallery',
+    'testimonials',
     'captcha',
 ]
 
@@ -157,6 +159,21 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "public", "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Site Information
-SITE_EMAIL = 'info@aramesh-academy.ir'
+SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7746', '+98 990 233 8431', '+98 21 4445 7748', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '
+
+# Email
+# Defaults to the console backend so local dev and tests never need real SMTP credentials.
+# In production, set EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend and the
+# EMAIL_HOST / EMAIL_HOST_USER / EMAIL_HOST_PASSWORD env vars on Runflare.
+EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', SITE_EMAIL)
+
+# Where new contact-form submissions are emailed.
+CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', SITE_EMAIL)
