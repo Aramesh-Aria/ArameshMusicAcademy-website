@@ -34,72 +34,58 @@
   <div class="container" data-aos="fade-up">
     {% if current_page and current_page.intro_text %}<p>{{ current_page.intro_text|linebreaks }}</p>{% endif %}
 
+    {% if child_pages %}
     <div class="row gy-4 portfolio-grid">
-      {% if child_pages %}
-        {% for page in child_pages %}
-        <div class="col-lg-4 col-md-6 portfolio-item">
-          <div class="portfolio-card">
-            <div class="image-container">
-              <a href="{{ page.get_absolute_url }}" aria-label="ورود به گالری {{ page.title }}">
+      {% for page in child_pages %}
+      <div class="col-lg-4 col-md-6 portfolio-item">
+        <div class="portfolio-card">
+          <div class="image-container">
+            <a href="{{ page.get_absolute_url }}" aria-label="ورود به گالری {{ page.title }}">
+              {% if page.cover_image %}
+                <img src="{{ page.cover_image.url }}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
+              {% else %}
+                <img src="{% static 'assets/img/portfolio/portfolio-5.webp' %}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
+              {% endif %}
+            </a>
+            <div class="overlay">
+              <div class="overlay-content">
                 {% if page.cover_image %}
-                  <img src="{{ page.cover_image.url }}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
-                {% else %}
-                  <img src="{% static 'assets/img/portfolio/portfolio-5.webp' %}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
+                <a href="{{ page.cover_image.url }}" class="glightbox zoom-link" title="{{ page.title }}">
+                  <i class="bi bi-zoom-in"></i>
+                </a>
                 {% endif %}
-              </a>
-              <div class="overlay">
-                <div class="overlay-content">
-                  {% if page.cover_image %}
-                  <a href="{{ page.cover_image.url }}" class="glightbox zoom-link" title="{{ page.title }}">
-                    <i class="bi bi-zoom-in"></i>
-                  </a>
-                  {% endif %}
-                  <a href="{{ page.get_absolute_url }}" class="details-link" title="مشاهده گالری">
-                    <i class="bi bi-arrow-left"></i>
-                  </a>
-                </div>
+                <a href="{{ page.get_absolute_url }}" class="details-link" title="مشاهده گالری">
+                  <i class="bi bi-arrow-left"></i>
+                </a>
               </div>
             </div>
-            <div class="content">
-              <h3>{{ page.title }}</h3>
-              <p>{{ page.description|default:'برای مشاهده تصاویر این بخش وارد شوید.'|truncatechars:70 }}</p>
-            </div>
+          </div>
+          <div class="content">
+            <h3>{{ page.title }}</h3>
+            <p>{{ page.description|default:'برای مشاهده تصاویر این بخش وارد شوید.'|truncatechars:70 }}</p>
           </div>
         </div>
-        {% endfor %}
-      {% endif %}
-
-      {% if images %}
-        {% for image in images %}
-        <div class="col-lg-4 col-md-6 portfolio-item">
-          <div class="portfolio-card">
-            <div class="image-container">
-              <img src="{{ image.image.url }}" class="img-fluid" alt="{{ image.title|default:current_page.title }}" loading="lazy">
-              <div class="overlay">
-                <div class="overlay-content">
-                  <a
-                    href="{{ image.image.url }}"
-                    class="glightbox zoom-link"
-                    data-gallery="gallery-preview"
-                    title="{{ image.title|default:current_page.title }}">
-                    <i class="bi bi-zoom-in"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div class="content">
-              <h3>{{ image.title|default:current_page.title }}</h3>
-              <p>{{ image.caption|default:'برای مشاهده بزرگ‌تر روی دکمه پیش‌نمایش کلیک کنید.'|truncatechars:80 }}</p>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      {% elif current_page and not child_pages and not videos %}
-      <div class="col-12">
-      <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
       </div>
-      {% endif %}
+      {% endfor %}
     </div>
+    {% endif %}
+
+    {% if images %}
+    <div class="row g-3">
+      {% for image in images %}
+      <div class="col-lg-4 col-md-6">
+        <a href="{{ image.image.url }}" class="glightbox d-block rounded-3 overflow-hidden" data-gallery="gallery-images" title="{{ image.title|default:current_page.title }}">
+          <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:current_page.title }}" loading="lazy" style="aspect-ratio:3/2;object-fit:cover">
+        </a>
+        {% if image.caption %}<p class="small text-muted mt-1 mb-0">{{ image.caption|truncatechars:80 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if current_page and not child_pages and not images and not videos %}
+    <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
+    {% endif %}
 
     {% if videos %}
     <div class="row gy-4 mt-2">
