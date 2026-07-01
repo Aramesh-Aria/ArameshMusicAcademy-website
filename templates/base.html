@@ -21,10 +21,22 @@
     {# ── Open Graph (link previews on Telegram, WhatsApp, etc.) ── #}
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="آموزشگاه موسیقی آرامش">
+    <meta property="og:locale" content="fa_IR">
     <meta property="og:title" content="{% block og_title %}{{ page_title|default:'آموزشگاه موسیقی آرامش' }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:image" content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'assets/img/home_pic.webp' %}{% endblock %}">
+    <meta property="og:image" content="{% block og_image %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
+    <meta property="og:image:secure_url" content="{% block og_image_secure %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
+    <meta property="og:image:type" content="image/jpeg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="آموزشگاه موسیقی آرامش">
+
+    {# ── Twitter / X card ── #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block tw_title %}{{ page_title|default:'آموزشگاه موسیقی آرامش' }}{% endblock %}">
+    <meta name="twitter:description" content="{% block tw_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
+    <meta name="twitter:image" content="{% block tw_image %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
 
     <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
     <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">

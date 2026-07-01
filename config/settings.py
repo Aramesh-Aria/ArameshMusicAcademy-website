@@ -39,6 +39,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://aramesh-academy.runflare.run',
 ]
 
+# Runflare terminates TLS at its proxy and forwards the original scheme in this header.
+# Without it, Django thinks every request is http and builds http:// URLs (breaks OG/canonical).
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # Application definition
 
