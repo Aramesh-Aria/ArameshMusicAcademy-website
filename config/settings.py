@@ -48,7 +48,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'jazzmin',
-    'django.contrib.admin',
+    'core.admin_config.ArameshAdminConfig',  # replaces 'django.contrib.admin' (adds unread-message count)
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',

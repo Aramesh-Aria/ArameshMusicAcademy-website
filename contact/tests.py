@@ -1,10 +1,41 @@
 from captcha.models import CaptchaStore
+from django.contrib.auth import get_user_model
 from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 
 from .forms import ContactForm
 from .models import ContactMessage
+
+
+class AdminUnreadCountTests(TestCase):
+    def setUp(self):
+        self.admin = get_user_model().objects.create_superuser(
+            username='admin', email='admin@example.com', password='pass12345',
+        )
+        self.client.force_login(self.admin)
+
+    def _make_message(self, is_read):
+        ContactMessage.objects.create(
+            full_name='Ali', email='a@example.com', subject='Q',
+            message='hi', is_read=is_read,
+        )
+
+    def test_sidebar_shows_unread_message_count(self):
+        self._make_message(is_read=False)
+        self._make_message(is_read=False)
+        self._make_message(is_read=True)  # read ones must not be counted
+
+        response = self.client.get(reverse('admin:index'))
+
+        self.assertContains(response, 'پیام‌های تماس (2)')
+
+    def test_no_count_when_all_read(self):
+        self._make_message(is_read=True)
+
+        response = self.client.get(reverse('admin:index'))
+
+        self.assertNotContains(response, 'پیام‌های تماس (')
 
 
 class ContactViewTests(TestCase):
