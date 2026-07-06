@@ -56,6 +56,14 @@
     min-width: 120px;
     border-right: 3px solid transparent;  /* accent stripe added per-color (RTL) */
   }
+  .cell-teacher a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .cell-teacher a:hover {
+    opacity: .8;
+  }
 
   /* Instruments cell */
   .cell-instruments {
@@ -159,7 +167,7 @@
           <tr class="course-{{ row.color_index }}">
 
             {# ── Teacher ── #}
-            <th class="cell-teacher" scope="row">{{ row.teacher.full_name }}</th>
+            <th class="cell-teacher" scope="row"><a href="{{ row.teacher.get_absolute_url }}">{{ row.teacher.full_name }}</a></th>
 
             {# ── Instruments ── #}
             <td class="cell-instruments">
