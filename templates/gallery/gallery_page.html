@@ -77,8 +77,6 @@
         <a href="{{ image.image.url }}" class="glightbox d-block rounded-3 overflow-hidden" data-gallery="gallery-images" title="{{ image.title|default:current_page.title }}">
           <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:current_page.title }}" loading="lazy" style="aspect-ratio:3/2;object-fit:cover">
         </a>
-        {% if image.title %}<p class="text-center fw-medium mt-2 mb-0">{{ image.title }}</p>{% endif %}
-        {% if image.caption %}<p class="text-center small text-muted mt-1 mb-0">{{ image.caption|truncatechars:80 }}</p>{% endif %}
       </div>
       {% endfor %}
     </div>
