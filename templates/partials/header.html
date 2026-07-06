@@ -3,7 +3,7 @@
     <div class="container d-flex justify-content-center justify-content-md-between">
       <div class="contact-info d-flex align-items-center">
         <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:{{ site_email }}">{{ site_email }}</a></i>
-        <i class="bi bi-phone d-flex align-items-center ms-4"><span>{{ site_phone_primary }}</span></i>
+        <i class="bi bi-phone d-flex align-items-center ms-4"><a href="tel:{{ site_phone_primary|cut:' ' }}">{{ site_phone_primary }}</a></i>
       </div>
     </div>
   </div>

@@ -47,6 +47,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -213,3 +214,60 @@ ABOUT_GALLERY_SLUG = os.environ.get('ABOUT_GALLERY_SLUG', 'academy-space')
 
 # Google Analytics 4 measurement ID (e.g. G-XXXXXXXXXX). Empty = analytics disabled.
 GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID', '')
+
+# ── Django admin theme (django-jazzmin) ──────────────────────────────────────
+JAZZMIN_SETTINGS = {
+    'site_title': 'مدیریت آموزشگاه آرامش',
+    'site_header': 'آموزشگاه موسیقی آرامش',
+    'site_brand': 'آموزشگاه آرامش',
+    'welcome_sign': 'به پنل مدیریت آموزشگاه موسیقی آرامش خوش آمدید',
+    'copyright': 'آموزشگاه موسیقی آرامش',
+    'search_model': ['teachers.Teacher', 'contact.ContactMessage'],
+
+    # Top menu: quick link to view the live site
+    'topmenu_links': [
+        {'name': 'مشاهده سایت', 'url': '/', 'new_window': True},
+    ],
+
+    # Order of app sections in the sidebar
+    'order_with_respect_to': [
+        'teachers', 'schedules', 'gallery', 'pages', 'testimonials', 'contact', 'auth',
+    ],
+
+    # FontAwesome icons per model
+    'icons': {
+        'auth': 'fas fa-users-cog',
+        'auth.user': 'fas fa-user',
+        'auth.Group': 'fas fa-users',
+        'teachers': 'fas fa-chalkboard-teacher',
+        'teachers.Teacher': 'fas fa-chalkboard-teacher',
+        'teachers.Instrument': 'fas fa-guitar',
+        'schedules': 'fas fa-calendar-alt',
+        'schedules.ClassSession': 'fas fa-calendar-alt',
+        'gallery': 'fas fa-images',
+        'gallery.GalleryPage': 'fas fa-folder-open',
+        'gallery.GalleryImage': 'fas fa-image',
+        'gallery.Video': 'fas fa-video',
+        'pages': 'fas fa-file-alt',
+        'pages.SitePageContent': 'fas fa-file-alt',
+        'testimonials': 'fas fa-comment-dots',
+        'testimonials.Testimonial': 'fas fa-comment-dots',
+        'contact': 'fas fa-envelope',
+        'contact.ContactMessage': 'fas fa-envelope-open-text',
+    },
+    'default_icon_parents': 'fas fa-chevron-circle-left',
+    'default_icon_children': 'fas fa-circle',
+
+    # Keep the familiar stacked fieldsets instead of tabbed forms
+    'changeform_format': 'single',
+    'show_ui_builder': False,
+    'related_modal_active': True,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'theme': 'flatly',
+    'default_theme_mode': 'light',
+    'sidebar_nav_flat_style': True,
+    'navbar_fixed': True,
+    'sidebar_fixed': True,
+}
