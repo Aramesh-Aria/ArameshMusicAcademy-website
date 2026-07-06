@@ -50,11 +50,15 @@ class HomeView(PageContentMixin, TemplateView):
             .filter(is_active=True)
             .prefetch_related('instruments')[:3]
         )
+        space_page = (
+            GalleryPage.objects
+            .filter(slug=settings.ABOUT_GALLERY_SLUG, is_active=True)
+            .first()
+        )
+        # Photos from the academy-space gallery, in the display_order set in admin.
         context['gallery_preview_images'] = (
-            GalleryImage.objects
-            .filter(is_active=True, gallery_page__is_active=True)
-            .select_related('gallery_page')
-            .order_by('-created_at')[:6]
+            space_page.images.filter(is_active=True).select_related('gallery_page')[:6]
+            if space_page else GalleryImage.objects.none()
         )
         context['testimonials'] = Testimonial.objects.filter(is_active=True)
         return context

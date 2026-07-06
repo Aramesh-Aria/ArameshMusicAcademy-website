@@ -135,6 +135,19 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
+
+  /* Pin the teacher column so its name stays visible while scrolling the days (RTL: right edge) */
+  .schedule-table thead th:first-child,
+  .schedule-table .cell-teacher {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    box-shadow: -6px 0 6px -6px rgba(0,0,0,.18);  /* divider on the scrolling (left) side */
+  }
+  .schedule-table thead th:first-child {
+    background: var(--accent-color, #2c6fad);  /* opaque so scrolling cells don't show through */
+    z-index: 3;
+  }
 </style>
 {% endblock %}
 
