@@ -27,10 +27,10 @@ load_dotenv(BASE_DIR / '.env')
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-w(p+t0x6&*4295%5nedht10@0yz)bbdth9&0jw8xe$tnk(sgyq'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-w(p+t0x6&*4295%5nedht10@0yz)bbdth9&0jw8xe$tnk(sgyq)')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['aramesh-academy.runflare.run', 'api.runflare.com', 'localhost', '127.0.0.1','aramesh-academy.ir']
 
