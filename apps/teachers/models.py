@@ -1,0 +1,75 @@
+from django.db import models
+from django.urls import reverse
+
+
+class Instrument(models.Model):
+    name = models.CharField(
+        'نام ساز',
+        max_length=100,
+        unique=True,
+        help_text='نام هر ساز را فقط یک بار ثبت کنید.',
+        error_messages={
+            'unique': 'این ساز قبلا ثبت شده است.',
+        },
+    )
+    created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
+    updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'ساز'
+        verbose_name_plural = 'سازها'
+
+    def __str__(self):
+        return self.name
+
+
+class Teacher(models.Model):
+    first_name = models.CharField('نام', max_length=100, help_text='نام استاد را وارد کنید.')
+    last_name = models.CharField('نام خانوادگی', max_length=100, help_text='نام خانوادگی استاد را وارد کنید.')
+    instruments = models.ManyToManyField(
+        Instrument,
+        related_name='teachers',
+        verbose_name='سازها',
+        help_text='یک یا چند ساز که این استاد تدریس می‌کند را انتخاب کنید.',
+    )
+    biography = models.TextField('بیوگرافی', help_text='توضیح کوتاه یا کامل درباره سابقه و فعالیت‌های استاد.')
+    profile_image = models.ImageField('تصویر پروفایل', upload_to='teachers/', help_text='تصویر پرتره استاد را بارگذاری کنید.')
+    is_active = models.BooleanField('فعال', default=True, help_text='فقط اساتید فعال در سایت نمایش داده می‌شوند.')
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در لیست اساتید.')
+    created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
+    updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', 'last_name', 'first_name']
+        verbose_name = 'استاد'
+        verbose_name_plural = 'اساتید'
+
+    def __str__(self):
+        return self.full_name
+
+    @property
+    def full_name(self):
+        return f'{self.first_name} {self.last_name}'
+
+    def save(self, *args, **kwargs):
+        try:
+            old = Teacher.objects.get(pk=self.pk)
+            old_name = old.profile_image.name if old.profile_image else None
+        except Teacher.DoesNotExist:
+            old_name = None
+
+        new_name = self.profile_image.name if self.profile_image else None
+        image_changed = old_name != new_name
+
+        super().save(*args, **kwargs)
+
+        if image_changed and self.profile_image:
+            from apps.core.image_utils import process_image
+            result_name = process_image(self.profile_image, width=600, height=600, crop=True)
+            if result_name != self.profile_image.name:
+                Teacher.objects.filter(pk=self.pk).update(profile_image=result_name)
+                self.profile_image.name = result_name
+
+    def get_absolute_url(self):
+        return reverse('teachers:teacher_detail', kwargs={'pk': self.pk})

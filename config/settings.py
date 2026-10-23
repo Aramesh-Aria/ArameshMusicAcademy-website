@@ -48,7 +48,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 INSTALLED_APPS = [
     'jazzmin',
-    'core.admin_config.ArameshAdminConfig',  # replaces 'django.contrib.admin' (adds unread-message count)
+    'apps.core.admin_config.ArameshAdminConfig',  # replaces 'django.contrib.admin' (adds unread-message count)
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -56,13 +56,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'django_jalali',
-    'core',
-    'pages',
-    'teachers',
-    'schedules',
-    'contact',
-    'gallery',
-    'testimonials',
+    'apps.core',
+    'apps.pages',
+    'apps.teachers',
+    'apps.schedules',
+    'apps.contact',
+    'apps.gallery',
+    'apps.testimonials',
     'captcha',
 ]
 
@@ -89,8 +89,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'gallery.context_processors.gallery_nav_tree',
-                'core.context_processors.site_info',
+                'apps.gallery.context_processors.gallery_nav_tree',
+                'apps.core.context_processors.site_info',
             ],
         },
     },

@@ -38,8 +38,12 @@
     <meta name="twitter:description" content="{% block tw_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
     <meta name="twitter:image" content="{% block tw_image %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
 
-    <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
-    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+    <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" sizes="any">
+    <link href="{% static 'assets/img/favicon-32x32.png' %}" rel="icon" type="image/png" sizes="32x32">
+    <link href="{% static 'assets/img/favicon-16x16.png' %}" rel="icon" type="image/png" sizes="16x16">
+    <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon" sizes="180x180">
+    <link href="{% static 'assets/img/site.webmanifest' %}" rel="manifest">
+    <meta name="theme-color" content="#09947d">
 
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>

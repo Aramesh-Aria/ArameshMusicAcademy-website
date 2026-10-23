@@ -18,20 +18,23 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.sitemaps.views import sitemap
+from django.templatetags.static import static as static_url
 from django.urls import include, path, re_path
+from django.views.generic import RedirectView
 from django.views.static import serve
 
-from core.sitemaps import sitemaps
-from gallery import urls as gallery_urls
+from apps.core.sitemaps import sitemaps
+from apps.gallery import urls as gallery_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('pages.urls')),
-    path('teachers/', include('teachers.urls')),
-    path('schedule/', include('schedules.urls')),
+    path('', include('apps.pages.urls')),
+    path('teachers/', include('apps.teachers.urls')),
+    path('schedule/', include('apps.schedules.urls')),
     path('gallery/', include(gallery_urls)),
-    path('contact/', include('contact.urls')),
+    path('contact/', include('apps.contact.urls')),
     path('captcha/', include('captcha.urls')),
+    path('favicon.ico', RedirectView.as_view(url=static_url('assets/img/favicon.ico'), permanent=True)),
     path('sitemap.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
 ]
 
