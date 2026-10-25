@@ -8,9 +8,9 @@ venv/
 .env
 .DS_Store
 static_dev/
-claude.md
-context.md
-/docs
-IMPLEMENTATION-PLAN.md
 INTERVIEW_PREP_FA.md
 INTERVIEW_PREP.md
+# Claude Code third-party skills and agents (installed locally)
+/.claude
+.claude/skills/
+.claude/agents/
