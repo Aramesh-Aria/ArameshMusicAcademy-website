@@ -1,7 +1,7 @@
-{# A teacher in a row: the portrait, the name (the link), what they teach, and whom they learned from. #}
+{# A teacher in a row: the portrait, the name (the link), what they teach, and whom they learned from. `name_h2` makes the name an h2, for a list straight under the page's h1. #}
 <article class="teacher-card">
   <div class="frame frame--portrait vt" style="--vt: teacher-{{ teacher.pk }}">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</div>
-  <h3 class="teacher-card__name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
+  {% if name_h2 %}<h2 class="teacher-card__name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h2>{% else %}<h3 class="teacher-card__name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>{% endif %}
   {% with offered=teacher.instruments.all %}{% if offered %}<p class="teacher-card__teaches">{{ offered|join:"، " }}</p>{% endif %}{% endwith %}
   {% if teacher.lineage %}<p class="teacher-card__lineage">{{ teacher.lineage }}</p>{% endif %}
   {% if teacher.active_sessions %}<p class="teacher-card__days"><span class="visually-hidden">روزهای کلاس: </span>{% for session in teacher.active_sessions %}{% ifchanged session.weekday %}{% if not forloop.first %}، {% endif %}{{ session.get_weekday_display }}{% endifchanged %}{% endfor %}</p>{% endif %}

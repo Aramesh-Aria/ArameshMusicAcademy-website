@@ -66,7 +66,6 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       panel.querySelector('.day-heading').hidden = true;
     });
     week.classList.add('is-tabbed');
-    tablist.hidden = false;
 
     // The struck day: an ink copy of the tabs, clipped to the selected one. Moving the clip moves the
     // fill and the stone-coloured label together, so the block slides instead of jumping.
@@ -397,6 +396,14 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   });
 })();
 
+// A stacked photo waiting in `data-src` (the template gives a src to the first only, since "lazy" would still
+// fetch the hidden ones lying in view) gets its file.
+const fetchPhoto = (photo) => {
+  if (!photo.dataset.src) return;
+  photo.src = photo.dataset.src;
+  delete photo.dataset.src;
+};
+
 // Crossfade (`.crossfade`): show photo `index` of a stack. The outgoing photo is held opaque under the incoming
 // one until the fade has covered it (see site.css), then let go.
 const crossfadeTo = (stack, index) => {
@@ -405,14 +412,18 @@ const crossfadeTo = (stack, index) => {
   const leaving = photos.find((photo) => photo.classList.contains('is-active')) || photos[0];
   const next = photos[index % photos.length];
   stack.setAttribute('data-cycling', '');
+  fetchPhoto(next);
+  // Fetch the photo after this one too, so it has arrived before its turn; on the first turn, not until the
+  // page has loaded, so it never competes with the first photo.
+  const after = photos[(index + 1) % photos.length];
+  if (document.readyState === 'complete') fetchPhoto(after);
+  else addEventListener('load', () => fetchPhoto(after), { once: true });
   if (leaving === next) { next.classList.add('is-active'); return; }
   photos.forEach((photo) => photo.classList.remove('is-leaving'));
   leaving.classList.remove('is-active');
   leaving.classList.add('is-leaving');
   setTimeout(() => leaving.classList.remove('is-leaving'), motion.ms('--dur-fade'));
   next.classList.add('is-active');
-  // Fetch the photo after this one now, so it has arrived before its turn.
-  photos[(index + 1) % photos.length].loading = 'eager';
 };
 
 // Home hero (`[data-hero]`): the rooms' photos take turns. The active bar's fill animation is the clock, so

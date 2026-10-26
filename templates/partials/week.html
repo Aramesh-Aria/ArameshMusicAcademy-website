@@ -1,10 +1,10 @@
 {% comment %}
   The week by day (`week_schedule`). Without JS every day is listed under its own heading; site.js turns
-  them into day tabs with today open. `full_week_link` adds a link to the schedule page under an empty day.
+  them into day tabs with today open, and the `js` class on the root lays that out before it runs. `full_week_link` adds a link to the schedule page under an empty day.
 {% endcomment %}
 <div class="week" data-week>
   <h2 class="week-title" id="week-title" data-week-title>این هفته در آموزشگاه</h2>
-  <div class="days" role="tablist" aria-labelledby="week-title" data-week-tabs hidden>
+  <div class="days" role="tablist" aria-labelledby="week-title" data-week-tabs>
     {% for day in week_schedule %}
     <button type="button" role="tab" id="day-tab-{{ day.weekday }}" aria-controls="day-{{ day.weekday }}"
             aria-selected="{% if day.is_today %}true{% else %}false{% endif %}" tabindex="{% if day.is_today %}0{% else %}-1{% endif %}"
@@ -17,7 +17,7 @@
   </div>
 
   {% for day in week_schedule %}
-  <section class="day" id="day-{{ day.weekday }}" aria-labelledby="day-heading-{{ day.weekday }}">
+  <section class="day" id="day-{{ day.weekday }}" aria-labelledby="day-heading-{{ day.weekday }}"{% if day.is_today %} data-today{% endif %}>
     <h3 class="day-heading" id="day-heading-{{ day.weekday }}">{{ day.label }}{% if day.is_today %} <small>امروز</small>{% endif %}</h3>
     {% if day.sessions %}
     <ul class="programme" role="list">

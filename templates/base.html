@@ -9,8 +9,11 @@
 
     <link rel="preload" href="{% static 'assets/fonts/sahel-fd-400.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'assets/fonts/amiri-fa-700.woff2' %}" as="font" type="font/woff2" crossorigin>
+    {% comment %}`js` lets the CSS lay out what site.js will set up (the week's day tabs) before first paint; a
+       site.js that fails to load takes it away again.{% endcomment %}
+    <script>document.documentElement.classList.add('js')</script>
     <link rel="stylesheet" href="{% static 'assets/css/site.css' %}">
-    <script src="{% static 'assets/js/site.js' %}" defer></script>
+    <script src="{% static 'assets/js/site.js' %}" defer onerror="document.documentElement.classList.remove('js')"></script>
     <script>
       // A portrait whose file is missing becomes a plate with initials. Inline so it catches errors
       // that fire before site.js loads.

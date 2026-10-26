@@ -1,13 +1,14 @@
-{% comment %}
+{% load site_tags %}{% comment %}
   Photos at their own ratios in balanced columns, each opening in the lightbox. Include with:
     images  GalleryImages
     group   the lightbox group, so its arrows step through this list only
     alt     the alt text for a photo without a title
+  Each photo states its size, so the columns hold their height while the files load.
 {% endcomment %}<ul class="plates" role="list">
   {% for image in images %}
   <li>
     <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="{{ group }}"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-      <img src="{{ image.image.url }}" alt="{{ image.title|default:alt }}" loading="lazy" decoding="async">
+      <img src="{{ image.image.url }}" alt="{{ image.title|default:alt }}" {% image_size image.image %} loading="lazy" decoding="async">
     </a>
   </li>
   {% endfor %}

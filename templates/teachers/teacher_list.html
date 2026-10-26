@@ -12,7 +12,7 @@
   </header>
   {% if teachers %}
   <ul class="portrait-row portrait-row--grid" role="list">
-    {% for teacher in teachers %}<li>{% include 'teachers/_teacher_card.html' %}</li>{% endfor %}
+    {% for teacher in teachers %}<li>{% include 'teachers/_teacher_card.html' with name_h2=True %}</li>{% endfor %}
   </ul>
   {% else %}
   <p class="section__note">فهرست اساتید به‌زودی در اینجا قرار می‌گیرد. برای آشنایی با اساتید با آموزشگاه تماس بگیرید.</p>

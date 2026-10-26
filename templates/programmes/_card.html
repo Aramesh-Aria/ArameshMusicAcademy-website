@@ -1,9 +1,9 @@
-{# A Programme card: its photos crossfading (or the santur shape), the age chip, the name and the short description. The title is the link; the whole card is its target. #}
+{# A Programme card: its photos crossfading (or the santur shape), the age chip, the name and the short description. The title is the link; the whole card is its target. Only the first photo has a src; site.js fetches the others when they are about to show. #}
 <article class="card programme-card on-stone">
   {% if programme.age_label %}<span class="chip chip--on-photo">{{ programme.age_label }}</span>{% endif %}
   {% with photos=programme.photos %}
   <div class="frame vt{% if photos %} crossfade{% else %} frame--shape{% endif %}" style="--vt: programme-{{ programme.pk }}">
-    {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600" loading="lazy" decoding="async">{% empty %}{% include 'components/santur.html' %}{% endfor %}
+    {% for photo in photos %}<img {% if forloop.first %}src{% else %}data-src{% endif %}="{{ photo.url }}" alt="" width="900" height="600" loading="lazy" decoding="async">{% empty %}{% include 'components/santur.html' %}{% endfor %}
   </div>
   {% endwith %}
   <div class="card__body">

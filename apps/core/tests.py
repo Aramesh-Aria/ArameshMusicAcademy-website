@@ -4,7 +4,7 @@ from django.urls import reverse
 from apps.programmes.models import Programme
 from apps.teachers.models import Teacher
 
-from .templatetags.site_tags import fa_digits, local_phone, tel_href
+from .templatetags.site_tags import fa_digits, image_size, local_phone, tel_href
 
 
 class PhoneFilterTests(TestCase):
@@ -23,6 +23,20 @@ class PhoneFilterTests(TestCase):
 
     def test_tel_href_strips_spaces_and_keeps_the_country_code(self):
         self.assertEqual(tel_href('+98 21 4445 7748'), 'tel:+982144457748')
+
+
+class ImageSizeTagTests(TestCase):
+    def test_image_size_gives_the_files_width_and_height(self):
+        class Field:
+            width, height = 900, 1200
+        self.assertEqual(image_size(Field()), 'width="900" height="1200"')
+
+    def test_image_size_is_empty_when_the_file_is_missing(self):
+        class Missing:
+            @property
+            def width(self):
+                raise FileNotFoundError('gallery/gone.jpg')
+        self.assertEqual(image_size(Missing()), '')
 
 
 class BaseLayoutTests(TestCase):

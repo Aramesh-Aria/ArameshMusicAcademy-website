@@ -1255,8 +1255,12 @@
   /* Without JS the days are listed one under another, each under its own heading. */
   .day-heading { margin-block-end: var(--space-3); font-size: var(--text-l); }
   .day-heading small { font-size: var(--text-s); font-weight: 400; color: var(--text-soft); }
-  .week:not(.is-tabbed) .week-title { margin-block-end: var(--space-5); }
-  .week:not(.is-tabbed) .day + .day { margin-block-start: var(--space-6); }
+  :root:not(.js) .week .week-title { margin-block-end: var(--space-5); }
+  :root:not(.js) .week .day + .day { margin-block-start: var(--space-6); }
+  :root:not(.js) [data-week-tabs] { display: none; }
+  /* With JS, today's tab is open from the first paint, before site.js arrives, so nothing collapses under the
+     Visitor. */
+  .js .week:not(.is-tabbed) :is(.day:not([data-today]), .day-heading) { display: none; }
 
   /* site.js sets is-swapping only for a click or tap, so the arrow keys and the first paint stay instant. */
   @media (prefers-reduced-motion: no-preference) {
@@ -1303,7 +1307,8 @@
     inset: 0;
     z-index: 1;
     background:
-      linear-gradient(to left, rgb(23 19 15 / 0.82) 0%, rgb(23 19 15 / 0.55) 38%, rgb(23 19 15 / 0) 68%),
+      /* Held dark as far as the copy reaches (47.5rem), so the saffron title keeps 4.5:1 even over a white wall. */
+      linear-gradient(to left, rgb(23 19 15 / 0.88) 0, rgb(23 19 15 / 0.86) 47.5rem, rgb(23 19 15 / 0) calc(47.5rem + 18rem)),
       linear-gradient(to top, rgb(23 19 15 / 0.6), rgb(23 19 15 / 0) 45%);
     pointer-events: none;
   }
@@ -1409,12 +1414,13 @@
   @media (max-width: 56.25em) {
     .hero__frame { min-block-size: min(43.75rem, calc(100svh - 7rem)); }   /* a floor, so a phone on its side grows it rather than clipping the call */
     .hero__frame:not(.frame--shape)::before {
-      background: linear-gradient(to top, rgb(23 19 15 / 0.94) 0%, rgb(23 19 15 / 0.82) 55%, rgb(23 19 15 / 0) 85%);
+      /* Dark at least 30rem up from the foot, so the copy is covered even when a phone on its side leaves the
+         frame little taller than the copy. */
+      background: linear-gradient(to top, rgb(23 19 15 / 0.94) 0, rgb(23 19 15 / 0.86) max(62%, 30rem), rgb(23 19 15 / 0) calc(max(62%, 30rem) + 8rem));
     }
     .hero__copy { padding: var(--space-5); }
     .hero__lede { font-size: var(--text-m); }
     .hero__actions > .btn { flex: 1 1 100%; justify-content: space-between; }
-    .hero__bars { inset-inline-end: auto; inset-inline-start: var(--space-5); }
     .today {
       position: static;
       max-inline-size: none;

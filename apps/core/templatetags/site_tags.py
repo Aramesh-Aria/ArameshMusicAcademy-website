@@ -1,4 +1,5 @@
 from django import template
+from django.utils.html import format_html
 
 register = template.Library()
 
@@ -36,3 +37,19 @@ def clock(value):
     if not value:
         return ''
     return str(value.hour) if not value.minute else f'{value.hour}:{value.minute:02d}'
+
+
+@register.simple_tag
+def image_size(field):
+    """`width` and `height` attributes for an uploaded image, so the page keeps its place while it loads.
+
+    Empty when the file can't be read (missing from media, or not an image): the photo then just loads
+    without them, rather than the page failing.
+    """
+    try:
+        width, height = field.width, field.height
+    except (OSError, ValueError, TypeError):
+        return ''
+    if not width or not height:
+        return ''
+    return format_html('width="{}" height="{}"', width, height)

@@ -13,7 +13,7 @@
     {% if hero_slides %}
     <div class="hero__slides crossfade">
       {% for slide in hero_slides %}
-      <img src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+      {% if forloop.first %}<img src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async" fetchpriority="high">{% else %}<img data-src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async">{% endif %}
       {% endfor %}
     </div>
     {% else %}
