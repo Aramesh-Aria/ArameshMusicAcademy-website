@@ -69,7 +69,7 @@ document.addEventListener('touchstart', () => {}, { passive: true });
     tablist.hidden = false;
 
     // The struck day: an ink copy of the tabs, clipped to the selected one. Moving the clip moves the
-    // fill and the paper-coloured label together, so the block slides instead of jumping.
+    // fill and the stone-coloured label together, so the block slides instead of jumping.
     const struck = tablist.cloneNode(true);
     struck.removeAttribute('role');
     struck.removeAttribute('aria-labelledby');
@@ -339,7 +339,7 @@ document.addEventListener('touchstart', () => {}, { passive: true });
     frame.title = poster.querySelector('.video-poster-title')?.textContent || '';
     frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
-    // The player paints a moment after it is inserted; it fades in from the paper instead of flashing.
+    // The player paints a moment after it is inserted; it fades in from the frame instead of flashing.
     frame.classList.add('is-loading');
     const reveal = () => frame.classList.remove('is-loading');
     frame.addEventListener('load', reveal, { once: true });
@@ -479,18 +479,5 @@ const crossfadeTo = (stack, index) => {
       clearInterval(timer);
       crossfadeTo(stack, current = 0);
     });
-  });
-})();
-
-// Photos develop once: an image still loading when this runs comes up out of the paper tone as it arrives.
-// Images already decoded, and every image without JS, simply show.
-(() => {
-  // Every photo carries the darkroom `.mono` treatment, so that class marks them.
-  document.querySelectorAll('img.mono').forEach((image) => {
-    if (image.complete) return;
-    image.classList.add('develops', 'is-developing');
-    const done = () => image.classList.remove('is-developing');
-    image.addEventListener('load', done, { once: true });
-    image.addEventListener('error', done, { once: true });
   });
 })();

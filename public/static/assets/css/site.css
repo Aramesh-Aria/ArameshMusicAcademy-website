@@ -134,7 +134,6 @@
 
     --frame: clamp(0.75rem, 1.7vw, 1.5rem);     /* the ground showing around a panel: 12-24 */
     --margin: clamp(1rem, 3.3vw, 3rem);         /* text's distance from a panel's edge */
-    --gutter: clamp(0.75rem, 1.7vw, 1.5rem);    /* the 12-column gap */
     --section: clamp(var(--space-8), 8vw, var(--space-9)); /* space between panels' content blocks */
     --panel-pad: clamp(1.25rem, 4vw, 4rem);
 
@@ -148,36 +147,16 @@
     --dur-swap: 140ms;
     --dur-state: 160ms;
     --dur-move: 260ms;
-    --dur-develop: 600ms;
+    --dur-zoom: 600ms;
     --dur-fade: 1200ms;     /* hero and card crossfades */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* strong ease-out: entrances, exits, presses */
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* strong ease-in-out: things moving on screen */
     /* A damped spring (ratio 0.8, 1.5% overshoot) sampled into linear(); pair it with --dur-spring. */
     --ease-spring: linear(0, 0.034, 0.118, 0.227, 0.346, 0.464, 0.573, 0.669, 0.752, 0.82, 0.875, 0.918, 0.951, 0.975, 0.991, 1.003, 1.01, 1.013, 1.015, 1.015, 1.014, 1.013, 1.011, 1.009, 1.007, 1.006, 1.004, 1.003, 1.002, 1.002, 1);
     --dur-spring: 560ms;
-    --dur-enter: 480ms;
-    --enter-rise: 0.75rem;
     --press-scale: 0.97;
 
     color-scheme: dark;
-
-    /* ── Legacy bridge (pass 1 names → pass 2 tokens). The pass-1 component and page CSS below still reads
-       these; steps 9-11 replace those rules, and step 14 deletes this block. Nothing new may use them. ── */
-    --paper: var(--stone);
-    --paper-2: #ddd6cb;
-    --on-ground: var(--stone);
-    --on-ground-soft: var(--stone-soft);
-    --rule: #d6cfc4;
-    --accent: var(--saffron);
-    --accent-light: var(--saffron);
-    --on-accent: var(--ink);
-    --font: var(--font-text);
-    --text-xl: var(--display-m);
-    --text-xxl: var(--display-l);
-    --leading-tight: var(--leading-display);
-    --sheet-pad: var(--panel-pad);
-    --radius: 0;
-    --tear: 10px;
   }
 
   /* Reduced motion: things change state instantly and nothing travels. Fades keep a short beat. */
@@ -185,11 +164,9 @@
     :root {
       --dur-press: 0ms;
       --dur-move: 0ms;
-      --dur-develop: 0ms;
+      --dur-zoom: 0ms;
       --dur-spring: 0ms;
       --dur-fade: 0ms;
-      --dur-enter: 160ms;
-      --enter-rise: 0;
       --dur-swap: 80ms;
       --dur-state: 80ms;
       --press-scale: 1;
@@ -200,20 +177,17 @@
 
 /* ── base ──────────────────────────────────────────────────────────── */
 @layer base {
-  /* The ground is dark, so the browser's own parts (scrollbars, autofill, the page before CSS) are too; stone
-     panels flip them back to light. */
   html {
-    color-scheme: dark;
     background: var(--ground);
     scrollbar-color: var(--stone-soft) var(--ground);
     -webkit-tap-highlight-color: transparent;
   }
-  .on-stone { color-scheme: light; }
-  /* A phone on its side puts the notch at one edge: pad the page clear of it. Physical sides, since the
-     notch is on the device, not at the start or end of the text. Zero everywhere else. */
-  body { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 
   body {
+    /* A phone on its side puts the notch at one edge: pad the page clear of it. Physical sides, since the
+       notch is on the device, not at the start or end of the text. Zero everywhere else. */
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
     background: var(--surface);
     color: var(--text);
     font-family: var(--font-text);
@@ -290,7 +264,8 @@
 
   /* A stone panel: the reading surface. Ink on stone, the deeper saffron for marks, and ink for focus,
      since saffron on stone is too faint to be a ring. */
-  .on-stone, .sheet {
+  .on-stone {
+    color-scheme: light;   /* the page is dark (tokens); the browser's own parts on stone go light */
     --surface: var(--stone);
     --text: var(--ink);
     --text-soft: var(--ink-soft);
@@ -307,18 +282,6 @@
 
 /* ── layout ────────────────────────────────────────────────────────── */
 @layer layout {
-  /* The measured column grid every section obeys. Twelve columns, collapsing to one on phones. */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--gutter);
-    padding-inline: var(--margin);
-  }
-  /* Below 900px the grid is one column. Components set their spans only above that width. */
-  @media (max-width: 56.25em) {
-    .grid { grid-template-columns: minmax(0, 1fr); }
-  }
-
   /* Things side by side that wrap when they run out of room. */
   .cluster {
     display: flex;
@@ -330,26 +293,6 @@
   /* Text set to a readable measure. */
   .prose { max-inline-size: var(--measure); }
   .prose > * + * { margin-block-start: 1em; }
-
-  /* The paper sheet: a whole chapter changes colour, never a scattered accent. */
-  .sheet {
-    /* Its colours come from the base layer's stone panel roles. */
-    padding: var(--sheet-pad);
-  }
-
-  /* The punched tear-off edge at a sheet's foot. Used once per page at most. */
-  .sheet-torn {
-    position: relative;
-    margin-block-end: var(--tear);
-  }
-  .sheet-torn::after {
-    content: "";
-    position: absolute;
-    inset-inline: 0;
-    inset-block-start: 100%;
-    block-size: var(--tear);
-    background: radial-gradient(circle at 8px 0, transparent 5px, var(--paper) 5.5px) 0 0 / 16px var(--tear) repeat-x;
-  }
 }
 
 
@@ -402,7 +345,7 @@
     --disc-bg: var(--ground);
     --disc-fg: var(--stone);
   }
-  .on-stone .btn--secondary, .sheet .btn--secondary {
+  .on-stone .btn--secondary {
     --btn-bg: color-mix(in oklab, var(--ink) 9%, var(--stone));
     --disc-bg: var(--ink);
   }
@@ -497,7 +440,7 @@
     background: var(--surface);
   }
   .panel + .panel { margin-block-start: var(--frame); }
-  .panel--flush { padding: 0; overflow: hidden; }
+
 
   .frame {
     --inset: var(--space-3);
@@ -527,7 +470,7 @@
   .frame--shape::after { content: none; }
   .frame--shape .shape { position: absolute; inset-block-end: -20%; inset-inline-start: -10%; inline-size: 85%; color: color-mix(in oklab, var(--saffron) 38%, var(--stone)); }
   .frame--portrait { aspect-ratio: 1; }
-  .frame--wide { aspect-ratio: 3 / 2; }
+
 
   /* Photos that crossfade (Programme cards, the hero): stacked in one frame, the first shows until a script
      takes over and moves `.is-active`. */
@@ -594,7 +537,7 @@
   .programme-card__title a { text-decoration: none; }
   .programme-card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
   .programme-card__text { color: var(--text-soft); font-size: var(--text-s); }
-  .programme-card .frame img { transition: transform var(--dur-develop) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
+  .programme-card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
   @media (hover: hover) and (pointer: fine) {
     .programme-card:hover .frame img { transform: scale(1.03); }
   }
@@ -824,7 +767,7 @@
   .teacher-card__teaches { font-weight: 700; font-size: var(--text-s); }
   .teacher-card__lineage { color: var(--text-soft); font-size: var(--text-s); line-height: 1.7; }
   .teacher-card__days { margin-block-start: var(--space-1); font-size: var(--text-s); }
-  .teacher-card .frame img { transition: transform var(--dur-develop) var(--ease-out); }
+  .teacher-card .frame img { transition: transform var(--dur-zoom) var(--ease-out); }
   @media (hover: hover) and (pointer: fine) {
     .teacher-card:hover .frame img { transform: scale(1.03); }
     .teacher-card:hover .teacher-card__name a { text-decoration: underline; text-decoration-thickness: 2px; }
@@ -1126,7 +1069,7 @@
   .plates li { break-inside: avoid; margin-block-end: var(--space-5); }
   .plate-link { display: block; }
   .plates img { inline-size: 100%; }
-  .plate-link img { transition: transform var(--dur-develop) var(--ease-out); }
+  .plate-link img { transition: transform var(--dur-zoom) var(--ease-out); }
   @media (hover: hover) and (pointer: fine) {
     .plate-link:hover img { transform: scale(1.03); }
   }
@@ -1136,7 +1079,7 @@
   }
 
 
-  /* The lightbox: the whole viewport on the ground. */
+  /* The lightbox: one photo across the whole viewport on the dark ground, with its caption, the count and the way out. */
   .lightbox {
     inline-size: 100%;
     max-inline-size: none;
@@ -1145,14 +1088,9 @@
     margin: 0;
     border: 0;
     overscroll-behavior: contain;
-  }
-  .lightbox::backdrop { background: var(--ground); }
-
-  /* The lightbox: one photo on the dark ground, with its caption, the count and the way out. */
-  .lightbox {
     padding: 0;
     background: var(--ground);
-    color: var(--on-ground);
+    color: var(--stone);
     transition:
       opacity var(--dur-move) var(--ease-out),
       overlay var(--dur-move) allow-discrete,
@@ -1166,6 +1104,7 @@
   @starting-style {
     .lightbox[open] { opacity: 0; }
   }
+  .lightbox::backdrop { background: var(--ground); }
 
   .lightbox-bar {
     display: flex;
@@ -1175,7 +1114,7 @@
     padding: var(--space-3) var(--margin);
     padding-block-start: max(var(--space-3), env(safe-area-inset-top));
   }
-  .lightbox-count { font-size: var(--text-s); color: var(--on-ground-soft); }
+  .lightbox-count { font-size: var(--text-s); color: var(--stone-soft); }
 
   .lightbox-stage {
     position: relative;
@@ -1220,8 +1159,8 @@
     padding: 0 var(--space-3);
     background: none;
     color: inherit;
-    border: 1px solid color-mix(in oklab, var(--on-ground), transparent 70%);
-    border-radius: var(--radius);
+    border: 1px solid color-mix(in oklab, var(--stone), transparent 70%);
+    border-radius: var(--radius-pill);
     font-size: var(--text-m);
     transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
   }
@@ -1231,7 +1170,7 @@
   .lightbox-next .icon { transform: rotate(90deg); }
   .lightbox-prev .icon { transform: rotate(-90deg); }
   @media (hover: hover) and (pointer: fine) {
-    .lightbox button:hover { background: color-mix(in oklab, var(--on-ground), transparent 88%); }
+    .lightbox button:hover { background: color-mix(in oklab, var(--stone), transparent 88%); }
   }
 
 
@@ -1345,8 +1284,6 @@
     .programme-time { grid-row: span 2; }
     .programme-instruments { grid-column: 2; font-size: var(--text-s); }
   }
-
-
 }
 
 
@@ -1520,89 +1457,6 @@
     .mosaic > li:first-child { grid-row: auto; grid-column: span 2; }
   }
 
-  /* ── teachers: the performers, one programme entry each ── */
-  .teachers .section-head { margin-block-end: var(--space-6); }
-  .teachers-sheet { grid-column: 1 / -1; }
-  .performer {
-    position: relative;
-    display: grid;
-    grid-template-columns: 7.5rem minmax(0, 1fr) minmax(0, 18rem);
-    align-items: center;
-    gap: var(--space-6);
-    padding-block: var(--space-5);
-    border-block-end: 1px solid var(--rule);
-  }
-  .performer:first-child { padding-block-start: 0; }
-  .performer:last-child { border-block-end: 0; padding-block-end: var(--space-7); }
-  .performer h2 { font-size: var(--text-xl); }
-  .performer h2 a { text-decoration: none; }
-  /* The whole entry is the link's target; the name stays the only link in the tab order. */
-  .performer h2 a::after { content: ""; position: absolute; inset: 0; }
-  .performer-instruments { margin-block-start: var(--space-1); color: var(--text-soft); }
-  .performer-days { font-size: var(--text-s); }
-  .performer-portrait.portrait-initials { font-size: var(--text-xl); }
-  @media (hover: hover) and (pointer: fine) {
-    .performer:hover h2 a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
-  }
-  .teachers-empty { font-size: var(--text-l); max-inline-size: var(--measure); padding-block-end: var(--space-7); }
-  @media (max-width: 56.25em) {
-    .teachers .section-head { margin-block-end: var(--space-5); }
-    .performer {
-      grid-template-columns: 5.5rem minmax(0, 1fr);
-      gap: var(--space-2) var(--space-4);
-    }
-    .performer-portrait { grid-row: span 2; align-self: start; }
-    .performer h2 { font-size: var(--text-l); }
-    .performer-days { grid-column: 2; }
-    .performer-portrait.portrait-initials { font-size: var(--text-l); }
-  }
-
-
-  /* ── teacher: the performer page ── */
-  .teacher-page { align-items: start; }
-  .teacher-back { font-size: var(--text-s); margin-block-end: var(--space-4); }
-  .teacher-back a { color: var(--text-soft); }
-  .teacher-page-instruments {
-    margin-block-start: var(--space-3);
-    font-size: var(--text-l);
-    color: var(--text-soft);
-  }
-  .teacher-page-bio { margin-block-start: var(--space-6); font-size: var(--text-l); line-height: 1.7; }
-  .teacher-week {
-    margin-block-start: var(--space-8);
-    padding-block-end: var(--space-7);
-  }
-  .teacher-week h2 { font-size: var(--text-l); margin-block-end: var(--space-4); }
-  .teacher-day {
-    display: grid;
-    grid-template-columns: 8rem minmax(0, 1fr);
-    gap: var(--space-1) var(--space-5);
-    padding-block: var(--space-3);
-    border-block-start: 1px solid var(--rule);
-  }
-  .teacher-day:last-child { border-block-end: 1px solid var(--rule); }
-  .teacher-day dt { grid-row: 1; font-weight: 700; }
-  .teacher-day dd {
-    grid-column: 2;
-    margin: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0 var(--space-4);
-    align-items: baseline;
-  }
-  .teacher-day .programme-time { font-size: var(--text-m); color: var(--text); }
-  .teacher-plate { margin: 0; }
-
-  @media (min-width: 56.3125em) {
-    .teacher-sheet { grid-column: 1 / span 7; }
-    .teacher-plate { grid-column: 9 / span 4; position: sticky; inset-block-start: var(--space-6); padding-block-start: var(--space-2); }
-  }
-  @media (max-width: 56.25em) {
-    /* The face comes first on a phone, at a size that leaves the name on screen. */
-    .teacher-plate { order: -1; inline-size: min(100%, 15rem); margin-block-end: var(--space-5); }
-    .teacher-day { grid-template-columns: 6rem minmax(0, 1fr); }
-  }
-
 
   /* ── schedule: the week diagram, and the week by day on smaller screens ── */
 
@@ -1685,7 +1539,7 @@
   }
   .album:active { transform: scale(0.99); }
   .album .frame { aspect-ratio: 3 / 2; }
-  .album .frame img { transition: transform var(--dur-develop) var(--ease-out); }
+  .album .frame img { transition: transform var(--dur-zoom) var(--ease-out); }
   .album__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); }
   /* Three lines at most, so one long title can't stretch its row; the full title heads the page itself. */
   .album__title {
@@ -1748,7 +1602,7 @@
     overflow: hidden;
     font-size: var(--text-l);
     font-weight: 700;
-    line-height: var(--leading-tight);
+    line-height: var(--leading-display);
   }
   .video-poster-meta { font-size: var(--text-s); color: var(--text-soft); }
   .video-caption { margin-block-start: var(--space-3); padding-inline: var(--space-3); font-size: var(--text-s); color: var(--text-soft); max-inline-size: var(--measure); }
@@ -1811,7 +1665,6 @@
   @media (hover: hover) and (pointer: fine) {
     .notice__links a:hover { text-decoration: underline; text-decoration-color: var(--mark); text-decoration-thickness: 2px; }
   }
-
 }
 
 
@@ -1825,16 +1678,6 @@
     clip-path: inset(50%);
     white-space: nowrap;
   }
-
-  /* The darkroom: every upload printed in the same monochrome, so mixed snapshots read as one set. */
-  .mono { filter: grayscale(1) contrast(1.06); }
-
-  /* Photos develop once (site.js): an image still loading comes up out of the paper tone behind it.
-     In this last layer so it wins over each plate's own filter transition. */
-  .develops { transition: opacity var(--dur-develop) var(--ease-out), filter var(--dur-state) var(--ease-out); }
-  .develops.is-developing { opacity: 0; }
-
-  .soft { color: var(--text-soft); }
 }
 
 

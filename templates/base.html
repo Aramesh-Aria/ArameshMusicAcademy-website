@@ -12,14 +12,13 @@
     <link rel="stylesheet" href="{% static 'assets/css/site.css' %}">
     <script src="{% static 'assets/js/site.js' %}" defer></script>
     <script>
-      // A portrait whose file is missing becomes a paper plate with initials. Inline so it catches errors
+      // A portrait whose file is missing becomes a plate with initials. Inline so it catches errors
       // that fire before site.js loads.
       document.addEventListener('error', function (event) {
         var img = event.target;
         if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-initials')) return;
         var plate = document.createElement('span');
-        // The plate keeps the portrait's layout classes, not the photo treatment or the develop fade.
-        plate.className = img.className.replace(/\b(mono|develops|is-developing)\b/g, '') + ' portrait-initials';
+        plate.className = img.className + ' portrait-initials';
         plate.setAttribute('role', 'img');
         plate.setAttribute('aria-label', img.alt);
         plate.textContent = img.getAttribute('data-initials');
