@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import time
 
 from django.utils import timezone
 
@@ -55,3 +56,54 @@ def week_schedule(sessions=None):
         )
         for weekday in WEEKDAY_ORDER
     ]
+
+
+@dataclass(frozen=True)
+class Today:
+    """What the home page says about today, in the Academy's time zone.
+
+    `state` is 'open' while today's classes run, 'over' once they have ended, and 'closed' on a day with
+    none. `taught` names what is taught today; `next_label` and `next_from` say when classes resume.
+    """
+    state: str
+    day_label: str
+    taught: list
+    until: time | None
+    next_label: str
+    next_from: time | None
+    is_friday: bool
+
+
+def today_status(days, now=None):
+    """Today from a `week_schedule()`: what is taught until when, or when the Academy opens next."""
+    now = now or timezone.localtime()
+    index = next(i for i, day in enumerate(days) if day.is_today)
+    today = days[index]
+    until = max((s.end_time for s in today.sessions), default=None)
+
+    instruments, programmes = {}, {}
+    for session in today.sessions:
+        offerings = session.offerings()
+        instruments.update((i.pk, i) for i in offerings.instruments)
+        programmes.update((p.pk, p) for p in offerings.programmes)
+    taught = [
+        item.name
+        for group in (instruments, programmes)
+        for item in sorted(group.values(), key=lambda item: (item.display_order, item.name))
+    ]
+
+    following = [days[(index + step) % 7] for step in range(1, 8)]
+    resume = next((day for day in following if day.sessions), None)
+    if until and now.time() < until:
+        state = 'open'
+    else:
+        state = 'over' if today.sessions else 'closed'
+    return Today(
+        state=state,
+        day_label=today.label,
+        taught=taught,
+        until=until,
+        next_label='فردا' if resume is following[0] else (resume.label if resume else ''),
+        next_from=min(s.start_time for s in resume.sessions) if resume else None,
+        is_friday=today.weekday == Weekday.FRIDAY,
+    )

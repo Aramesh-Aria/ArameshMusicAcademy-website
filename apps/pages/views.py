@@ -2,11 +2,20 @@ from django.conf import settings
 from django.views.generic import TemplateView
 
 from apps.gallery.models import GalleryImage, GalleryPage
-from apps.schedules.week import week_schedule
-from apps.teachers.models import Teacher
+from apps.programmes.models import Programme
+from apps.schedules.week import today_status, week_schedule
+from apps.teachers.models import Instrument, Teacher
 from apps.testimonials.models import Testimonial
 
-from .models import SitePageContent
+from .models import FAQ, SitePageContent
+
+
+def gallery_images(slug):
+    """The active photos of the active top-level gallery page `slug`, in admin order; empty without one."""
+    page = GalleryPage.objects.filter(slug=slug, parent__isnull=True, is_active=True).first()
+    if page is None:
+        return []
+    return list(page.images.filter(is_active=True).select_related('gallery_page'))
 
 
 class PageContentMixin:
@@ -37,39 +46,37 @@ class PageContentMixin:
 class HomeView(PageContentMixin, TemplateView):
     template_name = 'pages/home.html'
     page_key = SitePageContent.HOME
-    default_title = 'آموزشگاه موسیقی آرامش'
-    # Shown until staff add the home content in the admin, so it is written for visitors.
+    # The hero's headline and sentence (Gate 1 copy) until staff add the home content in the admin.
+    default_title = 'موسیقی، در فضایی آرام'
     default_body = (
-        'آموزش تخصصی موسیقی ایرانی و کلاسیک برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید مجرب. '
-        'برای مشاوره و هماهنگی کلاس با ما تماس بگیرید.'
+        'آموزش خصوصی سنتور، تار، پیانو، ویولن، آواز و سازهای دیگر برای کودکان، نوجوانان و بزرگسالان، '
+        'با مدیریت مسعود آرامش، آهنگساز و نوازندهٔ سنتور.'
     )
     default_meta_description = (
-        'آموزشگاه موسیقی آرامش؛ آموزش تخصصی سازهای مختلف توسط اساتید مجرب. '
-        'برای مشاوره و هماهنگی کلاس با ما در تماس باشید.'
+        'آموزشگاه موسیقی آرامش در تهران؛ آموزش خصوصی سنتور، تار، پیانو، ویولن، آواز و سازهای دیگر برای کودکان، '
+        'نوجوانان و بزرگسالان. برای انتخاب ساز و استاد با ما تماس بگیرید.'
     )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        teachers = list(Teacher.objects.filter(is_active=True).prefetch_related('instruments')[:4])
-        # Without a hero photo the first teacher stands in the hero as the director, and the next three
-        # fill the teachers section; with one, the first three do.
-        if context.get('page_hero_image'):
-            context['director'], context['home_teachers'] = None, teachers[:3]
-        else:
-            context['director'], context['home_teachers'] = (teachers[0] if teachers else None), teachers[1:4]
-        context['week_schedule'] = week_schedule()
-        space_page = (
-            GalleryPage.objects
-            .filter(slug=settings.ABOUT_GALLERY_SLUG, is_active=True)
-            .first()
-        )
-        # Photos from the academy-space gallery, in the display_order set in admin.
-        context['gallery_preview_images'] = (
-            space_page.images.filter(is_active=True).select_related('gallery_page')[:6]
-            if space_page else GalleryImage.objects.none()
-        )
-        # Three letters at most, by display order then newest: a wall of them reads as filler.
-        context['testimonials'] = Testimonial.objects.filter(is_active=True)[:3]
+        context['hero_slides'] = gallery_images(settings.HERO_GALLERY_SLUG)[:6]
+        space = gallery_images(settings.ABOUT_GALLERY_SLUG)
+        context['about_photo'] = space[0] if space else None
+        context['gallery_preview_images'] = space[1:6]
+        context['programmes'] = Programme.objects.active()
+        context['instruments'] = Instrument.objects.main()
+        context['home_teachers'] = Teacher.objects.filter(is_active=True).prefetch_related('instruments')[:8]
+        sections = {
+            content.page_key: content
+            for content in SitePageContent.objects.filter(
+                page_key__in=[SitePageContent.TEACHING, SitePageContent.FIRST_LESSON], is_active=True,
+            )
+        }
+        context['teaching'] = sections.get(SitePageContent.TEACHING)
+        context['first_lesson'] = sections.get(SitePageContent.FIRST_LESSON)
+        context['testimonials'] = Testimonial.objects.filter(is_active=True)[:8]
+        context['faqs'] = FAQ.objects.active().filter(show_on_home=True)
+        context['today'] = today_status(week_schedule())
         return context
 
 

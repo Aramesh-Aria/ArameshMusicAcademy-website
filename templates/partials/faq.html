@@ -1,0 +1,9 @@
+{# The FAQ accordion. Expects `faqs`. #}
+<div class="accordion">
+  {% for faq in faqs %}
+  <details>
+    <summary>{{ faq.question }}<svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+    <div class="accordion__answer">{{ faq.answer|linebreaks }}</div>
+  </details>
+  {% endfor %}
+</div>

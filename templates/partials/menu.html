@@ -31,8 +31,8 @@
 
   {% if site_phone_primary %}
   <div class="menu-sheet__foot">
-    {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" block=True %}
-    {% if site_map_neshan %}{% include "components/button.html" with label="مسیر در نشان" href=site_map_neshan rel="noopener" icon="route" variant="secondary" block=True %}{% endif %}
+    {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" full=True %}
+    {% if site_map_neshan %}{% include "components/button.html" with label="مسیر در نشان" href=site_map_neshan rel="noopener" icon="route" variant="secondary" full=True %}{% endif %}
   </div>
   {% endif %}
 </dialog>

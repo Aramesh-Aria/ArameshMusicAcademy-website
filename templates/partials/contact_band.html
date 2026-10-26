@@ -1,0 +1,31 @@
+{% load site_tags %}
+{# The contact band: the one saffron field on a page. Phones, address, hours, the way here, and the two ways in. #}
+<section class="band" aria-labelledby="band-title">
+  <h2 id="band-title">{{ band_title|default:'برای انتخاب ساز و استاد، با ما تماس بگیرید' }}</h2>
+  <div class="band__facts">
+    {% if site_phone_primary %}
+    <div>
+      <h3 class="band__label">تلفن</h3>
+      <p><a href="{{ site_phone_primary|tel_href }}"><span class="num">{{ site_phone_primary|local_phone }}</span></a>{% if site_phone_mobile %}<br><a href="{{ site_phone_mobile|tel_href }}"><span class="num">{{ site_phone_mobile|local_phone }}</span></a> موبایل{% endif %}</p>
+    </div>
+    {% endif %}
+    {% if site_address %}
+    <div>
+      <h3 class="band__label">نشانی</h3>
+      <p>{{ site_address }}{% if site_map_neshan %}<br><a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>{% endif %}</p>
+    </div>
+    {% endif %}
+    {% if site_hours %}
+    <div>
+      <h3 class="band__label">ساعت‌ها</h3>
+      <p>{% for line in site_hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
+    </div>
+    {% endif %}
+  </div>
+  <div class="band__actions">
+    {% if site_phone_primary %}
+    {% with label_text="تماس با" %}{% include "components/button.html" with label=label_text href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}{% endwith %}
+    {% endif %}
+    {% url 'contact:contact' as contact_url %}{% include "components/button.html" with label="ارسال پیام" href=contact_url variant="secondary" %}
+  </div>
+</section>

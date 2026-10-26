@@ -792,6 +792,79 @@
   .menu-sheet .navbar__logo img { block-size: 2.375rem; }
 
 
+  /* ── Section on the ground: a heading (and its link or intro), then its content, aligned with the panels ── */
+  .section { margin-block-start: var(--section); padding-inline: calc(var(--frame) + var(--space-3)); }
+  .section__head { display: grid; gap: var(--space-3); margin-block-end: var(--space-6); padding-inline: calc(var(--panel-pad) - var(--space-3)); }
+  .section__head--row { grid-auto-flow: column; justify-content: space-between; align-items: end; }
+  .section__intro { max-inline-size: var(--measure); color: var(--text-soft); }
+
+  .tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr)); gap: var(--space-3); }
+
+  /* ── Teacher card: portrait, name, what they teach, from whom they learned ── */
+  .portrait-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-7) var(--space-5); }
+  .teacher-card { position: relative; display: grid; gap: var(--space-1); align-content: start; }
+  .teacher-card .frame { margin-block-end: var(--space-3); }
+  .teacher-card .frame > .portrait { inline-size: 100%; block-size: 100%; }
+  .teacher-card__name { font-size: var(--display-s); }
+  .teacher-card__name a { text-decoration: none; }
+  .teacher-card__name a::after { content: ""; position: absolute; inset: 0; }
+  .teacher-card__teaches { font-weight: 700; font-size: var(--text-s); }
+  .teacher-card__lineage { color: var(--text-soft); font-size: var(--text-s); line-height: 1.7; }
+  .teacher-card .frame img { transition: transform var(--dur-develop) var(--ease-out); }
+  @media (hover: hover) and (pointer: fine) {
+    .teacher-card:hover .frame img { transform: scale(1.03); }
+    .teacher-card:hover .teacher-card__name a { text-decoration: underline; text-decoration-thickness: 2px; }
+  }
+  .teacher-card:has(a:focus-visible) .frame { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .teacher-card a:focus-visible { outline: none; }
+  /* Phones: the teacher row scrolls sideways with the next card peeking in, so eight portraits don't stack
+     into a tower; instrument tiles pair up. */
+  @media (max-width: 37.5em) {
+    .tile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+    .tile { grid-template-columns: minmax(0, 1fr) 30%; min-block-size: 4.5rem; }
+    .tile__name { padding-inline: var(--space-3) var(--space-2); font-size: var(--text-s); }
+    .portrait-row {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 68%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--space-3);
+      scrollbar-width: none;
+      margin-inline: calc(-1 * (var(--frame) + var(--space-3)));
+      padding-inline: calc(var(--frame) + var(--space-3));
+    }
+    .portrait-row > li { scroll-snap-align: start; }
+  }
+
+  /* ── Contact band: the page's one saffron field ── */
+  .band {
+    --surface: var(--saffron);
+    --text: var(--ink);
+    --text-soft: color-mix(in oklab, var(--ink) 78%, var(--saffron));
+    --mark: var(--ink);
+    --focus: var(--ink);
+    display: grid;
+    gap: var(--space-7);
+    margin: var(--section) var(--frame) 0;
+    padding: var(--panel-pad);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    color: var(--text);
+  }
+  .band h2 { max-inline-size: 16em; }
+  .band__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--space-5) var(--space-7); font-size: var(--text-s); line-height: 1.8; }
+  .band__label { margin-block-end: var(--space-1); font-family: var(--font-text); font-size: var(--text-xs); color: var(--text-soft); }
+  .band__facts a { text-decoration-thickness: 2px; }
+  .band__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  /* On saffron the primary pill turns ground, its disc saffron; the secondary stays stone. */
+  .band .btn--primary { --btn-bg: var(--ground); --btn-fg: var(--stone); --disc-bg: var(--saffron); --disc-fg: var(--ink); }
+  @media (max-width: 37.5em) {
+    .band__actions > .btn { flex: 1 1 100%; justify-content: space-between; }
+  }
+
+
   /* ── Footer: reach and visit, then the logo across the full width ── */
   .footer {
     margin-block-start: var(--section);
@@ -1221,164 +1294,158 @@
 /* ── pages ─────────────────────────────────────────────────────────── */
 @layer pages {
   /* Every page opens the same distance below the header. */
-  .home-hero, .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
+  .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
   @media (max-width: 56.25em) {
-    .home-hero, .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
+    .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
   }
 
-  /* ── home: the programme sheet ── */
-  .home-hero { align-items: start; }
-  .home-sheet {
-    display: flex;
-    flex-direction: column;
-    padding-block-end: 0;
-  }
-  .home-lead {
-    margin-block-start: var(--space-5);
-    max-inline-size: var(--measure);
-    font-size: var(--text-l);
-  }
-  .home-sheet .week { margin-block-start: var(--space-7); }
-  .home-sheet-foot { padding-block: var(--space-7); }
-
-  .home-plate { margin: 0; }
-  .home-plate figcaption {
-    margin-block-start: var(--space-3);
-    font-size: var(--text-s);
-  }
-  .home-plate figcaption a { text-decoration: none; font-weight: 700; }
-  .home-plate-intro {
-    margin-block-start: var(--space-2);
-    max-inline-size: var(--measure);
-    font-size: var(--text-m);
-  }
-  .home-plate-wide img { inline-size: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-
-  @media (min-width: 56.3125em) {
-    .home-sheet { grid-column: 1 / span 7; }
-    .home-plate { grid-column: 9 / span 4; padding-block-start: var(--space-2); }
-    .home-plate-wide { grid-column: 8 / span 5; }
-  }
-  @media (max-width: 56.25em) {
-    .home-sheet-foot .btn { inline-size: 100%; }
-    .home-plate { margin-block-start: var(--space-7); }
-  }
-
-
-  /* ── home: teachers, one large and two beside ── */
-  .section-head {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-5);
-    margin-block-end: var(--space-7);
-  }
-
-  .home-teachers {
-    padding-block: var(--section) 0;
-    align-items: start;
-  }
-  .home-teachers figure { margin: 0; }
-  .home-teachers h3 a { text-decoration: none; }
-  .teacher-instruments {
-    margin-block-start: var(--space-1);
-    color: var(--text-soft);
-  }
-  .teacher-bio { margin-block-start: var(--space-3); max-inline-size: var(--measure); }
-
-  .teacher-lead figcaption { margin-block-start: var(--space-5); }
-  .teacher-lead h3 { font-size: var(--text-xl); }
-
-  .teacher-side { display: grid; gap: var(--space-7); }
-  .teacher-small {
+  /* ── home ── */
+  /* The hero: a full-height frame of the Academy's own rooms. Copy sits at the start over a side and bottom
+     scrim; the slide bars ride the far top corner; today's strip sits in the far bottom corner. */
+  .hero { position: relative; margin: var(--space-3) var(--frame) 0; }
+  .hero__frame {
+    --inset: 0px;
     display: grid;
-    grid-template-columns: minmax(0, 13.75rem) minmax(0, 1fr);
-    gap: var(--space-5);
     align-items: end;
+    min-block-size: min(48.75rem, calc(100svh - 5.5rem));
+    border-radius: var(--radius-panel);
+    isolation: isolate;
   }
-  .teacher-small h3 { font-size: clamp(1.625rem, 1.3rem + 0.8vw, 2rem); }
-  .teacher-small .teacher-bio {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
+  .hero__slides { position: absolute; inset: 0; }
+  .hero__slides > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .hero__frame:not(.frame--shape)::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background:
+      linear-gradient(to left, rgb(23 19 15 / 0.82) 0%, rgb(23 19 15 / 0.55) 38%, rgb(23 19 15 / 0) 68%),
+      linear-gradient(to top, rgb(23 19 15 / 0.6), rgb(23 19 15 / 0) 45%);
+    pointer-events: none;
+  }
+  .hero__frame::after { z-index: 1; }
+  .hero__frame.frame--shape { color: var(--ink); }
+  .hero__frame.frame--shape .shape { inset-inline-start: auto; inset-inline-end: -10%; inline-size: 60%; }
+  .hero__copy { position: relative; z-index: 2; max-inline-size: 47.5rem; padding: var(--panel-pad); }
+  .hero__copy h1 { margin-block-end: var(--space-4); font-size: clamp(2.75rem, 1rem + 4.4vw, 4.875rem); }
+  .hero__lede { max-inline-size: 34em; margin-block-end: var(--space-6); font-size: var(--text-l); line-height: 1.7; color: var(--text); }
+  .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  /* The slide titles share one cell; the active one shows. */
+  .hero__titles { display: grid; }
+  .hero__titles > span { grid-area: 1 / 1; opacity: 0; transition: opacity 400ms var(--ease-out); }
+  .hero__titles > span.is-active { opacity: 1; }
+  .hero__bars { position: absolute; z-index: 2; inset-block-start: var(--space-5); inset-inline-end: var(--space-5); display: flex; gap: 0.375rem; }
+  .hero__bar { inline-size: 1.75rem; block-size: 3px; border-radius: var(--radius-pill); background: rgb(235 229 220 / 0.3); overflow: hidden; }
+  .hero__bar i { display: block; block-size: 100%; background: var(--stone); transform: scaleX(0); transform-origin: right; }
+  .hero__bar:first-child i { transform: none; }
+
+  /* «امروز در آموزشگاه»: a small dark pill in the hero's far bottom corner, under the hero on phones. */
+  .today {
+    position: absolute;
+    z-index: 2;
+    inset-block-end: var(--space-5);
+    inset-inline-end: var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    max-inline-size: min(34rem, 45%);
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-pill);
+    background: var(--ground);
     font-size: var(--text-s);
+    line-height: var(--leading-ui);
+  }
+  .today a { text-decoration: none; }
+  .today b { color: var(--saffron); }
+  .today__dot { flex: none; inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: var(--saffron); }
+  @media (hover: hover) and (pointer: fine) {
+    .today a:hover { text-decoration: underline; text-decoration-color: var(--saffron); }
   }
 
-  @media (min-width: 56.3125em) {
-    .teacher-lead { grid-column: 1 / span 6; }
-    .teacher-side { grid-column: 8 / span 5; align-self: end; }
-  }
-  @media (max-width: 56.25em) {
-    .section-head { margin-block-end: var(--space-5); }
-    .teacher-lead h3 { font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem); }
-    .teacher-side { margin-block-start: var(--space-7); gap: var(--space-5); }
-    .teacher-small { grid-template-columns: 7rem minmax(0, 1fr); align-items: center; gap: var(--space-4); }
-    .teacher-small h3 { font-size: var(--text-l); }
-    .teacher-small .teacher-bio { display: none; }
-  }
-
-
-  /* ── home: the rooms ── */
-  .home-rooms { padding-block-start: var(--section); }
-  .home-rooms-sheet { grid-column: 1 / -1; }
-
-
-  /* ── home: letters from parents ── */
-  .home-letters {
-    padding-block-start: var(--section);
-    row-gap: var(--space-5);
-    align-items: start;
-  }
-  .home-letters-list { display: grid; gap: var(--space-5); }
-  .letter { margin: 0; }
-  .letter blockquote { font-size: var(--text-l); line-height: 1.55; }
-  .letter.sheet { padding-block: var(--space-7); }
-  .home-letters-list.is-single .letter blockquote { font-size: clamp(1.5rem, 1.2rem + 1vw, 1.875rem); }
-  .letter figcaption { margin-block-start: var(--space-5); font-size: var(--text-s); }
-  @media (min-width: 56.3125em) {
-    .home-letters h2 { grid-column: 1 / span 4; }
-    .home-letters-list { grid-column: 6 / span 7; }
-  }
-
-
-  /* ── home: tablets set portrait and caption side by side instead of a full-width plate ── */
-  @media (min-width: 37.5em) and (max-width: 56.25em) {
-    .home-plate:not(.home-plate-wide),
-    .teacher-lead {
-      display: grid;
-      grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-      gap: var(--space-6);
-      align-items: end;
-    }
-    .home-plate figcaption, .teacher-lead figcaption { margin-block-start: 0; }
-  }
-
-
-  /* ── home: visit ── */
-  .home-visit { padding-block-start: var(--section); }
-  .home-visit-sheet {
-    grid-column: 1 / -1;
+  /* About: a split reading panel, the text and the rooms side by side. */
+  .about-split {
     display: grid;
-    gap: var(--space-7);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: var(--panel-pad);
+    align-items: center;
+    margin-block-start: var(--frame);
+    padding: var(--space-3);
+    padding-inline-start: var(--panel-pad);
   }
-  .home-visit-text p { margin-block-start: var(--space-4); max-inline-size: 26em; }
-  .home-visit-routes { --cluster: var(--space-2) var(--space-6); }
-  .home-visit-map {
-    inline-size: 100%;
-    min-block-size: 22rem;
-    block-size: 100%;
-    border: 0;
-    background: var(--paper-2);
-    filter: grayscale(1) contrast(0.95);
-  }
-  @media (min-width: 56.3125em) {
-    .home-visit-sheet { grid-template-columns: 5fr 7fr; }
-    .home-visit-map { min-block-size: 26rem; }
-  }
+  .about-split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
+  .about-split__text p { max-inline-size: var(--measure); }
+  .about-split__media { align-self: stretch; min-block-size: 26rem; }
 
+  .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
+  .programme-row > li, .programme-row .programme-card { block-size: 100%; }
+
+  .teaching { display: grid; gap: var(--section); margin-block-start: var(--section); }
+  .teaching__part > h2 { margin-block-end: var(--space-6); }
+  .points, .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
+    gap: var(--space-6) var(--panel-pad);
+    padding: 0;
+    list-style: none;
+  }
+  .points h3, .steps h3 { margin-block-end: var(--space-2); font-size: var(--display-s); }
+  .points p, .steps p { color: var(--text-soft); }
+  /* The steps are an ordered list in words; a short saffron-deep rule above each carries the sequence. */
+  .steps li { padding-block-start: var(--space-4); border-block-start: 3px solid var(--mark); }
+  .steps .steps__note { margin-block-start: var(--space-2); color: var(--text); font-weight: 700; }
+
+  /* The rooms as a mosaic: one large photo leads, four fill the other half. */
+  .mosaic {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: repeat(2, clamp(10rem, 16vw, 15rem));
+    gap: var(--space-3);
+  }
+  .mosaic > li:first-child { grid-row: span 2; }
+  .mosaic img { inline-size: 100%; block-size: 100%; object-fit: cover; }
+
+  .faq { margin-block-start: var(--section); }
+  .faq h2 { margin-block-end: var(--space-6); }
+
+  @media (max-width: 56.25em) {
+    .hero__frame { min-block-size: 0; aspect-ratio: auto; block-size: min(43.75rem, calc(100svh - 7rem)); }
+    .hero__frame:not(.frame--shape)::before {
+      background: linear-gradient(to top, rgb(23 19 15 / 0.94) 0%, rgb(23 19 15 / 0.82) 55%, rgb(23 19 15 / 0) 85%);
+    }
+    .hero__copy { padding: var(--space-5); }
+    .hero__lede { font-size: var(--text-m); }
+    .hero__actions > .btn { flex: 1 1 100%; justify-content: space-between; }
+    .hero__bars { inset-inline-end: auto; inset-inline-start: var(--space-5); }
+    .today {
+      position: static;
+      max-inline-size: none;
+      margin-block-start: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-panel);
+      background: var(--ground-2);
+    }
+    .about-split { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
+    .about-split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
+    .about-split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
+    @media (max-width: 37.5em) {
+      /* The Programme cards scroll sideways like the teachers. */
+      .programme-row {
+        grid-template-columns: none;
+        grid-auto-flow: column;
+        grid-auto-columns: 82%;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: none;
+        margin-inline: calc(-1 * (var(--frame) + var(--space-3)));
+        padding-inline: calc(var(--frame) + var(--space-3));
+        scroll-padding-inline: var(--space-3);
+      }
+      .programme-row > li { scroll-snap-align: start; }
+    }
+    .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 13rem; grid-auto-rows: 8.5rem; }
+    .mosaic > li:first-child { grid-row: auto; grid-column: span 2; }
+  }
 
   /* ── about: the letter, the rooms, the call ── */
   .about-hero { align-items: start; }
@@ -1766,15 +1833,6 @@
     .stub-call .btn { inline-size: 100%; }
   }
 
-  /* Entrance: the opening section is set down once on load, its parts a beat apart. CSS only, so
-     nothing waits on JS; `translate` leaves any resting transform alone. */
-  main > section:first-child > * {
-    animation: set-down var(--dur-enter) var(--ease-out) backwards;
-  }
-  main > section:first-child > :nth-child(2) { animation-delay: 60ms; }
-  main > section:first-child > :nth-child(3) { animation-delay: 120ms; }
-  main > section:first-child > :nth-child(n + 4) { animation-delay: 180ms; }
-
   /* Later sections settle as they scroll in, finished well before they are read. Movement only, so
      a page captured without scrolling never shows them missing. Skipped where scroll timelines are
      missing or motion is reduced: there they simply sit still. */
@@ -1788,9 +1846,6 @@
     }
   }
 
-  @keyframes set-down {
-    from { opacity: 0; translate: 0 var(--enter-rise); }
-  }
   @keyframes settle {
     from { translate: 0 calc(var(--enter-rise) * 3); }
   }

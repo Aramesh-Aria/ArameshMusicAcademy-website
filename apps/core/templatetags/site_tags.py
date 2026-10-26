@@ -28,3 +28,11 @@ def fa_digits(value):
     values in ASCII; this is for what the Visitor reads.
     """
     return str(value).translate(PERSIAN_DIGITS)
+
+
+@register.filter
+def clock(value):
+    """A time as a clock reading for a sentence: 21:00 -> '21', 9:30 -> '9:30'."""
+    if not value:
+        return ''
+    return str(value.hour) if not value.minute else f'{value.hour}:{value.minute:02d}'

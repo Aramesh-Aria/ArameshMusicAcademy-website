@@ -43,7 +43,7 @@ class BaseLayoutTests(TestCase):
             name='دورهٔ پنهان', slug='hidden', short_description='.', long_description='.', is_active=False,
         )
 
-        response = self.client.get(reverse('pages:home'))
+        response = self.client.get(reverse('pages:about'))
 
         self.assertContains(response, 'href="/programmes/theory/"', count=2)  # navbar and menu
         self.assertNotContains(response, 'دورهٔ پنهان')

@@ -1,96 +1,203 @@
 {% extends 'base.html' %}
 {% load site_tags %}
 
-{% block title %}{% if page_title == 'آموزشگاه موسیقی آرامش' %}{{ page_title }}{% else %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endif %}{% endblock %}
+{% block title %}آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-home{% endblock %}
-{% block og_image %}{% if page_hero_image %}{% include 'partials/og_image.html' with url=page_hero_image.url alt=page_title %}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block og_image %}{% if hero_slides %}{% include 'partials/og_image.html' with url=hero_slides.0.image.url alt=hero_slides.0.title|default:'آموزشگاه موسیقی آرامش' %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
 
-{# ── The programme sheet: who is teaching today, and the call. ── #}
-<section class="home-hero grid" aria-labelledby="home-title">
-  <div class="home-sheet sheet sheet-torn">
-    <h1 id="home-title">{{ page_title }}</h1>
-    {% if page_body %}<p class="home-lead">{{ page_body|linebreaksbr }}</p>{% endif %}
-
-    {% include 'partials/week.html' with full_week_link=True %}
-
-    <div class="home-sheet-foot cluster">
-      {% if site_phone_primary %}
-      {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
-      {% endif %}
-      <a href="{% url 'contact:contact' %}">پیام بگذارید تا با شما تماس بگیریم</a>
+{# ── 1. Hero: the Academy's own rooms, framed; who is in today; the call. ── #}
+<section class="hero" aria-labelledby="home-title" data-hero>
+  <div class="hero__frame frame{% if not hero_slides %} frame--shape{% endif %}">
+    {% if hero_slides %}
+    <div class="hero__slides crossfade">
+      {% for slide in hero_slides %}
+      <img src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>
+      {% endfor %}
     </div>
+    {% else %}
+    {% include 'components/santur.html' %}
+    {% endif %}
+
+    <div class="hero__copy">
+      {% if hero_slides %}
+      <p class="hero__titles label" aria-hidden="true">{% for slide in hero_slides %}<span{% if forloop.first %} class="is-active"{% endif %}>{{ slide.title }}</span>{% endfor %}</p>
+      {% endif %}
+      <h1 id="home-title">{{ page_title }}</h1>
+      {% if page_body %}<p class="hero__lede">{{ page_body }}</p>{% endif %}
+      <div class="hero__actions">
+        {% if site_phone_primary %}
+        {% include "components/button.html" with label="تماس با آموزشگاه" href=site_phone_primary|tel_href icon="phone" %}
+        {% endif %}
+        {% include "components/button.html" with label="دوره‌ها" href="#programmes" variant="secondary" %}
+      </div>
+    </div>
+
+    {% if hero_slides|length > 1 %}
+    <div class="hero__bars" aria-hidden="true">{% for slide in hero_slides %}<span class="hero__bar"><i></i></span>{% endfor %}</div>
+    {% endif %}
   </div>
 
-  {% if page_hero_image %}
-  <figure class="home-plate home-plate-wide">
-    <img class="mono" src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high">
-  </figure>
-  {% elif director %}
-  <figure class="home-plate">
-    {% include 'partials/portrait.html' with teacher=director %}
-    <figcaption>
-      <a href="{{ director.get_absolute_url }}">{{ director.full_name }}</a>
-      {% if director.instruments.all %}<span class="soft"> · {{ director.instruments.all|join:"، " }}</span>{% endif %}
-      {% if director.home_intro %}<p class="home-plate-intro">{{ director.home_intro|linebreaksbr }}</p>{% endif %}
-    </figcaption>
-  </figure>
+  {% if today %}
+  <p class="today">
+    <span class="today__dot" aria-hidden="true"></span>
+    <a href="{% url 'schedules:schedule' %}">
+      {% if today.state == 'open' %}
+      <b>امروز، {{ today.day_label }}:</b> {% if today.taught|length > 5 %}{{ today.taught|slice:":4"|join:"، " }} و …{% else %}{{ today.taught|join:"، " }}{% endif %} · تا ساعت {{ today.until|clock }}
+      {% elif today.is_friday %}
+      <b>جمعه‌ها آموزشگاه تعطیل است.</b>{% if today.next_from %} {{ today.next_label }} از ساعت {{ today.next_from|clock }} پاسخگوی شما هستیم.{% endif %}
+      {% elif today.state == 'over' %}
+      <b>کلاس‌های امروز تمام شده.</b>{% if today.next_from %} {{ today.next_label }} از ساعت {{ today.next_from|clock }}.{% endif %}
+      {% else %}
+      <b>امروز کلاسی برگزار نمی‌شود.</b>{% if today.next_from %} {{ today.next_label }} از ساعت {{ today.next_from|clock }}.{% endif %}
+      {% endif %}
+    </a>
+  </p>
   {% endif %}
 </section>
 
 
-{# ── Teachers: one large with the biography, two beside. The director already stands in the hero. ── #}
-{% include 'pages/_home_teachers.html' with teachers=home_teachers %}
+{# ── 2. About: a working musician leads the place. Text on stone, the rooms beside it. ── #}
+<section class="about-split panel on-stone" aria-labelledby="about-title">
+  <div class="about-split__text">
+    <h2 id="about-title">با مدیریت مسعود آرامش</h2>
+    <p>مسعود آرامش، آهنگساز و نوازندهٔ سنتور با بیش از چهل سال فعالیت در موسیقی، این آموزشگاه را در سال ۱۳۹۵ در تهران بنیان گذاشت. اینجا کودکان، نوجوانان و بزرگسالان در فضایی آرام، نزد استادانی ساز و آواز می‌آموزند که بیشترشان سابقهٔ اجرا در کنسرت‌ها و جشنواره‌ها دارند.</p>
+    {% url 'pages:about' as about_url %}{% include "components/button.html" with label="دربارهٔ آموزشگاه" href=about_url variant="quiet" %}
+  </div>
+  <div class="about-split__media frame{% if not about_photo %} frame--shape{% endif %}">
+    {% if about_photo %}
+    <img src="{{ about_photo.image.url }}" alt="{{ about_photo.title|default:about_photo.gallery_page.title }}" loading="lazy" decoding="async">
+    {% else %}
+    {% include 'components/santur.html' %}
+    {% endif %}
+  </div>
+</section>
 
 
-{# ── The rooms: photos of the Academy as tipped-in plates. ── #}
-{% if gallery_preview_images %}
-<section class="home-rooms grid" aria-labelledby="rooms-title">
-  <div class="home-rooms-sheet sheet">
-    <header class="section-head">
-      <h2 id="rooms-title">فضای آموزشگاه</h2>
-      <a href="{{ gallery_preview_images.0.gallery_page.get_absolute_url }}">همهٔ تصاویر</a>
-    </header>
-    <ul class="plates" role="list">
-      {% for image in gallery_preview_images %}
-      <li><img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async"></li>
+{# ── 3. Programmes: a way in for a child or an adult. ── #}
+{% if programmes %}
+<section class="section" id="programmes" aria-labelledby="programmes-title">
+  <header class="section__head">
+    <h2 id="programmes-title">دوره‌ها</h2>
+    <p class="section__intro">همهٔ کلاس‌های آرامش خصوصی است: یک استاد و یک هنرجو. کنار آن، هنرجویان می‌توانند در گروه نوازی بنوازند، و کودکان و علاقه‌مندان به تئوری هم دورهٔ خودشان را دارند.</p>
+  </header>
+  <ul class="programme-row" role="list">
+    {% for programme in programmes %}
+    <li>{% include 'programmes/_card.html' %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+
+{# ── 4. Instruments: every one taught, as compact tiles. ── #}
+{% if instruments %}
+<section class="section" aria-labelledby="instruments-title">
+  <header class="section__head">
+    <h2 id="instruments-title">سازهایی که آموزش می‌دهیم</h2>
+  </header>
+  <ul class="tile-grid" role="list">
+    {% for instrument in instruments %}
+    <li>{% include 'teachers/_instrument_tile.html' %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+
+{# ── 5. Teachers: who a child would learn from, and from whom they learned. ── #}
+{% if home_teachers %}
+<section class="section" aria-labelledby="teachers-title">
+  <header class="section__head section__head--row">
+    <h2 id="teachers-title">استادان آرامش</h2>
+    {% url 'teachers:teacher_list' as teachers_url %}{% include "components/button.html" with label="همهٔ اساتید" href=teachers_url variant="quiet" %}
+  </header>
+  <ul class="portrait-row" role="list">
+    {% for teacher in home_teachers %}
+    <li>{% include 'teachers/_teacher_card.html' %}</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+
+{# ── 6. How we teach, then the three steps to a first lesson: the page's reading panel. ── #}
+{% if teaching or first_lesson %}
+<section class="panel on-stone teaching" aria-label="شیوهٔ آموزش و شروع کلاس">
+  {% if teaching %}
+  <div class="teaching__part">
+    <h2>{{ teaching.title }}</h2>
+    <ul class="points" role="list">
+      {% for title, text in teaching.points %}
+      <li><h3>{{ title }}</h3>{% if text %}<p>{{ text }}</p>{% endif %}</li>
       {% endfor %}
     </ul>
   </div>
+  {% endif %}
+  {% if first_lesson %}
+  <div class="teaching__part">
+    <h2>{{ first_lesson.title }}</h2>
+    <ol class="steps">
+      {% for title, text in first_lesson.points %}
+      <li><h3>{{ title }}</h3>{% if text %}<p>{{ text }}</p>{% endif %}{% if forloop.last and site_address %}<p class="steps__note">{{ site_address }}</p>{% endif %}</li>
+      {% endfor %}
+    </ol>
+  </div>
+  {% endif %}
 </section>
 {% endif %}
 
 
-{# ── Letters from parents: hidden until there is a real one. ── #}
+{# ── 7. Testimonials: real quotes only, so the section is hidden until there is one. ── #}
 {% if testimonials %}
-<section class="home-letters grid" aria-labelledby="letters-title">
-  <h2 id="letters-title">از زبان والدین</h2>
-  <div class="home-letters-list{% if testimonials|length == 1 %} is-single{% endif %}">
-    {% for testimonial in testimonials %}
-    <figure class="letter sheet">
-      <blockquote>{{ testimonial.quote|linebreaksbr }}</blockquote>
-      <figcaption>{{ testimonial.author_name }}{% if testimonial.relation %}<span class="soft"> · {{ testimonial.relation }}</span>{% endif %}</figcaption>
-    </figure>
-    {% endfor %}
+<section class="section" aria-labelledby="quotes-title">
+  <header class="section__head"><h2 id="quotes-title">از زبان خانواده‌ها</h2></header>
+  <div class="marquee">
+    <div class="marquee__track">
+      {% for copy in "ab" %}
+      <ul class="marquee__list" role="list"{% if not forloop.first %} aria-hidden="true"{% endif %}>
+        {% for testimonial in testimonials %}
+        <li>
+          <figure class="quote on-stone">
+            <blockquote><p>{{ testimonial.quote }}</p></blockquote>
+            <figcaption>{{ testimonial.author_name }}{% if testimonial.relation %}، {{ testimonial.relation }}{% endif %}</figcaption>
+          </figure>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endfor %}
+    </div>
   </div>
 </section>
 {% endif %}
 
 
-{# ── Visit: the map and the way here. Phones, hours and the full address are in the footer. ── #}
-<section class="home-visit grid" aria-labelledby="visit-title">
-  <div class="home-visit-sheet sheet">
-    <div class="home-visit-text">
-      <h2 id="visit-title">به آموزشگاه سر بزنید</h2>
-      {% if site_address %}<p>{{ site_address }}</p>{% endif %}
-      <p class="cluster home-visit-routes">
-        <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
-      </p>
-    </div>
-    <iframe class="home-visit-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-            src="{{ site_map_embed }}"></iframe>
-  </div>
+{# ── 8. Gallery preview: the rooms, as a mosaic. ── #}
+{% if gallery_preview_images %}
+<section class="section" aria-labelledby="rooms-title">
+  <header class="section__head section__head--row">
+    <h2 id="rooms-title">فضای آموزشگاه</h2>
+    {% include "components/button.html" with label="همهٔ تصاویر" href=gallery_preview_images.0.gallery_page.get_absolute_url variant="quiet" %}
+  </header>
+  <ul class="mosaic" role="list">
+    {% for image in gallery_preview_images %}
+    <li class="frame"><img src="{{ image.image.url }}" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async"></li>
+    {% endfor %}
+  </ul>
 </section>
+{% endif %}
+
+
+{# ── 9. FAQ: owner-approved answers only; hidden while there are none. ── #}
+{% if faqs %}
+<section class="panel on-stone faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">پرسش‌های متداول</h2>
+  {% include 'partials/faq.html' %}
+</section>
+{% endif %}
+
+
+{# ── 10. Contact band: the page's one saffron field. ── #}
+{% include 'partials/contact_band.html' %}
 {% endblock %}
