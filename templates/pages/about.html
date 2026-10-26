@@ -5,35 +5,33 @@
 {% block og_image %}{% if page_hero_image %}{% include 'partials/og_image.html' with url=page_hero_image.url alt=page_title %}{% elif space_images %}{% include 'partials/og_image.html' with url=space_images.0.image.url alt=page_title %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
-
-{# ── The letter: the admin's text on a paper sheet, signed by the Academy. ── #}
-<section class="about-hero grid{% if page_hero_image %} has-plate{% endif %}" aria-labelledby="about-title">
-  <article class="about-letter sheet sheet-torn">
+{# ── The Academy in its own words (admin text), beside a photo of its rooms. ── #}
+<article class="split panel on-stone page-head" aria-labelledby="about-title">
+  <div class="split__text">
     <h1 id="about-title">{{ page_title }}</h1>
-    <div class="about-body prose">{{ page_body|linebreaks }}</div>
-    <p class="about-signature">آموزشگاه موسیقی آرامش</p>
-  </article>
-
+    <div class="prose">{{ page_body|linebreaks }}</div>
+  </div>
   {% if page_hero_image %}
-  <figure class="about-plate">
-    <img class="mono" src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high">
-  </figure>
+  <div class="split__media frame"><img src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high"></div>
+  {% elif space_images %}
+  <div class="split__media frame"><img src="{{ space_images.0.image.url }}" alt="{{ space_images.0.title|default:'فضای آموزشگاه' }}" fetchpriority="high"></div>
+  {% else %}
+  <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
   {% endif %}
-</section>
-
+</article>
 
 {# ── The rooms: every photo of the space at its own ratio, opening in the lightbox. ── #}
 {% if space_images %}
-<section class="about-rooms grid" aria-labelledby="rooms-title">
-  <header class="section-head">
+<section class="section" aria-labelledby="rooms-title">
+  <header class="section__head section__head--row">
     <h2 id="rooms-title">فضای آموزشگاه</h2>
-    <span class="soft"><span class="num">{{ space_images|length }}</span> تصویر</span>
+    <p class="section__intro"><span class="num">{{ space_images|length }}</span> تصویر</p>
   </header>
   <ul class="plates" role="list">
     {% for image in space_images %}
     <li>
-      <a class="plate-link" href="{{ image.image.url }}" data-lightbox="rooms"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-        <img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:'فضای آموزشگاه' }}" loading="lazy" decoding="async">
+      <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="rooms"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
+        <img src="{{ image.image.url }}" alt="{{ image.title|default:'فضای آموزشگاه' }}" loading="lazy" decoding="async">
       </a>
     </li>
     {% endfor %}
@@ -41,6 +39,5 @@
 </section>
 {% endif %}
 
-
-{% include 'partials/page_call.html' %}
+{% include 'partials/contact_band.html' %}
 {% endblock %}

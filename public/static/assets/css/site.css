@@ -1106,11 +1106,11 @@
     column-gap: var(--space-5);
   }
   .plates li { break-inside: avoid; margin-block-end: var(--space-5); }
-  .plate-link { display: block; background: var(--paper-2); }
+  .plate-link { display: block; }
   .plates img { inline-size: 100%; }
-  .plate-link img { transition: filter var(--dur-state) var(--ease-out); }
+  .plate-link img { transition: transform var(--dur-develop) var(--ease-out); }
   @media (hover: hover) and (pointer: fine) {
-    .plate-link:hover img { filter: grayscale(1) contrast(1.06) brightness(1.08); }
+    .plate-link:hover img { transform: scale(1.03); }
   }
   @media (max-width: 56.25em) {
     .plates { columns: 2; column-gap: var(--space-3); }
