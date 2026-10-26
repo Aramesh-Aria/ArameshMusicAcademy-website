@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from .templatetags.site_tags import local_phone, tel_href
+from .templatetags.site_tags import fa_digits, local_phone, tel_href
 
 
 class PhoneFilterTests(TestCase):
@@ -13,6 +13,10 @@ class PhoneFilterTests(TestCase):
 
     def test_local_phone_leaves_a_local_number_alone(self):
         self.assertEqual(local_phone('021 4445 7748'), '021 4445 7748')
+
+    def test_fa_digits_turns_ascii_digits_persian_and_leaves_the_rest(self):
+        self.assertEqual(fa_digits('ساعت 14:30، 1404'), 'ساعت ۱۴:۳۰، ۱۴۰۴')
+        self.assertEqual(fa_digits(404), '۴۰۴')
 
     def test_tel_href_strips_spaces_and_keeps_the_country_code(self):
         self.assertEqual(tel_href('+98 21 4445 7748'), 'tel:+982144457748')

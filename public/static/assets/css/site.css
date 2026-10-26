@@ -1,24 +1,37 @@
 /*
   Aramesh Music Academy: site stylesheet.
-  Direction A, "The programme": paper sheets on a green-black ground, one Naskh face, one jade action.
+  Pass 2, «سینه به سینه»: large-radius stone and photo panels inset on a warm near-black frame, saffron as
+  the one accent, Amiri for display over Sahel for everything else (docs/redesign/03-direction.md).
   Logical properties throughout, so RTL is native. No build step: this file is served as written.
 */
 
 @layer reset, tokens, base, layout, components, pages, utilities;
 
 /*
-  Amiri (Khaled Hosny, SIL OFL 1.1), regular and bold, self-hosted.
-  The Persian files are cut from Fontsource's Arabic subset down to the Persian alphabet and punctuation
-  (fontTools, all layout features kept); the Latin files are Fontsource's Latin subset as shipped.
+  Sahel (Saber Rastikerdar, SIL OFL 1.1, v3.4.0), regular and bold, self-hosted. The Farsi-Digits build,
+  so every number set in Sahel shows Persian digits while the text keeps ASCII digits (tel: links, copy and
+  paste). Cut with fontTools to Persian, Basic Latin and the punctuation in use, all layout features kept.
 */
 @font-face {
-  font-family: "Amiri";
+  font-family: "Sahel";
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("../fonts/amiri-fa-400.woff2") format("woff2");
-  unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0655, U+066A-066D, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200F, U+FD3E-FD3F;
+  src: url("../fonts/sahel-fd-400.woff2") format("woff2");
 }
+@font-face {
+  font-family: "Sahel";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("../fonts/sahel-fd-700.woff2") format("woff2");
+}
+
+/*
+  Amiri (Khaled Hosny, SIL OFL 1.1), bold only: it sets display type and nothing else. The Persian file is cut
+  from Fontsource's Arabic subset down to the Persian alphabet; the Latin file is Fontsource's Latin subset.
+  Amiri draws ASCII digits as Latin, so numbers in display type go through the `fa_digits` filter.
+*/
 @font-face {
   font-family: "Amiri";
   font-style: normal;
@@ -26,14 +39,6 @@
   font-display: swap;
   src: url("../fonts/amiri-fa-700.woff2") format("woff2");
   unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0655, U+066A-066D, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200F, U+FD3E-FD3F;
-}
-@font-face {
-  font-family: "Amiri";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../fonts/amiri-latin-400.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
   font-family: "Amiri";
@@ -69,42 +74,52 @@
 /* ── tokens ────────────────────────────────────────────────────────── */
 @layer tokens {
   :root {
-    /* Colour: five colours, each with the lighter or darker steps it needs for contrast.
-       Green-black (ground, ink, and their soft steps), cool paper (paper, paper-2, rule), jade (accent and
-       its lift for the dark ground), white (fields, and text on jade), and the error red. Nothing else. */
-    --ground: #12201b;
-    --on-ground: #e4e7df;        /* 13.5:1 on ground */
-    --on-ground-soft: #b9c1b7;   /*  9.1:1 on ground */
-    --paper: #e9ece5;
-    --paper-2: #dde2da;          /* a struck row, an empty plate */
-    --ink: #12201b;              /* 14.1:1 on paper */
-    --ink-soft: #45524c;         /*  6.9:1 on paper, 6.2:1 on paper-2 */
-    --rule: #d3d8cf;             /* the one hairline: between schedule rows */
-    --accent: #0e7a64;           /* jade, from the wordmark: the call action and focus only */
-    --on-accent: #fff;           /*  5.3:1 on accent */
-    --field: #fff;               /* form fields on paper */
-    --accent-light: #3fb393;     /* the same jade lifted for the dark ground: 6.5:1 */
-    --error: #9a2f1d;            /* form errors only, on paper: 6.3:1 */
+    /* Colour: four tokens (ground, stone, saffron, error), plus the few steps of them that contrast needs.
+       Every pair is checked: stone on ground 14.8:1, ink on saffron 8.6:1, saffron on ground 8.6:1. */
+    --ground: #17130f;          /* the warm near-black frame; also the ink on stone panels */
+    --ground-2: #24201b;        /* a dark panel or strip set on the ground (stone on it: 12.9:1) */
+    --stone: #ebe5dc;           /* reading panels, and the text on the ground; kept greyer than cream */
+    --stone-soft: #aba69e;      /* secondary text on the ground: 7.6:1 */
+    --ink: var(--ground);
+    --ink-soft: #57524d;        /* secondary text on stone: 6.2:1 */
+    --field: #f7f4ef;           /* form fields on stone (ink on it: 16.8:1) */
+    --field-line: #8c8780;      /* a field's edge on stone: 3.3:1 */
+    --saffron: #e2a72e;         /* the one accent: the call pill, active states, focus, today; dark text on it */
+    --saffron-deep: #9a6c12;    /* saffron where it marks something on stone (saffron itself is 1.7:1 there): 3.7:1 */
+    --error: #a8321f;           /* form errors, on stone or a field: 5.3:1 */
 
-    /* Surface roles. A .sheet flips these, so components never ask where they sit. */
+    /* Surface roles. A stone panel flips these, so components never ask where they sit. */
     --surface: var(--ground);
-    --text: var(--on-ground);
-    --text-soft: var(--on-ground-soft);
-    --focus: var(--accent-light);
+    --text: var(--stone);
+    --text-soft: var(--stone-soft);
+    --mark: var(--saffron);      /* underlines, today markers, small accents */
+    --focus: var(--saffron);
 
-    /* Type: one family, five steps. Amiri ships 400 and 700 only, so hierarchy uses those two weights. */
-    --font: "Amiri", "Noto Naskh Arabic", "Times New Roman", serif;
-    /* Amiri's small x-height reads about a size below a sans at the same px, so text runs large. */
-    --text-s:   1.125rem;                               /* 18: captions, meta */
-    --text-m:   1.3125rem;                              /* 21: body */
-    --text-l:   clamp(1.375rem, 1.25rem + 0.5vw, 1.6875rem); /* 22-27: lead, names */
-    --text-xl:  clamp(2.125rem, 1.5rem + 1.8vw, 3rem);  /* 34-48: section heads */
-    --text-xxl: clamp(2.75rem, 1.4rem + 5vw, 5rem);     /* 44-80: the page's h1 */
-    --leading-tight: 1.2;   /* Amiri's tall alef-madda and deep descenders need the room */
-    --leading-body: 1.6;
-    --measure: 34em;
+    /* Type: Amiri bold for display, Sahel 400/700 for everything else. Tahoma is the closest Persian sans
+       every Windows and macOS has, so the swap from fallback to Sahel barely moves the text. */
+    --font-text: "Sahel", Tahoma, "Segoe UI", sans-serif;
+    --font-display: "Amiri", "Sahel", "Times New Roman", serif;
 
-    /* Space: one scale, used for gaps and section rhythm. */
+    /* Sahel steps: labels, meta, body (18 on phones, 20 on desktop) and lead. */
+    --text-xs: 0.875rem;                                        /* 14: short labels above a heading */
+    --text-s: 1rem;                                             /* 16: meta, captions, chips, small buttons */
+    --text-m: clamp(1.125rem, 1.06rem + 0.28vw, 1.25rem);       /* 18-20: body, buttons, nav */
+    --text-l: clamp(1.25rem, 1.12rem + 0.56vw, 1.5rem);         /* 20-24: leads, the supporting sentence */
+    /* Amiri steps: card titles and names, section heads, the page's one h1. */
+    --display-s: clamp(1.625rem, 1.38rem + 1.05vw, 2.25rem);    /* 26-36 */
+    --display-m: clamp(2rem, 1.5rem + 2.1vw, 3.25rem);          /* 32-52 */
+    --display-l: clamp(2.75rem, 1.6rem + 4.8vw, 4.75rem);       /* 44-76 */
+
+    /* Leading runs inversely to size. Naskh needs more than Latin: Amiri's alef-madda and deep descenders
+       collide below 1.2, and Sahel's tall ascenders want 1.8 in running text. Light text on the ground
+       gets a touch more air than ink on stone. Tracking stays 0 at every size: it breaks the joins. */
+    --leading-display: 1.25;
+    --leading-ui: 1.4;          /* buttons, labels, nav: one line */
+    --leading-body: 1.85;
+    --leading-body-stone: 1.8;
+    --measure: 36em;            /* about 65 Persian characters */
+
+    /* Space: one scale, for gaps and section rhythm. */
     --space-1: 0.25rem;  /*   4 */
     --space-2: 0.5rem;   /*   8 */
     --space-3: 0.75rem;  /*  12 */
@@ -116,21 +131,24 @@
     --space-9: 6rem;     /*  96 */
     --space-10: 10rem;   /* 160 */
 
-    --margin: clamp(1rem, 3.3vw, 3rem);         /* the outer page margin */
+    --frame: clamp(0.75rem, 1.7vw, 1.5rem);     /* the ground showing around a panel: 12-24 */
+    --margin: clamp(1rem, 3.3vw, 3rem);         /* text's distance from a panel's edge */
     --gutter: clamp(0.75rem, 1.7vw, 1.5rem);    /* the 12-column gap */
-    --section: clamp(var(--space-9), 11vw, var(--space-10)); /* space between chapters */
-    --sheet-pad: clamp(1.25rem, 3.9vw, 3.5rem);
+    --section: clamp(var(--space-8), 8vw, var(--space-9)); /* space between panels' content blocks */
+    --panel-pad: clamp(1.25rem, 4vw, 4rem);
 
-    /* Shape: square corners. Paper is cut, not rounded. */
-    --radius: 0;
-    --tear: 10px;   /* height of the punched tear-off edge */
+    /* Shape: exactly two radii. The panel's, and full round for pills. An image inside a panel nests its
+       corner: the panel radius minus the inset. */
+    --radius-panel: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);   /* 20 on phones, 28 on desktop */
+    --radius-pill: 999px;
 
-    /* Motion: printed paper, handled. Short, ease-out, interruptible. */
+    /* Motion: slow where it carries content, quick where it answers a hand. */
     --dur-press: 120ms;
     --dur-swap: 140ms;
     --dur-state: 160ms;
-    --dur-move: 220ms;
+    --dur-move: 260ms;
     --dur-develop: 600ms;
+    --dur-fade: 1200ms;     /* hero and card crossfades */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* strong ease-out: entrances, exits, presses */
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* strong ease-in-out: things moving on screen */
     /* A damped spring (ratio 0.8, 1.5% overshoot) sampled into linear(); pair it with --dur-spring. */
@@ -141,6 +159,24 @@
     --press-scale: 0.97;
 
     color-scheme: dark;
+
+    /* ── Legacy bridge (pass 1 names → pass 2 tokens). The pass-1 component and page CSS below still reads
+       these; steps 9-11 replace those rules, and step 14 deletes this block. Nothing new may use them. ── */
+    --paper: var(--stone);
+    --paper-2: #ddd6cb;
+    --on-ground: var(--stone);
+    --on-ground-soft: var(--stone-soft);
+    --rule: #d6cfc4;
+    --accent: var(--saffron);
+    --accent-light: var(--saffron);
+    --on-accent: var(--ink);
+    --font: var(--font-text);
+    --text-xl: var(--display-m);
+    --text-xxl: var(--display-l);
+    --leading-tight: var(--leading-display);
+    --sheet-pad: var(--panel-pad);
+    --radius: 0;
+    --tear: 10px;
   }
 
   /* Reduced motion: things change state instantly and nothing travels. Fades keep a short beat. */
@@ -150,6 +186,7 @@
       --dur-move: 0ms;
       --dur-develop: 0ms;
       --dur-spring: 0ms;
+      --dur-fade: 0ms;
       --dur-enter: 160ms;
       --enter-rise: 0;
       --dur-swap: 80ms;
@@ -164,20 +201,19 @@
 @layer base {
   html {
     background: var(--ground);
-    scrollbar-color: var(--on-ground-soft) var(--ground);
+    scrollbar-color: var(--stone-soft) var(--ground);
     -webkit-tap-highlight-color: transparent;
   }
 
   body {
     background: var(--surface);
     color: var(--text);
-    font-family: var(--font);
+    font-family: var(--font-text);
     font-size: var(--text-m);
     font-weight: 400;
     line-height: var(--leading-body);
-    font-optical-sizing: auto;
     font-kerning: normal;
-    /* Arabic script joins its letters: tracking would break them apart. */
+    /* Persian joins its letters: tracking would break them apart, at every size. */
     letter-spacing: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -185,15 +221,21 @@
     overflow-x: clip;
   }
 
-  h1, h2, h3, h4 {
+  /* Headings are Amiri; weight 700 is the only one loaded. h4 and below are Sahel labels. */
+  h1, h2, h3 {
+    font-family: var(--font-display);
     font-weight: 700;
-    line-height: var(--leading-tight);
+    line-height: var(--leading-display);
     text-wrap: balance;
   }
-  h1 { font-size: var(--text-xxl); }
-  h2 { font-size: var(--text-xl); }
-  h3 { font-size: var(--text-l); }
-  h4 { font-size: var(--text-m); }
+  h1 { font-size: var(--display-l); }
+  h2 { font-size: var(--display-m); }
+  h3 { font-size: var(--display-s); }
+  h4 {
+    font-size: var(--text-m);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+  }
 
   p, li, dd { text-wrap: pretty; }
   strong, b { font-weight: 700; }
@@ -202,20 +244,20 @@
   a {
     color: inherit;
     text-decoration-thickness: 1px;
-    text-underline-offset: 0.35em;
+    text-decoration-color: var(--mark);
+    /* Below Persian descenders, not through them. */
+    text-underline-offset: 0.45em;
     text-decoration-skip-ink: auto;
   }
   @media (hover: hover) and (pointer: fine) {
     a:hover { text-decoration-thickness: 2px; }
   }
 
-  /* Selected text inverts the surface it sits on: ink on paper, paper on the ground. */
-  ::selection { background: var(--text); color: var(--surface); }
+  ::selection { background: var(--saffron); color: var(--ink); }
 
   :focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
-    border-radius: var(--radius);
   }
 
   /* A focused iframe matches only :focus-within, so the map needs it to show it holds the keys. */
@@ -224,18 +266,32 @@
     outline-offset: 3px;
   }
 
+  input, textarea, select { caret-color: var(--saffron-deep); }
   ::placeholder { color: var(--text-soft); opacity: 1; }
 
-  hr { border: 0; border-block-start: 1px solid var(--rule); }
-
-  /* Phones, times and counts: Latin digits, tabular, kept left-to-right inside RTL text. */
+  /* Phones, times and counts. Sahel draws the digits in Persian; a phone keeps its groups in order
+     left-to-right inside the RTL line. */
   .num, time, [href^="tel:"] {
-    font-variant-numeric: tabular-nums lining-nums;
+    font-variant-numeric: tabular-nums;
   }
   .ltr, [href^="tel:"] .num {
     direction: ltr;
     unicode-bidi: isolate;
     white-space: nowrap;
+  }
+
+  /* A stone panel: the reading surface. Ink on stone, the deeper saffron for marks, and ink for focus,
+     since saffron on stone is too faint to be a ring. */
+  .on-stone, .sheet {
+    --surface: var(--stone);
+    --text: var(--ink);
+    --text-soft: var(--ink-soft);
+    --mark: var(--saffron-deep);
+    --focus: var(--ink);
+    background: var(--surface);
+    color: var(--text);
+    line-height: var(--leading-body-stone);
+    scrollbar-color: var(--ink-soft) var(--stone);
   }
 }
 
@@ -268,14 +324,8 @@
 
   /* The paper sheet: a whole chapter changes colour, never a scattered accent. */
   .sheet {
-    --surface: var(--paper);
-    --text: var(--ink);
-    --text-soft: var(--ink-soft);
-    --focus: var(--accent);
-    background: var(--surface);
-    color: var(--text);
+    /* Its colours come from the base layer's stone panel roles. */
     padding: var(--sheet-pad);
-    scrollbar-color: var(--ink-soft) var(--paper);
   }
 
   /* The punched tear-off edge at a sheet's foot. Used once per page at most. */
