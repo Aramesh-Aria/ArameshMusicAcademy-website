@@ -136,6 +136,8 @@
     /* A damped spring (ratio 0.8, 1.5% overshoot) sampled into linear(); pair it with --dur-spring. */
     --ease-spring: linear(0, 0.034, 0.118, 0.227, 0.346, 0.464, 0.573, 0.669, 0.752, 0.82, 0.875, 0.918, 0.951, 0.975, 0.991, 1.003, 1.01, 1.013, 1.015, 1.015, 1.014, 1.013, 1.011, 1.009, 1.007, 1.006, 1.004, 1.003, 1.002, 1.002, 1);
     --dur-spring: 560ms;
+    --dur-enter: 480ms;
+    --enter-rise: 0.75rem;
     --press-scale: 0.97;
 
     color-scheme: dark;
@@ -148,6 +150,8 @@
       --dur-move: 0ms;
       --dur-develop: 0ms;
       --dur-spring: 0ms;
+      --dur-enter: 160ms;
+      --enter-rise: 0;
       --dur-swap: 80ms;
       --dur-state: 80ms;
       --press-scale: 1;
@@ -212,6 +216,12 @@
     outline: 3px solid var(--focus);
     outline-offset: 3px;
     border-radius: var(--radius);
+  }
+
+  /* A focused iframe matches only :focus-within, so the map needs it to show it holds the keys. */
+  iframe:focus-within {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
   }
 
   ::placeholder { color: var(--text-soft); opacity: 1; }
@@ -694,6 +704,7 @@
   }
   .programme-time { color: var(--text-soft); font-size: var(--text-s); }
   .programme-name { font-size: var(--text-l); font-weight: 700; text-decoration: none; }
+  .programme-note { grid-column: 2 / -1; max-inline-size: var(--measure); font-size: var(--text-s); color: var(--text-soft); }
   @media (hover: hover) and (pointer: fine) {
     .programme-name:hover { text-decoration: underline; text-decoration-thickness: 1px; }
   }
@@ -1150,6 +1161,7 @@
   /* A start-first range reads left to right; in the RTL cell it sits at the start edge. */
   .week-time { display: block; inline-size: fit-content; font-size: var(--text-s); padding-block: 0.15em; }
   .week-instruments, .week-note { display: block; font-size: var(--text-s); color: var(--text-soft); }
+  .week-note { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
   /* Two sessions on the same day stand apart. */
   .week-table td > .week-time:not(:first-child) { margin-block-start: var(--space-3); }
 
@@ -1196,7 +1208,16 @@
     background: var(--paper);
     color: var(--ink);
   }
-  .subpage-title { margin-block-start: var(--space-4); font-size: var(--text-l); }
+  /* Three lines at most, so one long title can't stretch its row; the full title heads the page itself. */
+  .subpage-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    margin-block-start: var(--space-4);
+    font-size: var(--text-l);
+  }
   .subpage-plate .subpage-title { margin: 0; font-size: var(--text-xl); }
   .subpage-plate + .subpage-text { margin-block-start: var(--space-3); }
   .subpage-title a { text-decoration: none; }
@@ -1409,6 +1430,35 @@
   }
   @media (max-width: 56.25em) {
     .stub-call .btn { inline-size: 100%; }
+  }
+
+  /* Entrance: the opening section is set down once on load, its parts a beat apart. CSS only, so
+     nothing waits on JS; `translate` leaves any resting transform alone. */
+  main > section:first-child > * {
+    animation: set-down var(--dur-enter) var(--ease-out) backwards;
+  }
+  main > section:first-child > :nth-child(2) { animation-delay: 60ms; }
+  main > section:first-child > :nth-child(3) { animation-delay: 120ms; }
+  main > section:first-child > :nth-child(n + 4) { animation-delay: 180ms; }
+
+  /* Later sections settle as they scroll in, finished well before they are read. Movement only, so
+     a page captured without scrolling never shows them missing. Skipped where scroll timelines are
+     missing or motion is reduced: there they simply sit still. */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      main > section:not(:first-child) {
+        animation: settle linear backwards;
+        animation-timeline: view();
+        animation-range: entry 0% entry 60%;
+      }
+    }
+  }
+
+  @keyframes set-down {
+    from { opacity: 0; translate: 0 var(--enter-rise); }
+  }
+  @keyframes settle {
+    from { translate: 0 calc(var(--enter-rise) * 3); }
   }
 }
 

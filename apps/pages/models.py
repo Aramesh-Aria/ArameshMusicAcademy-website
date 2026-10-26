@@ -12,7 +12,7 @@ class SitePageContent(models.Model):
     )
 
     page_key = models.CharField('کلید صفحه', max_length=20, choices=PAGE_CHOICES, unique=True, help_text='مشخص می‌کند این محتوا مربوط به کدام صفحه است.')
-    title = models.CharField('عنوان', max_length=150, help_text='عنوان اصلی صفحه.')
+    title = models.CharField('عنوان', max_length=150, help_text='عنوان اصلی صفحه، با حروف درشت بالای صفحه. کوتاه بنویسید (حدود ۴۰ حرف)؛ توضیح بیشتر را در متن صفحه بیاورید.')
     body = models.TextField('متن صفحه', help_text='متن اصلی که در صفحه نمایش داده می‌شود.')
     meta_description = models.CharField(
         'توضیحات متا (سئو)',

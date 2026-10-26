@@ -104,6 +104,26 @@ class GalleryPageModelTests(TestCase):
         self.assertTrue(page.slug)
 
 
+    def test_display_cover_falls_back_to_the_first_active_photo(self):
+        page = GalleryPage.objects.create(title='Space', slug='space')
+        # bulk_create skips save(), which would try to process the (absent) files.
+        GalleryImage.objects.bulk_create([
+            GalleryImage(gallery_page=page, image='gallery/hidden.jpg', is_active=False, display_order=0),
+            GalleryImage(gallery_page=page, image='gallery/first.jpg', display_order=1),
+            GalleryImage(gallery_page=page, image='gallery/second.jpg', display_order=2),
+        ])
+
+        self.assertEqual(page.display_cover.name, 'gallery/first.jpg')
+
+    def test_display_cover_prefers_the_cover_and_is_none_without_photos(self):
+        page = GalleryPage.objects.create(title='Space', slug='space')
+        self.assertIsNone(page.display_cover)
+
+        GalleryPage.objects.filter(pk=page.pk).update(cover_image='gallery/covers/cover.jpg')
+        page = GalleryPage.objects.get(pk=page.pk)
+        self.assertEqual(page.display_cover.name, 'gallery/covers/cover.jpg')
+
+
 class GalleryViewTests(TestCase):
     def test_gallery_root_lists_active_top_level_pages(self):
         active_page = GalleryPage.objects.create(title='Concerts', slug='concerts')

@@ -38,7 +38,11 @@ class HomeView(PageContentMixin, TemplateView):
     template_name = 'pages/home.html'
     page_key = SitePageContent.HOME
     default_title = 'آموزشگاه موسیقی آرامش'
-    default_body = 'این صفحه فعلا به عنوان نقطه شروع بک‌اند و معماری Django نگه داشته شده است.'
+    # Shown until staff add the home content in the admin, so it is written for visitors.
+    default_body = (
+        'آموزش تخصصی موسیقی ایرانی و کلاسیک برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید مجرب. '
+        'برای مشاوره و هماهنگی کلاس با ما تماس بگیرید.'
+    )
     default_meta_description = (
         'آموزشگاه موسیقی آرامش؛ آموزش تخصصی سازهای مختلف توسط اساتید مجرب. '
         'برای مشاوره و هماهنگی کلاس با ما در تماس باشید.'
@@ -64,7 +68,8 @@ class HomeView(PageContentMixin, TemplateView):
             space_page.images.filter(is_active=True).select_related('gallery_page')[:6]
             if space_page else GalleryImage.objects.none()
         )
-        context['testimonials'] = Testimonial.objects.filter(is_active=True)
+        # Three letters at most, by display order then newest: a wall of them reads as filler.
+        context['testimonials'] = Testimonial.objects.filter(is_active=True)[:3]
         return context
 
 
@@ -72,7 +77,11 @@ class AboutView(PageContentMixin, TemplateView):
     template_name = 'pages/about.html'
     page_key = SitePageContent.ABOUT
     default_title = 'درباره ما'
-    default_body = 'محتوای این صفحه بعدا هنگام انتخاب قالب و آماده‌سازی متن نهایی تکمیل می‌شود.'
+    # Shown until staff add the About content in the admin, so it is written for visitors.
+    default_body = (
+        'آموزشگاه موسیقی آرامش جایی برای آموختن و نواختن موسیقی ایرانی و کلاسیک است؛ '
+        'برای کودکان، نوجوانان و بزرگسالان، از جلسهٔ اول تا اجرای روی صحنه.'
+    )
     default_meta_description = (
         'درباره آموزشگاه موسیقی آرامش، داستان شکل‌گیری، اهداف و فضای آموزشی.'
     )

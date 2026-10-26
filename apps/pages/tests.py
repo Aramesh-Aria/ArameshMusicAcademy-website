@@ -138,7 +138,28 @@ class HomeWeekScheduleTests(TestCase):
         self.assertNotContains(response, 'home-plate-intro')
 
 
+    def test_home_shows_at_most_three_testimonials_in_display_order(self):
+        for order in range(5):
+            Testimonial.objects.create(author_name=f'والد {order}', quote='خوب بود.', display_order=order, is_active=True)
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertEqual([t.author_name for t in response.context['testimonials']], ['والد 0', 'والد 1', 'والد 2'])
+
+
 class PageViewTests(TestCase):
+    def test_home_without_admin_content_shows_visitor_copy_not_a_placeholder(self):
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'برای مشاوره و هماهنگی کلاس با ما تماس بگیرید.')
+        self.assertNotContains(response, 'Django')
+
+    def test_about_without_admin_content_shows_visitor_copy_not_a_placeholder(self):
+        response = self.client.get(reverse('pages:about'))
+
+        self.assertContains(response, 'آموزشگاه موسیقی آرامش جایی برای آموختن')
+        self.assertNotContains(response, 'انتخاب قالب')
+
     def test_home_page_loads(self):
         response = self.client.get(reverse('pages:home'))
 

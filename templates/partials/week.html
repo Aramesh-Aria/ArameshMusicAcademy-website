@@ -26,6 +26,7 @@
         <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
         <a class="programme-name" href="{{ session.teacher.get_absolute_url }}">{{ session.teacher.full_name }}</a>
         <span class="programme-instruments">{{ session.instruments.all|join:"، " }}</span>
+        {% if session.notes %}<small class="programme-note">{{ session.notes }}</small>{% endif %}
       </li>
       {% endfor %}
     </ul>

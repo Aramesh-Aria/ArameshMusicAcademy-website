@@ -4,6 +4,7 @@ from urllib.parse import parse_qs, urlparse
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 
 
@@ -28,7 +29,7 @@ def aparat_video_hash(url):
 
 
 class GalleryPage(models.Model):
-    title = models.CharField('عنوان', max_length=150, help_text='نامی که در لیست گالری و صفحه نمایش داده می‌شود.')
+    title = models.CharField('عنوان', max_length=150, help_text='نامی که در لیست گالری و صفحه نمایش داده می‌شود. کوتاه بنویسید (حدود ۴۰ حرف)؛ در لیست گالری فقط سه خط آن دیده می‌شود.')
     slug = models.SlugField(
         'نام در آدرس',
         max_length=150,
@@ -115,6 +116,14 @@ class GalleryPage(models.Model):
             if result_name != self.cover_image.name:
                 GalleryPage.objects.filter(pk=self.pk).update(cover_image=result_name)
                 self.cover_image.name = result_name
+
+    @cached_property
+    def display_cover(self):
+        """The cover, or without one the first active photo, so a page with photos never shows a bare plate."""
+        if self.cover_image:
+            return self.cover_image
+        first = self.images.filter(is_active=True).first()
+        return first.image if first else None
 
     @property
     def slug_path(self):
