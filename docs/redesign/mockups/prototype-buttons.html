@@ -1,0 +1,603 @@
+<!doctype html>
+<!--
+  PROTOTYPE, throwaway. Redesign brief step 5: four button systems for Aramesh Music Academy,
+  switchable with the picker at the bottom (keys 1–4, ← →, R to replay).
+  Each variant covers primary (saffron pill), secondary (light pill) and quiet (text + underline),
+  on the dark ground and on a stone reading panel, with rest / hover / press / focus / disabled shown
+  side by side in the state strip, and a live form submit (sending → sent).
+  Tokens are the 03-direction.md proposals. Copy is from gate-1-models-and-copy.md.
+  Sahel loads from jsDelivr for the prototype only; production self-hosts subset woff2.
+-->
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<link rel="icon" href="img/logo-saffron.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype: button system</title>
+<style>
+@font-face { font-family: "Sahel"; font-weight: 400; font-display: swap;
+  src: url(https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/Sahel.woff2) format("woff2"); }
+@font-face { font-family: "Sahel"; font-weight: 700; font-display: swap;
+  src: url(https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/Sahel-Bold.woff2) format("woff2"); }
+@font-face { font-family: "Amiri"; font-weight: 700; font-display: swap;
+  src: url(../../../public/static/assets/fonts/amiri-fa-700.woff2) format("woff2"); }
+
+:root {
+  --ground: #17130f;
+  --stone: #ebe5dc;
+  --ink: #17130f;
+  --saffron: #e2a72e;
+  --error: #a8321f;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --pad: clamp(12px, 1.7vw, 24px);
+  --r-panel: 28px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--ground); color: var(--stone);
+  font-family: "Sahel", system-ui, sans-serif; font-size: 19px; line-height: 1.75;
+  -webkit-font-smoothing: antialiased; overflow-x: clip;
+}
+img { display: block; max-width: 100%; }
+bdi.num { direction: ltr; unicode-bidi: isolate; }
+
+/* ── Contexts: every button reads its colours from the surface it sits on ── */
+.on-ground {
+  --fg: var(--stone); --soft: rgba(235, 229, 220, 0.72);
+  --focus: var(--saffron);
+  --sec-bg: var(--stone); --sec-fg: var(--ink); --sec-hover: #f6f2ec;
+  --tint: rgba(235, 229, 220, 0.12);
+  --off-bg: rgba(235, 229, 220, 0.1); --off-fg: rgba(235, 229, 220, 0.42);
+}
+.on-stone {
+  --fg: var(--ink); --soft: rgba(23, 19, 15, 0.7);
+  --focus: var(--ink);
+  --sec-bg: rgba(23, 19, 15, 0.08); --sec-fg: var(--ink); --sec-hover: rgba(23, 19, 15, 0.13);
+  --tint: rgba(23, 19, 15, 0.08);
+  --off-bg: rgba(23, 19, 15, 0.07); --off-fg: rgba(23, 19, 15, 0.38);
+}
+
+/* ── Page scaffold (shared by all variants; only the buttons change) ── */
+.page { padding: var(--pad); display: grid; gap: var(--pad); }
+.nav {
+  position: sticky; top: var(--pad); z-index: 5;
+  display: flex; align-items: center; gap: 28px;
+  background: var(--ground); border-radius: 999px; padding: 8px 8px 8px 8px;
+  padding-inline-start: 22px;
+}
+.nav-logo { height: 40px; width: auto; }
+.nav-links { display: flex; gap: 26px; margin-inline-start: auto; font-size: 17px; }
+.nav-links a { color: var(--stone); text-decoration: none; }
+.nav-links a[aria-current] { color: var(--saffron); }
+.nav-menu { display: none; }
+
+.hero {
+  position: relative; border-radius: var(--r-panel); overflow: hidden;
+  min-height: min(760px, calc(100svh - 120px));
+  display: grid; align-items: end;
+}
+.hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 40%; }
+.hero::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(23,19,15,.88) 0%, rgba(23,19,15,.55) 42%, rgba(23,19,15,.05) 75%); }
+.hero-copy { position: relative; z-index: 1; padding: clamp(24px, 4vw, 64px); max-width: 760px; }
+.label { font-weight: 700; font-size: 15px; color: var(--saffron); margin: 0 0 6px; }
+.hero h1 { font-family: "Amiri", serif; font-weight: 700; font-size: clamp(44px, 5vw, 76px); line-height: 1.2; margin: 0 0 14px; }
+.hero p { margin: 0 0 28px; max-width: 56ch; color: var(--soft); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; }
+
+.split { display: grid; grid-template-columns: 1.1fr 1fr; gap: var(--pad); }
+.panel { border-radius: var(--r-panel); padding: clamp(24px, 3.4vw, 52px); }
+.panel.stone { background: var(--stone); color: var(--ink); }
+.panel.dark { background: #211b16; }
+.panel h2 { font-family: "Amiri", serif; font-weight: 700; font-size: clamp(32px, 3vw, 44px); line-height: 1.2; margin: 0 0 10px; }
+.panel > p { margin: 0 0 24px; max-width: 52ch; }
+
+.form { display: grid; gap: 16px; margin-top: 8px; }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 700; font-size: 16px; }
+.field input, .field textarea {
+  font: inherit; font-size: 18px; color: var(--ink); background: #f7f4ef;
+  border: 1px solid rgba(23,19,15,.22); border-radius: 14px; padding: 12px 16px; width: 100%;
+}
+.field textarea { min-height: 96px; resize: vertical; }
+.field input:focus-visible, .field textarea:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.form-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px; margin-top: 6px; }
+.form-note { font-size: 15px; color: var(--soft); margin: 0; }
+
+.card { display: grid; grid-template-rows: auto 1fr; gap: 18px; }
+.card img { border-radius: 16px; aspect-ratio: 3 / 2; object-fit: cover; width: 100%; }
+.card h3 { font-family: "Amiri", serif; font-size: 32px; line-height: 1.2; margin: 0 0 6px; }
+.card p { margin: 0 0 18px; color: var(--soft); }
+
+/* State strip: every button kind in every state, on both surfaces */
+.states { display: grid; grid-template-columns: 1fr 1fr; gap: var(--pad); }
+.states > *, .split > * { min-width: 0; }
+.states .panel { padding: clamp(20px, 2.6vw, 36px); }
+.states h2 { font-family: "Sahel", sans-serif; font-size: 17px; font-weight: 700; margin: 0 0 18px; color: var(--soft); }
+.state-grid { display: grid; grid-template-columns: max-content repeat(3, max-content); gap: 16px 18px; align-items: center; overflow-x: auto; padding: 6px; }
+.state-grid .cap { font-size: 14px; color: var(--soft); }
+.state-grid .colh { font-size: 14px; font-weight: 700; color: var(--soft); }
+
+/* ════ Shared button base ════ */
+.btn {
+  --h: 50px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  height: var(--h); padding: 0 24px; border: 0; border-radius: 999px;
+  font: 700 17px/1 "Sahel", system-ui, sans-serif; text-decoration: none; white-space: nowrap;
+  cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 160ms var(--ease-out), background-color 150ms ease-out, color 150ms ease-out;
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn:focus-visible, .btn.is-focus { outline: 2px solid var(--focus); outline-offset: 3px; }
+.btn[aria-disabled="true"] { cursor: not-allowed; }
+.btn--primary { background: var(--saffron); color: var(--ink); }
+.btn--secondary { background: var(--sec-bg); color: var(--sec-fg); }
+.btn--quiet { height: auto; min-height: 44px; padding: 0 2px; background: none; color: var(--fg); }
+.btn--sm { --h: 46px; padding: 0 20px; font-size: 16px; }
+.spin { animation: spin 700ms linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* ════ 1 · ساده (Plain): flat fills, colour carries the state ════ */
+.v-plain .btn:active, .v-plain .btn.is-press { transform: scale(0.97); }
+.v-plain .btn--primary.is-hover { background: #ecb646; }
+.v-plain .btn--secondary.is-hover { background: var(--sec-hover); }
+@media (hover: hover) and (pointer: fine) {
+  .v-plain .btn--primary:hover { background: #ecb646; }
+  .v-plain .btn--secondary:hover { background: var(--sec-hover); }
+}
+.v-plain .btn--quiet .btn__label {
+  text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px;
+  text-decoration-color: color-mix(in srgb, var(--saffron) 55%, transparent);
+  transition: text-decoration-color 150ms ease-out;
+}
+.v-plain .btn--quiet.is-hover .btn__label { text-decoration-color: var(--saffron); }
+@media (hover: hover) and (pointer: fine) { .v-plain .btn--quiet:hover .btn__label { text-decoration-color: var(--saffron); } }
+.v-plain .btn--quiet:active, .v-plain .btn--quiet.is-press { transform: scale(0.97); }
+.v-plain .on-stone .btn--quiet .btn__label { text-decoration-color: color-mix(in srgb, #9a6c12 60%, transparent); }
+.v-plain .on-stone .btn--quiet.is-hover .btn__label { text-decoration-color: #9a6c12; }
+@media (hover: hover) and (pointer: fine) { .v-plain .on-stone .btn--quiet:hover .btn__label { text-decoration-color: #9a6c12; } }
+.v-plain .btn[aria-disabled="true"] { background: var(--off-bg); color: var(--off-fg); transform: none; }
+.v-plain .btn--quiet[aria-disabled="true"] { background: none; }
+.v-plain .btn--quiet[aria-disabled="true"] .btn__label { text-decoration-color: var(--off-bg); }
+
+/* ════ 2 · مضراب (Disc): the icon lives in its own disc and travels ════ */
+.v-disc .btn:not(.btn--quiet):not(.btn--bare) { padding-inline-start: 24px; padding-inline-end: 5px; gap: 14px; }
+.v-disc .btn__disc {
+  position: relative; display: grid; place-items: center; overflow: hidden;
+  width: 40px; height: 40px; border-radius: 50%; flex: none;
+}
+.v-disc .btn--sm .btn__disc { width: 36px; height: 36px; }
+.v-disc .btn--primary .btn__disc { background: var(--ground); color: var(--saffron); }
+.v-disc .on-ground .btn--secondary .btn__disc { background: var(--ground); color: var(--stone); }
+.v-disc .on-stone .btn--secondary .btn__disc { background: var(--ink); color: var(--stone); }
+.v-disc .btn__glyph { grid-area: 1 / 1; display: grid; transition: transform 260ms var(--ease-out); }
+/* Forward in RTL is leftwards: the arrow leaves to the left and its twin enters from the right. */
+.v-disc .btn__glyph--next { transform: translateX(150%); }
+.v-disc .btn:not(.btn--quiet)[data-motion="slide"].is-hover .btn__glyph:not(.btn__glyph--next) { transform: translateX(-150%); }
+.v-disc .btn:not(.btn--quiet)[data-motion="slide"].is-hover .btn__glyph--next { transform: translateX(0); }
+.v-disc .btn:not(.btn--quiet)[data-motion="ring"].is-hover .btn__glyph:not(.btn__glyph--next) { transform: rotate(-14deg); }
+@media (hover: hover) and (pointer: fine) {
+  .v-disc .btn:not(.btn--quiet)[data-motion="slide"]:hover .btn__glyph:not(.btn__glyph--next) { transform: translateX(-150%); }
+  .v-disc .btn:not(.btn--quiet)[data-motion="slide"]:hover .btn__glyph--next { transform: translateX(0); }
+  .v-disc .btn:not(.btn--quiet)[data-motion="ring"]:hover .btn__glyph:not(.btn__glyph--next) { transform: rotate(-14deg); }
+}
+.v-disc .btn:active, .v-disc .btn.is-press { transform: scale(0.97); }
+.v-disc .btn--quiet { gap: 8px; }
+.v-disc .btn--quiet .btn__label { background: linear-gradient(var(--saffron), var(--saffron)) no-repeat 0 100% / 100% 2px; padding-bottom: 6px; }
+.v-disc .on-stone .btn--quiet .btn__label { background-image: linear-gradient(#9a6c12, #9a6c12); }
+.v-disc .btn--quiet .btn__glyph { transition: transform 200ms var(--ease-out); }
+.v-disc .btn--quiet.is-hover .btn__glyph { transform: translateX(-4px); }
+@media (hover: hover) and (pointer: fine) { .v-disc .btn--quiet:hover .btn__glyph { transform: translateX(-4px); } }
+.v-disc .btn[aria-disabled="true"] { background: var(--off-bg); color: var(--off-fg); transform: none; }
+.v-disc .btn[aria-disabled="true"] .btn__disc { background: var(--off-bg); color: var(--off-fg); }
+.v-disc .btn[aria-disabled="true"] .btn__glyph { transform: none !important; }
+.v-disc .btn--quiet[aria-disabled="true"] { background: none; }
+.v-disc .btn--quiet[aria-disabled="true"] .btn__label { background-image: linear-gradient(var(--off-bg), var(--off-bg)); }
+
+/* ════ 3 · زخمه (Strike): a key on a solid ledge; press sinks it like a hammer stroke ════ */
+.v-strike .btn:not(.btn--quiet) { padding: 0; background: none; transition: none; }
+.v-strike .btn:not(.btn--quiet)::before {
+  content: ""; position: absolute; inset: 5px 0 0; border-radius: 999px; background: var(--ledge);
+}
+.v-strike .btn__face {
+  position: relative; display: inline-flex; align-items: center; gap: 10px;
+  height: calc(var(--h) - 5px); align-self: flex-start; padding: 0 24px; border-radius: 999px;
+  background: var(--face); color: var(--face-fg);
+  /* Release springs back; press is answered in 90ms. */
+  transition: transform 420ms linear(0, 0.42 9%, 0.84 20%, 1.06 33%, 1.1 40%, 1.04 55%, 0.99 72%, 1);
+}
+.v-strike .btn--sm .btn__face { padding: 0 20px; }
+.v-strike .btn--primary { --face: var(--saffron); --face-fg: var(--ink); --ledge: #9a6c12; }
+.v-strike .on-ground .btn--secondary { --face: var(--stone); --face-fg: var(--ink); --ledge: #a89d8d; }
+.v-strike .on-stone .btn--secondary { --face: #f8f5f0; --face-fg: var(--ink); --ledge: #c5bbad; }
+.v-strike .btn.is-hover .btn__face { transform: translateY(-1px); transition-duration: 160ms; transition-timing-function: var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .v-strike .btn:hover .btn__face { transform: translateY(-1px); transition-duration: 160ms; transition-timing-function: var(--ease-out); }
+}
+.v-strike .btn:active .btn__face, .v-strike .btn.is-press .btn__face { transform: translateY(4px); transition: transform 90ms var(--ease-out); }
+.v-strike .btn--quiet .btn__label { position: relative; padding-bottom: 6px; }
+.v-strike .btn--quiet .btn__label::after {
+  content: ""; position: absolute; inset: auto 0 0; height: 2px; background: color-mix(in srgb, var(--saffron) 40%, transparent);
+}
+.v-strike .btn--quiet .btn__label::before {
+  content: ""; position: absolute; inset: auto 0 0; height: 2px; background: var(--saffron); z-index: 1;
+  transform: scaleX(0); transform-origin: right; transition: transform 240ms var(--ease-out);
+}
+.v-strike .on-stone .btn--quiet .btn__label::before { background: #9a6c12; }
+.v-strike .on-stone .btn--quiet .btn__label::after { background: color-mix(in srgb, #9a6c12 35%, transparent); }
+.v-strike .btn--quiet.is-hover .btn__label::before { transform: scaleX(1); }
+@media (hover: hover) and (pointer: fine) { .v-strike .btn--quiet:hover .btn__label::before { transform: scaleX(1); } }
+.v-strike .btn--quiet:active, .v-strike .btn--quiet.is-press { transform: scale(0.97); }
+.v-strike .btn[aria-disabled="true"] { --face: var(--off-bg); --face-fg: var(--off-fg); --ledge: transparent; }
+.v-strike .btn[aria-disabled="true"] .btn__face { transform: translateY(5px) !important; }
+.v-strike .btn--quiet[aria-disabled="true"] { color: var(--off-fg); }
+.v-strike .btn--quiet[aria-disabled="true"] .btn__label::before { display: none; }
+.v-strike .btn--quiet[aria-disabled="true"] .btn__label::after { background: var(--off-bg); }
+
+/* ════ 4 · شماره (Fact): the button carries the fact it acts on ════ */
+.v-fact .btn:not(.btn--quiet) { padding-inline-start: 22px; padding-inline-end: 6px; gap: 10px; }
+.v-fact .btn:not(.btn--quiet):not(:has(.btn__meta)) { padding-inline-end: 22px; }
+.v-fact .btn__meta {
+  display: inline-flex; align-items: center; height: calc(var(--h) - 12px); padding: 0 14px; margin-inline-start: 4px;
+  border-radius: 999px; font-weight: 400; font-size: 16px;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.v-fact .btn--primary .btn__meta { background: rgba(23, 19, 15, 0.12); }
+.v-fact .btn--secondary .btn__meta { background: rgba(23, 19, 15, 0.08); }
+.v-fact .btn--primary.is-hover .btn__meta { background: var(--ground); color: var(--saffron); }
+.v-fact .btn--secondary.is-hover .btn__meta { background: var(--ink); color: var(--stone); }
+@media (hover: hover) and (pointer: fine) {
+  .v-fact .btn--primary:hover .btn__meta { background: var(--ground); color: var(--saffron); }
+  .v-fact .btn--secondary:hover .btn__meta { background: var(--ink); color: var(--stone); }
+}
+.v-fact .btn:active, .v-fact .btn.is-press { transform: scale(0.97); }
+.v-fact .btn--quiet { gap: 10px; }
+.v-fact .btn--quiet .btn__label { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 8px; text-decoration-color: var(--saffron); }
+.v-fact .on-stone .btn--quiet .btn__label { text-decoration-color: #9a6c12; }
+.v-fact .btn--quiet .btn__meta { display: inline; height: auto; padding: 0; margin: 0; font-size: 15px; color: var(--soft); background: none !important; }
+.v-fact .btn--quiet .btn__meta::before { content: "·"; margin-inline-end: 10px; }
+.v-fact .btn--quiet.is-hover .btn__label { text-decoration-thickness: 3px; }
+@media (hover: hover) and (pointer: fine) { .v-fact .btn--quiet:hover .btn__label { text-decoration-thickness: 3px; } }
+.v-fact .btn[aria-disabled="true"] { background: var(--off-bg); color: var(--off-fg); transform: none; }
+.v-fact .btn[aria-disabled="true"] .btn__meta { background: transparent; color: inherit; }
+.v-fact .btn--quiet[aria-disabled="true"] { background: none; }
+.v-fact .btn--quiet[aria-disabled="true"] .btn__label { text-decoration-color: var(--off-bg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .btn, .btn *, .btn::before, .btn__face, .btn__glyph { transition-duration: 0ms !important; }
+  .btn:active, .btn.is-press { transform: none !important; }
+  .v-disc .btn__glyph { transform: none !important; }
+  .v-disc .btn__glyph--next { opacity: 0; }
+}
+
+/* ── Phone ── */
+@media (max-width: 760px) {
+  .nav { gap: 12px; padding-inline-start: 16px; }
+  .nav-links { display: none; }
+  .nav-menu { display: inline-flex; margin-inline-start: auto; }
+  .nav .nav-call .btn__label, .nav .nav-call .btn__meta { display: none; }
+  .nav .nav-call { width: 46px; padding: 0 !important; }
+  .v-disc .nav .nav-call .btn__disc { width: 46px; height: 46px; background: transparent; color: var(--ink); }
+  .v-strike .nav .nav-call .btn__face { width: 46px; padding: 0; justify-content: center; }
+  .hero { min-height: 640px; }
+  .hero::after { background: linear-gradient(to top, rgba(23,19,15,.92) 0%, rgba(23,19,15,.82) 62%, rgba(23,19,15,.1) 92%); }
+  .hero .actions .btn:not(.btn--quiet) { width: 100%; }
+  .hero .actions .btn:not(.btn--quiet) .btn__face { width: 100%; justify-content: center; }
+  .v-disc .hero .actions .btn:not(.btn--quiet) { justify-content: space-between; }
+  .split, .states { grid-template-columns: 1fr; }
+  .form-foot .btn:not(.btn--quiet) { width: 100%; }
+  .form-foot .btn .btn__face { width: 100%; justify-content: center; }
+  :root { --r-panel: 20px; }
+}
+
+/* ════ Picker (verbatim from emil-prototype/PICKER.md) ════ */
+.proto-picker {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2147483647;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(10, 10, 10, 0.82);
+  -webkit-backdrop-filter: blur(12px) saturate(1.4);
+  backdrop-filter: blur(12px) saturate(1.4);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+    0 8px 24px rgba(0, 0, 0, 0.24),
+    0 2px 6px rgba(0, 0, 0, 0.12);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.proto-picker-highlight {
+  position: absolute;
+  top: 4px;
+  left: 0;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  will-change: transform;
+}
+.proto-picker[data-ready] .proto-picker-highlight {
+  transition:
+    transform 250ms cubic-bezier(0.23, 1, 0.32, 1),
+    width 250ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .proto-picker[data-ready] .proto-picker-highlight { transition: none; }
+}
+.proto-picker-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
+  font: inherit;
+  cursor: pointer;
+  transition: color 150ms ease-out;
+}
+.proto-picker-item:hover {
+  color: rgba(255, 255, 255, 0.85);
+}
+.proto-picker-item:active {
+  transform: scale(0.97);
+}
+.proto-picker-item:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 2px;
+}
+.proto-picker-item[data-active] {
+  color: #fff;
+}
+.proto-picker-divider {
+  width: 1px;
+  height: 16px;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.proto-picker-replay {
+  padding: 0 10px;
+  font-size: 14px;
+}
+.proto-picker[data-position="top"] {
+  bottom: auto;
+  top: 24px;
+}
+</style>
+</head>
+<body>
+<div id="stage"></div>
+
+<nav class="proto-picker" aria-label="Prototype variants" dir="ltr">
+  <span class="proto-picker-highlight" aria-hidden="true"></span>
+  <button class="proto-picker-item" data-active aria-current="true">Plain</button>
+  <button class="proto-picker-item">Disc</button>
+  <button class="proto-picker-item">Strike</button>
+  <button class="proto-picker-item">Fact</button>
+  <span class="proto-picker-divider" aria-hidden="true"></span>
+  <button class="proto-picker-item proto-picker-replay" aria-label="Replay animation (R)">↻</button>
+</nav>
+
+<script>
+const PHONE = '<bdi class="num">۰۲۱ ۴۴۴۵ ۷۷۴۸</bdi>';
+const TEL = 'tel:+982144457748';
+const ICON = {
+  phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  // Forward in RTL points left.
+  arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 4 3 11l7 3 3 7z"/><path d="m10 14 4-4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>',
+  spin: '<svg class="spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9" /></svg>',
+};
+
+// opts: { kind, label, icon, href, meta, state, disabled, sm, submit, cls }
+function attrs(o) {
+  const cls = ['btn', 'btn--' + o.kind, o.sm && 'btn--sm', o.state && 'is-' + o.state, o.cls].filter(Boolean).join(' ');
+  const motion = o.icon === 'phone' ? 'ring' : 'slide';
+  const dis = o.disabled ? ' aria-disabled="true" tabindex="-1"' : '';
+  const tag = o.submit ? 'button' : 'a';
+  const href = o.submit ? ' type="submit"' : ` href="${o.href || '#'}"`;
+  return { tag, open: `<${tag} class="${cls}"${href}${dis} data-motion="${motion}">`, close: `</${tag}>` };
+}
+const icn = (name) => `<span class="btn__icon" aria-hidden="true" style="display:grid">${ICON[name]}</span>`;
+const lab = (o) => `<span class="btn__label">${o.label}</span>`;
+
+const render = {
+  // 1 · Plain: phone icon leads, arrows trail.
+  plain(o) {
+    const a = attrs(o); const lead = o.icon === 'phone' || o.icon === 'send' || o.icon === 'spin' || o.icon === 'check';
+    const meta = o.kind === 'primary' && o.meta ? ' ' + o.meta : '';
+    return a.open + (o.icon && lead ? icn(o.icon) : '') + `<span class="btn__label">${o.label}${meta}</span>` + (o.icon && !lead ? icn(o.icon) : '') + a.close;
+  },
+  // 2 · Disc: the icon always sits in a disc at the end; quiet keeps a bare arrow.
+  disc(o) {
+    const a = attrs(o);
+    const meta = o.kind === 'primary' && o.meta ? ' ' + o.meta : '';
+    if (o.kind === 'quiet') return a.open + `<span class="btn__label">${o.label}</span>` + `<span class="btn__glyph" aria-hidden="true">${ICON.arrow}</span>` + a.close;
+    if (!o.icon) return a.open.replace('class="btn ', 'class="btn btn--bare ') + lab(o) + a.close;
+    const g = ICON[o.icon];
+    return a.open + `<span class="btn__label">${o.label}${meta}</span><span class="btn__disc" aria-hidden="true"><span class="btn__glyph">${g}</span><span class="btn__glyph btn__glyph--next">${g}</span></span>` + a.close;
+  },
+  // 3 · Strike: a face on a ledge.
+  strike(o) {
+    const a = attrs(o); const lead = o.icon !== 'arrow';
+    const meta = o.kind === 'primary' && o.meta ? ' ' + o.meta : '';
+    if (o.kind === 'quiet') return a.open + lab(o) + a.close;
+    const inner = (o.icon && lead ? icn(o.icon) : '') + `<span class="btn__label">${o.label}${meta}</span>` + (o.icon && !lead ? icn(o.icon) : '');
+    return a.open + `<span class="btn__face">${inner}</span>` + a.close;
+  },
+  // 4 · Fact: label, then the fact it acts on in an inner pill.
+  fact(o) {
+    const a = attrs(o);
+    const lead = o.icon && o.icon !== 'arrow' ? icn(o.icon) : '';
+    const meta = o.meta ? `<span class="btn__meta">${o.meta}</span>` : (o.icon === 'arrow' && o.kind !== 'quiet' ? icn('arrow') : '');
+    return a.open + lead + lab(o) + meta + a.close;
+  },
+};
+
+function scene(variant) {
+  const B = (o) => render[variant](o);
+  const phoneBtn = (extra = {}) => B({ kind: 'primary', label: variant === 'fact' ? 'تماس' : 'تماس با آموزشگاه', icon: 'phone', href: TEL, meta: variant === 'fact' ? PHONE : '', ...extra });
+  const STATES = [['پیش‌فرض', ''], ['روی ماوس', 'hover'], ['فشرده', 'press'], ['فوکوس', 'focus'], ['غیرفعال', 'disabled']];
+  const strip = (surface) => `
+    <div class="panel ${surface === 'ground' ? 'dark on-ground' : 'stone on-stone'}">
+      <h2>${surface === 'ground' ? 'روی زمینهٔ تیره' : 'روی پنل سنگی'}</h2>
+      <div class="state-grid">
+        <span></span><span class="colh">اصلی</span><span class="colh">فرعی</span><span class="colh">آرام</span>
+        ${STATES.map(([cap, s]) => `
+          <span class="cap">${cap}</span>
+          ${B({ kind: 'primary', label: 'تماس', icon: 'phone', href: TEL, meta: variant === 'fact' ? PHONE : '', state: s === 'disabled' ? '' : s, disabled: s === 'disabled' })}
+          ${B({ kind: 'secondary', label: 'دوره‌ها', icon: 'arrow', meta: variant === 'fact' ? '۴' : '', state: s === 'disabled' ? '' : s, disabled: s === 'disabled' })}
+          ${B({ kind: 'quiet', label: 'همه سازها', icon: 'arrow', meta: variant === 'fact' ? '۱۳ ساز' : '', state: s === 'disabled' ? '' : s, disabled: s === 'disabled' })}
+        `).join('')}
+      </div>
+    </div>`;
+
+  return `
+  <div class="page v-${variant}">
+    <header class="nav on-ground">
+      <img class="nav-logo" src="img/logo-saffron.png" alt="آموزشگاه موسیقی آرامش">
+      <nav class="nav-links" aria-label="اصلی">
+        <a href="#">درباره ما</a><a href="#">دوره‌ها</a><a href="#">اساتید</a><a href="#">برنامه کلاس‌ها</a><a href="#">گالری</a>
+      </nav>
+      <span class="nav-menu">${B({ kind: 'secondary', label: 'منو', sm: true })}</span>
+      ${B({ kind: 'primary', label: 'تماس', icon: 'phone', href: TEL, meta: PHONE, sm: true, cls: 'nav-call' })}
+    </header>
+
+    <section class="hero on-ground">
+      <img src="img/hero-santur.jpg" alt="">
+      <div class="hero-copy">
+        <p class="label">کلاس سنتور</p>
+        <h1>موسیقی، در فضایی آرام</h1>
+        <p>آموزش خصوصی سنتور، تار، پیانو، ویولن، آواز و سازهای دیگر برای کودکان، نوجوانان و بزرگسالان، با مدیریت مسعود آرامش، آهنگساز و نوازندهٔ سنتور.</p>
+        <div class="actions">
+          ${phoneBtn()}
+          ${B({ kind: 'secondary', label: 'دوره‌ها', icon: 'arrow', meta: variant === 'fact' ? '۴ دوره' : '' })}
+          ${B({ kind: 'quiet', label: 'برنامه کلاس‌ها', icon: 'arrow', meta: variant === 'fact' ? 'شنبه تا پنجشنبه' : '' })}
+        </div>
+      </div>
+    </section>
+
+    <div class="split">
+      <section class="panel stone on-stone">
+        <h2>پیام بگذارید</h2>
+        <p>نام و شماره‌تان را بنویسید تا آموزشگاه با شما تماس بگیرد.</p>
+        <form class="form" data-demo-form>
+          <div class="field"><label for="f-name">نام</label><input id="f-name" value="مریم رضایی" autocomplete="name"></div>
+          <div class="field"><label for="f-phone">شماره تماس</label><input id="f-phone" value="۰۹۱۲ ۳۴۵ ۶۷۸۹" inputmode="tel" dir="ltr" style="text-align:right"></div>
+          <div class="field"><label for="f-msg">پیام</label><textarea id="f-msg">برای دخترم که هفت ساله است کلاس پیانو می‌خواهم.</textarea></div>
+          <div class="form-foot">
+            <span data-submit-slot>${B({ kind: 'primary', label: 'ارسال پیام', icon: 'send', submit: true })}</span>
+            ${B({ kind: 'quiet', label: 'یا تماس بگیرید', href: TEL, meta: variant === 'fact' ? PHONE : '' })}
+          </div>
+          <p class="form-note" aria-live="polite" data-form-note></p>
+        </form>
+      </section>
+      <section class="panel dark on-ground card">
+        <img src="img/space-5.jpg" alt="">
+        <div>
+                    <h3>موسیقی کودک</h3>
+          <p>آشنایی با نت و ریتم، با سازهای کودک مثل بلز و فلوت، نزد نسیم حقی.</p>
+          <div class="actions">
+            ${B({ kind: 'secondary', label: 'دربارهٔ این دوره', icon: 'arrow', meta: variant === 'fact' ? 'شنبه‌ها' : '' })}
+            ${B({ kind: 'quiet', label: 'همه دوره‌ها', icon: 'arrow', meta: variant === 'fact' ? '۴ دوره' : '' })}
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="states">${strip('ground')}${strip('stone')}</div>
+    <div style="height:80px"></div>
+  </div>`;
+}
+
+const variants = ['plain', 'disc', 'strike', 'fact'].map((v) => () => scene(v));
+
+// Live submit: sending → sent, then back. Shows the loading and success states of the primary.
+document.addEventListener('submit', (e) => {
+  const form = e.target.closest('[data-demo-form]'); if (!form) return;
+  e.preventDefault();
+  const slot = form.querySelector('[data-submit-slot]');
+  const note = form.querySelector('[data-form-note]');
+  if (slot.querySelector('[aria-busy]')) return;
+  const v = form.closest('.page').className.match(/v-(\w+)/)[1];
+  slot.innerHTML = render[v]({ kind: 'primary', label: 'در حال ارسال', icon: 'spin', submit: true });
+  slot.firstElementChild.setAttribute('aria-busy', 'true');
+  setTimeout(() => {
+    slot.innerHTML = render[v]({ kind: 'primary', label: 'ارسال شد', icon: 'check', submit: true });
+    note.textContent = 'پیام شما رسید. آموزشگاه به‌زودی تماس می‌گیرد.';
+    setTimeout(() => { slot.innerHTML = render[v]({ kind: 'primary', label: 'ارسال پیام', icon: 'send', submit: true }); note.textContent = ''; }, 2200);
+  }, 1300);
+});
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a.btn'); if (!a) return;
+  if (a.getAttribute('aria-disabled') === 'true' || a.getAttribute('href') === '#') e.preventDefault();
+});
+
+// ── Picker wiring (verbatim from PICKER.md) ──
+const stage = document.getElementById('stage');
+const picker = document.querySelector('.proto-picker');
+const highlight = picker.querySelector('.proto-picker-highlight');
+const items = [...picker.querySelectorAll('.proto-picker-item:not(.proto-picker-replay)')];
+const replay = picker.querySelector('.proto-picker-replay');
+let current = 0;
+
+function moveHighlight() {
+  const el = items[current];
+  highlight.style.width = el.offsetWidth + 'px';
+  highlight.style.transform = `translateX(${el.offsetLeft}px)`;
+}
+
+function mount(i) {
+  stage.innerHTML = '';
+  requestAnimationFrame(() => { stage.innerHTML = variants[i](); });
+}
+
+function setActive(i) {
+  if (i < 0 || i >= variants.length) return;
+  current = i;
+  items.forEach((el, j) => {
+    el.toggleAttribute('data-active', j === i);
+    if (j === i) el.setAttribute('aria-current', 'true');
+    else el.removeAttribute('aria-current');
+  });
+  moveHighlight();
+  const url = new URL(location);
+  url.searchParams.set('v', i + 1);
+  history.replaceState(null, '', url);
+  mount(i);
+}
+
+items.forEach((el, i) => el.addEventListener('click', () => setActive(i)));
+replay?.addEventListener('click', () => mount(current));
+window.addEventListener('resize', moveHighlight);
+
+document.addEventListener('keydown', (e) => {
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable) return;
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const num = parseInt(e.key, 10);
+  if (num >= 1 && num <= variants.length) setActive(num - 1);
+  else if (e.key === 'ArrowRight') setActive((current + 1) % variants.length);
+  else if (e.key === 'ArrowLeft') setActive((current - 1 + variants.length) % variants.length);
+  else if (e.key === 'r' || e.key === 'R') mount(current);
+});
+
+setActive((parseInt(new URLSearchParams(location.search).get('v'), 10) || 1) - 1);
+requestAnimationFrame(() => requestAnimationFrame(() => picker.setAttribute('data-ready', '')));
+</script>
+</body>
+</html>
