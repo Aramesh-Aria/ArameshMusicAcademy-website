@@ -1,5 +1,6 @@
 from django.views.generic import DetailView
 
+from apps.core.text import meta_description
 from apps.pages.models import FAQ
 from apps.schedules.week import active_sessions
 from apps.teachers.models import Instrument, Teacher
@@ -17,7 +18,7 @@ class ProgrammeDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         programme = self.object
-        context['meta_description'] = ' '.join(programme.short_description.split())[:160]
+        context['meta_description'] = meta_description(programme.short_description)
 
         shown = Programme.InstrumentsShown
         context['programme_instruments'] = {

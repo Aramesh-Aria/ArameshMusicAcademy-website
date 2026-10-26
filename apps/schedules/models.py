@@ -36,6 +36,21 @@ class Offerings:
     instruments: list
     programmes: list
 
+    @classmethod
+    def combine(cls, sessions):
+        """Everything `sessions` offer between them, each named once, in display order."""
+        instruments, programmes = {}, {}
+        for session in sessions:
+            offerings = session.offerings()
+            instruments.update((i.pk, i) for i in offerings.instruments)
+            programmes.update((p.pk, p) for p in offerings.programmes)
+        in_order = lambda items: sorted(items.values(), key=lambda item: (item.display_order, item.name))
+        return cls(instruments=in_order(instruments), programmes=in_order(programmes))
+
+    @property
+    def names(self):
+        return [item.name for item in self.instruments + self.programmes]
+
     def __str__(self):
         # «پیانو، گیتار پاپ · تئوری و سلفژ»
         parts = ['، '.join(item.name for item in group) for group in (self.instruments, self.programmes) if group]

@@ -35,15 +35,7 @@
     <h2 id="photos-title">تصاویر</h2>
     <p class="section__intro"><span class="num">{{ images|length }}</span> تصویر</p>
   </header>
-  <ul class="plates" role="list">
-    {% for image in images %}
-    <li>
-      <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="gallery"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-        <img src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" loading="lazy" decoding="async">
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
+  {% include 'partials/plates.html' with images=images group='gallery' alt=current_page.title %}
 </section>
 {% endif %}
 
@@ -73,7 +65,7 @@
 
 {# ── Nothing here yet: the santur shape where the photos will go, and the ways on. ── #}
 {% if not child_pages and not images and not videos %}
-<section class="split panel on-stone gallery-empty" aria-label="گالری خالی">
+<section class="split panel on-stone notice gallery-empty" aria-label="گالری خالی">
   <div class="split__text">
     <p class="split__lead">{% if current_page %}هنوز تصویری در این گالری قرار نگرفته است.{% else %}گالری به‌زودی با تصاویر آموزشگاه پر می‌شود.{% endif %}</p>
     <div class="cluster">

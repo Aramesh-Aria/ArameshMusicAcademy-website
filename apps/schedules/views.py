@@ -27,14 +27,11 @@ class ScheduleView(PageContentMixin, TemplateView):
         for session in sessions:
             row = rows_by_teacher.setdefault(session.teacher_id, {
                 'teacher': session.teacher,
-                'instruments': {},
-                'programmes': {},
+                'sessions': [],
                 'cells': {weekday.value: [] for weekday in WEEKDAY_ORDER},
             })
+            row['sessions'].append(session)
             row['cells'][session.weekday].append(session)
-            offerings = session.offerings()
-            row['instruments'].update((instrument.pk, instrument) for instrument in offerings.instruments)
-            row['programmes'].update((programme.pk, programme) for programme in offerings.programmes)
 
         # One fetch serves both views: the desktop table by teacher, and the week by day for phones.
         week = week_schedule(sessions)
@@ -43,10 +40,7 @@ class ScheduleView(PageContentMixin, TemplateView):
             {
                 'teacher': row['teacher'],
                 # Everything the teacher's sessions offer, named once at the start of the row.
-                'offerings': Offerings(
-                    instruments=sorted(row['instruments'].values(), key=lambda i: (i.display_order, i.name)),
-                    programmes=sorted(row['programmes'].values(), key=lambda p: (p.display_order, p.name)),
-                ),
+                'offerings': Offerings.combine(row['sessions']),
                 # Each cell is that day, holding only this teacher's sessions.
                 'cells': [replace(day, sessions=row['cells'][day.weekday]) for day in week],
             }

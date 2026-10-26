@@ -83,7 +83,6 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       el.tabIndex = -1;
     });
     tablist.append(struck);
-    tablist.classList.add('has-struck');
 
     const strike = (tab) => {
       const list = tablist.getBoundingClientRect();
@@ -408,11 +407,9 @@ const crossfadeTo = (stack, index) => {
   stack.setAttribute('data-cycling', '');
   if (leaving === next) { next.classList.add('is-active'); return; }
   photos.forEach((photo) => photo.classList.remove('is-leaving'));
-  if (leaving) {
-    leaving.classList.remove('is-active');
-    leaving.classList.add('is-leaving');
-    setTimeout(() => leaving.classList.remove('is-leaving'), motion.ms('--dur-fade'));
-  }
+  leaving.classList.remove('is-active');
+  leaving.classList.add('is-leaving');
+  setTimeout(() => leaving.classList.remove('is-leaving'), motion.ms('--dur-fade'));
   next.classList.add('is-active');
   // Fetch the photo after this one now, so it has arrived before its turn.
   photos[(index + 1) % photos.length].loading = 'eager';
@@ -480,4 +477,11 @@ const crossfadeTo = (stack, index) => {
       crossfadeTo(stack, current = 0);
     });
   });
+})();
+
+// Testimonials marquee: the drift stops while it is off the screen, so it isn't animating for nothing all visit.
+(() => {
+  const marquee = document.querySelector('.marquee');
+  if (!marquee) return;
+  new IntersectionObserver(([entry]) => marquee.toggleAttribute('data-paused', !entry.isIntersecting)).observe(marquee);
 })();

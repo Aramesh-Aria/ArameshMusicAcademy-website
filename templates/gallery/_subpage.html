@@ -1,15 +1,15 @@
 {# One child gallery page in an index: a stone card with its cover (or the santur shape), its title and a line about it. The title is the link; the whole card is its target. #}
 {# The first row's covers are the page's largest paint, so they load at once; the rest wait until they're near. #}
 <li>
-  <article class="album on-stone">
+  <article class="card album on-stone">
     {% with cover=page.display_cover %}
     <div class="frame{% if not cover %} frame--shape{% endif %}">
       {% if cover %}<img src="{{ cover.url }}" width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async">{% else %}{% include 'components/santur.html' %}{% endif %}
     </div>
     {% endwith %}
-    <div class="album__body">
-      <h2 class="album__title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
-      {% if page.description %}<p class="album__text">{{ page.description|truncatewords:18 }}</p>{% endif %}
+    <div class="card__body">
+      <h2 class="card__title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
+      {% if page.description %}<p class="card__text">{{ page.description|truncatewords:18 }}</p>{% endif %}
     </div>
   </article>
 </li>

@@ -3,7 +3,7 @@ from datetime import time
 
 from django.utils import timezone
 
-from .models import ClassSession, Weekday, WEEKDAY_ORDER
+from .models import ClassSession, Offerings, Weekday, WEEKDAY_ORDER
 
 # The Academy is closed on Fridays unless a class is booked anyway.
 CLOSED_DAYS = {Weekday.FRIDAY}
@@ -81,16 +81,7 @@ def today_status(days, now=None):
     today = days[index]
     until = max((s.end_time for s in today.sessions), default=None)
 
-    instruments, programmes = {}, {}
-    for session in today.sessions:
-        offerings = session.offerings()
-        instruments.update((i.pk, i) for i in offerings.instruments)
-        programmes.update((p.pk, p) for p in offerings.programmes)
-    taught = [
-        item.name
-        for group in (instruments, programmes)
-        for item in sorted(group.values(), key=lambda item: (item.display_order, item.name))
-    ]
+    taught = Offerings.combine(today.sessions).names
 
     following = [days[(index + step) % 7] for step in range(1, 8)]
     resume = next((day for day in following if day.sessions), None)

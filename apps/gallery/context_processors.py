@@ -1,9 +1,11 @@
 from collections import defaultdict
 
+from django.utils.functional import SimpleLazyObject
+
 from .models import GalleryPage
 
 
-def gallery_nav_tree(request):
+def build_nav_tree():
     pages = list(
         GalleryPage.objects
         .listed()
@@ -15,13 +17,16 @@ def gallery_nav_tree(request):
     for page in pages:
         by_parent[page.parent_id].append(page)
 
-    def build(parent_id):
-        return [
-            {
-                'page': page,
-                'children': build(page.id),
-            }
-            for page in by_parent[parent_id]
-        ]
+    def build(parent):
+        children = by_parent[parent.id if parent else None]
+        for page in children:
+            # The parent is already loaded: a child's URL walks up to it without a query of its own.
+            page.parent = parent
+        return [{'page': page, 'children': build(page)} for page in children]
 
-    return {'gallery_nav_tree': build(None)}
+    return build(None)
+
+
+def gallery_nav_tree(request):
+    # Lazy, so a page that never shows the menu (the admin) never runs the query.
+    return {'gallery_nav_tree': SimpleLazyObject(build_nav_tree)}

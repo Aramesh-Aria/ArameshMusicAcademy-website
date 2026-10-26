@@ -16,7 +16,7 @@
   {% if instrument.photo %}
   <div class="split__media frame"><img src="{{ instrument.photo.url }}" alt="{{ instrument.name }}" width="1200" height="800" fetchpriority="high"></div>
   {% else %}
-  <div class="split__media frame type-tile" aria-hidden="true">{% include 'components/santur.html' %}<span class="type-tile__name">{{ instrument.name }}</span></div>
+  <div class="split__media frame frame--shape type-tile" aria-hidden="true">{% include 'components/santur.html' %}<span class="type-tile__name">{{ instrument.name }}</span></div>
   {% endif %}
 </article>
 

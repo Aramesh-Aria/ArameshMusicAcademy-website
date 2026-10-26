@@ -65,12 +65,10 @@
 {% include 'partials/header.html' %}
 
 <main id="main" tabindex="-1">
-  {% block page_header %}{% endblock %}
   {% block content %}{% endblock %}
 </main>
 
 {% include 'partials/footer.html' %}
 {% include 'partials/menu.html' %}
-{% block page_specific_js %}{% endblock %}
 </body>
 </html>

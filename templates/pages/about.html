@@ -27,15 +27,7 @@
     <h2 id="rooms-title">فضای آموزشگاه</h2>
     <p class="section__intro"><span class="num">{{ space_images|length }}</span> تصویر</p>
   </header>
-  <ul class="plates" role="list">
-    {% for image in space_images %}
-    <li>
-      <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="rooms"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-        <img src="{{ image.image.url }}" alt="{{ image.title|default:'فضای آموزشگاه' }}" loading="lazy" decoding="async">
-      </a>
-    </li>
-    {% endfor %}
-  </ul>
+  {% include 'partials/plates.html' with images=space_images group='rooms' alt='فضای آموزشگاه' %}
 </section>
 {% endif %}
 

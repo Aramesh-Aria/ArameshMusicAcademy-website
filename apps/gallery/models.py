@@ -131,7 +131,12 @@ class GalleryPage(models.Model):
         """The cover, or without one the first active photo, so a page with photos never shows a bare plate."""
         if self.cover_image:
             return self.cover_image
-        first = self.images.filter(is_active=True).first()
+        # A list the view loaded (`active_images`) saves a query per card.
+        active = getattr(self, 'active_images', None)
+        if active is None:
+            first = self.images.filter(is_active=True).first()
+        else:
+            first = active[0] if active else None
         return first.image if first else None
 
     @property

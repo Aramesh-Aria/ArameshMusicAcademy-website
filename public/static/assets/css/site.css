@@ -137,10 +137,11 @@
     --section: clamp(var(--space-8), 8vw, var(--space-9)); /* space between panels' content blocks */
     --panel-pad: clamp(1.25rem, 4vw, 4rem);
 
-    /* Shape: exactly two radii. The panel's, and full round for pills. An image inside a panel nests its
-       corner: the panel radius minus the inset. */
+    /* Shape: exactly two radii. The panel's, and full round for pills. An image or plate inside a panel nests its
+       corner: the panel radius minus the inset (`--radius-inner` for the usual inset). */
     --radius-panel: clamp(1.25rem, 0.9rem + 1.4vw, 1.75rem);   /* 20 on phones, 28 on desktop */
     --radius-pill: 999px;
+    --radius-inner: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));   /* a plate nested in a panel */
 
     /* Motion: slow where it carries content, quick where it answers a hand. */
     --dur-press: 120ms;
@@ -341,8 +342,6 @@
 
   .btn--secondary {
     --btn-bg: var(--stone);
-    --btn-fg: var(--ink);
-    --disc-bg: var(--ground);
     --disc-fg: var(--stone);
   }
   .on-stone .btn--secondary {
@@ -520,29 +519,32 @@
   }
 
 
-  /* ── Programme card: crossfading photos, the age chip, the name, two lines, and the whole card is the link ── */
-  .programme-card {
+  /* ── Card (Programmes, gallery pages): a stone plate with a 3:2 photo, the title and a line about it. The title
+     is the link; the whole card is its target. ── */
+  .card {
     position: relative;
     display: flex;
     flex-direction: column;
+    block-size: 100%;
     padding: var(--space-3);
     border-radius: var(--radius-panel);
     transition: transform var(--dur-press) var(--ease-out);
   }
-  .programme-card:active { transform: scale(0.99); }
-  .programme-card .frame { aspect-ratio: 3 / 2; }
-  .programme-card .chip { position: absolute; inset-block-start: var(--space-3); inset-inline-start: var(--space-3); z-index: 1; margin: var(--space-3); }
-  .programme-card__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); flex: 1; align-content: start; }
-  .programme-card__title { font-size: var(--display-s); }
-  .programme-card__title a { text-decoration: none; }
-  .programme-card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
-  .programme-card__text { color: var(--text-soft); font-size: var(--text-s); }
-  .programme-card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
+  .card:active { transform: scale(0.99); }
+  .card .frame { aspect-ratio: 3 / 2; }
+  .card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
+  .card__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); flex: 1; align-content: start; }
+  .card__title { font-size: var(--display-s); }
+  .card__title a { text-decoration: none; }
+  .card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  .card__text { color: var(--text-soft); font-size: var(--text-s); }
   @media (hover: hover) and (pointer: fine) {
-    .programme-card:hover .frame img { transform: scale(1.03); }
+    .card:hover .frame img { transform: scale(1.03); }
   }
-  .programme-card:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
-  .programme-card a:focus-visible { outline: none; }
+  .card:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .card a:focus-visible { outline: none; }
+  /* A Programme's age chip rides the photo's corner. */
+  .programme-card .chip { position: absolute; inset-block-start: var(--space-3); inset-inline-start: var(--space-3); z-index: 1; margin: var(--space-3); }
 
 
   /* ── Instrument tile (RAM): the name and a chevron, a photo flush to the far edge ── */
@@ -552,7 +554,7 @@
     grid-template-columns: minmax(0, 1fr) 38%;
     align-items: center;
     min-block-size: 5.5rem;
-    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    border-radius: var(--radius-inner);
     overflow: hidden;
     text-decoration: none;
     transition: transform var(--dur-press) var(--ease-out);
@@ -581,10 +583,8 @@
     position: relative;
     display: grid;
     place-items: center;
-    aspect-ratio: 3 / 2;
     overflow: hidden;
     padding: var(--space-6);
-    background: var(--stone);
     color: var(--ink);
   }
   .type-tile .shape {
@@ -680,6 +680,7 @@
   .dropdown__panel a {
     display: flex;
     align-items: center;
+    gap: var(--space-2);
     min-block-size: 2.75rem;
     padding-inline: var(--space-3);
     border-radius: max(0.5rem, calc(var(--radius-panel) - var(--space-4)));
@@ -687,7 +688,6 @@
     font-weight: 700;
     text-decoration: none;
   }
-  .dropdown__panel a { gap: var(--space-2); }
   .dropdown__panel a[aria-current]::after {
     content: "";
     inline-size: 0.4em;
@@ -774,16 +774,17 @@
   }
   .teacher-card:has(a:focus-visible) .frame { outline: 3px solid var(--focus); outline-offset: 3px; }
   .teacher-card a:focus-visible { outline: none; }
-  /* Phones: the teacher row scrolls sideways with the next card peeking in, so eight portraits don't stack
+  .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
+  /* Phones: the teacher and Programme rows scroll sideways with the next card peeking in, so eight portraits don't stack
      into a tower; instrument tiles pair up. */
   @media (max-width: 37.5em) {
     .tile-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
     .tile { grid-template-columns: minmax(0, 1fr) 30%; min-block-size: 4.5rem; }
     .tile__name { padding-inline: var(--space-3) var(--space-2); font-size: var(--text-s); }
-    .portrait-row {
+    .portrait-row:not(.portrait-row--grid), .programme-row {
       grid-template-columns: none;
       grid-auto-flow: column;
-      grid-auto-columns: 68%;
+      grid-auto-columns: var(--rail-col, 68%);
       overflow-x: auto;
       overscroll-behavior-x: contain;
       scroll-snap-type: x mandatory;
@@ -792,16 +793,10 @@
       margin-inline: calc(-1 * (var(--frame) + var(--space-3)));
       padding-inline: calc(var(--frame) + var(--space-3));
     }
-    .portrait-row > li { scroll-snap-align: start; }
-    /* The full list stays a grid: two portraits a row. */
-    .portrait-row--grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      grid-auto-flow: row;
-      gap: var(--space-6) var(--space-3);
-      overflow: visible;
-      margin-inline: 0;
-      padding-inline: 0;
-    }
+    :is(.portrait-row, .programme-row) > li { scroll-snap-align: start; }
+    .programme-row { --rail-col: 82%; }
+    /* The full list of teachers stays a grid: two portraits a row. */
+    .portrait-row--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); }
     .portrait-row--grid .teacher-card__name { font-size: var(--text-l); }
   }
 
@@ -923,7 +918,7 @@
   /* ── Accordion (FAQ): native <details>, the answer opening to its own height ── */
   .accordion { display: grid; gap: var(--space-2); }
   .accordion details {
-    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    border-radius: var(--radius-inner);
     background: color-mix(in oklab, var(--text) 6%, var(--surface));
     interpolate-size: allow-keywords;
   }
@@ -965,7 +960,7 @@
     animation: marquee var(--marquee-duration, 70s) linear infinite;
   }
   .marquee__list { display: flex; gap: var(--space-4); padding-inline-end: var(--space-4); }
-  .marquee:focus-within .marquee__track { animation-play-state: paused; }
+  .marquee:focus-within .marquee__track, .marquee[data-paused] .marquee__track { animation-play-state: paused; }
   /* Only a real hover holds it: a tap would leave touch's fake hover on, and the quotes stopped for good. */
   @media (hover: hover) and (pointer: fine) {
     .marquee:hover .marquee__track { animation-play-state: paused; }
@@ -984,7 +979,7 @@
     gap: var(--space-4);
     inline-size: min(22rem, 80vw);
     padding: var(--space-5);
-    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    border-radius: var(--radius-inner);
   }
   .quote blockquote { font-size: var(--text-m); }
   .quote figcaption { color: var(--text-soft); font-size: var(--text-s); font-weight: 700; }
@@ -1002,7 +997,7 @@
     background: var(--field);
     color: var(--ink);
     border: 1px solid var(--field-line);
-    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    border-radius: var(--radius-inner);
     font-size: max(1rem, var(--text-m));   /* 16px or more, so phones don't zoom into the field */
     line-height: 1.6;
     transition: border-color var(--dur-state) var(--ease-out);
@@ -1016,7 +1011,7 @@
 
   .form-summary {
     padding: var(--space-4) var(--space-5);
-    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    border-radius: var(--radius-inner);
     background: color-mix(in oklab, var(--error) 10%, var(--stone));
   }
   .form-summary:focus { outline: none; }
@@ -1197,6 +1192,7 @@
   /* The week: every day present, the chosen one struck forward. */
   .week-title { font-size: clamp(1.5rem, 1.3rem + 0.6vw, 1.875rem); }
   .days {
+    position: relative;   /* the struck copy (site.js) is laid over it */
     display: flex;
     gap: var(--space-1);
     margin-block: var(--space-3) var(--space-5);
@@ -1225,7 +1221,6 @@
 
   /* The struck day (site.js): an ink copy of the tabs, clipped to the selected one, so fill and label
      travel together. The real tabs keep their place underneath and take the clicks and focus. */
-  .days.has-struck { position: relative; }
   .days-struck {
     position: absolute;
     inset: 0;
@@ -1294,7 +1289,6 @@
      scrim; the slide bars ride the far top corner; today's strip sits in the far bottom corner. */
   .hero { position: relative; margin: var(--space-3) var(--frame) 0; }
   .hero__frame {
-    --inset: 0px;
     display: grid;
     align-items: end;
     min-block-size: min(48.75rem, calc(100svh - 5.5rem));
@@ -1371,9 +1365,6 @@
   .split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
   .split__text p { max-inline-size: var(--measure); }
   .split__media { align-self: stretch; min-block-size: 26rem; }
-  /* An Instrument with no photo: its name in large Amiri where the photo would be. */
-  .split__media.type-tile { aspect-ratio: auto; background: color-mix(in oklab, var(--saffron) 14%, var(--stone)); }
-  .split__media.type-tile::after { content: none; }
   /* A teacher: the square portrait stays in view beside a long biography. */
   .split--portrait { align-items: start; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
   .split--portrait .split__media { align-self: start; min-block-size: 0; aspect-ratio: 1; position: sticky; inset-block-start: 5.5rem; }
@@ -1384,8 +1375,6 @@
   .facts dt { color: var(--text-soft); }
   .facts dd { font-weight: 700; }
 
-  .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
-  .programme-row > li, .programme-row .programme-card { block-size: 100%; }
 
   .teaching { display: grid; gap: var(--section); margin-block-start: var(--section); }
   .teaching__part > h2 { margin-block-end: var(--space-6); }
@@ -1416,7 +1405,7 @@
   .faq h2 { margin-block-end: var(--space-6); }
 
   @media (max-width: 56.25em) {
-    .hero__frame { aspect-ratio: auto; min-block-size: min(43.75rem, calc(100svh - 7rem)); }   /* a floor, so a phone on its side grows it rather than clipping the call */
+    .hero__frame { min-block-size: min(43.75rem, calc(100svh - 7rem)); }   /* a floor, so a phone on its side grows it rather than clipping the call */
     .hero__frame:not(.frame--shape)::before {
       background: linear-gradient(to top, rgb(23 19 15 / 0.94) 0%, rgb(23 19 15 / 0.82) 55%, rgb(23 19 15 / 0) 85%);
     }
@@ -1435,24 +1424,7 @@
     .split { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
     .split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
     .split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
-    .split__media.type-tile { aspect-ratio: 3 / 2; }
     .split--portrait .split__media { position: static; max-inline-size: 22rem; }
-    @media (max-width: 37.5em) {
-      /* The Programme cards scroll sideways like the teachers. */
-      .programme-row {
-        grid-template-columns: none;
-        grid-auto-flow: column;
-        grid-auto-columns: 82%;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: none;
-        margin-inline: calc(-1 * (var(--frame) + var(--space-3)));
-        padding-inline: calc(var(--frame) + var(--space-3));
-        scroll-padding-inline: var(--space-3);
-      }
-      .programme-row > li { scroll-snap-align: start; }
-    }
     .mosaic { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: 13rem; grid-auto-rows: 8.5rem; }
     .mosaic > li:first-child { grid-row: auto; grid-column: span 2; }
   }
@@ -1527,37 +1499,15 @@
   }
 
   .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: var(--frame); }
-  .album {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    block-size: 100%;
-    padding: var(--space-3);
-    border-radius: var(--radius-panel);
-    background: var(--surface);
-    transition: transform var(--dur-press) var(--ease-out);
-  }
-  .album:active { transform: scale(0.99); }
-  .album .frame { aspect-ratio: 3 / 2; }
-  .album .frame img { transition: transform var(--dur-zoom) var(--ease-out); }
-  .album__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); }
-  /* Three lines at most, so one long title can't stretch its row; the full title heads the page itself. */
-  .album__title {
+  /* An album's title is clamped to three lines, so one long title can't stretch its row; the full title heads
+     the page itself. */
+  .album .card__title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     overflow: hidden;
-    font-size: var(--display-s);
   }
-  .album__title a { text-decoration: none; }
-  .album__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
-  .album__text { color: var(--text-soft); font-size: var(--text-s); }
-  @media (hover: hover) and (pointer: fine) {
-    .album:hover .frame img { transform: scale(1.03); }
-  }
-  .album:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
-  .album a:focus-visible { outline: none; }
 
   .videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); gap: var(--space-6) var(--frame); }
   /* A stone poster in the player's 16:9; the iframe replaces it on a click. */
@@ -1613,7 +1563,7 @@
   .gallery-empty .cluster { --cluster: var(--space-3); }
   /* On phones the shape is decoration that would push the words down: it goes. */
   @media (max-width: 37.5em) {
-    :is(.gallery-empty, .notice) .split__media { display: none; }
+    .notice .split__media { display: none; }
   }
 
 
@@ -1623,15 +1573,13 @@
     grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
     gap: var(--panel-pad);
     align-items: start;
-    margin-inline-end: calc(var(--frame) + var(--space-3));
   }
-  .contact__form { margin-inline-end: 0; }
   .contact__form > h2 { margin-block-end: var(--space-6); font-size: var(--display-s); }
   .contact__form .form-summary { margin-block-end: var(--space-5); }
   .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
   .field-wide { grid-column: 1 / -1; }
 
-  .contact__details { display: grid; gap: var(--space-7); padding-block-start: var(--space-5); }
+  .contact__details { display: grid; gap: var(--space-7); padding-block-start: var(--space-5); padding-inline-end: calc(var(--frame) + var(--space-3)); }
   .contact__phones a { display: inline-flex; align-items: center; min-block-size: 2.75rem; font-size: var(--text-l); font-weight: 700; text-decoration: none; }
   @media (hover: hover) and (pointer: fine) {
     .contact__phones a:hover { text-decoration: underline; text-decoration-color: var(--saffron); }
@@ -1642,8 +1590,7 @@
   .contact__map iframe { inline-size: 100%; block-size: 100%; border: 0; }
 
   @media (max-width: 56.25em) {
-    .contact { grid-template-columns: minmax(0, 1fr); gap: var(--section); margin-inline-end: 0; }
-    .contact__form { margin-inline: var(--frame); }
+    .contact { grid-template-columns: minmax(0, 1fr); gap: var(--section); }
     .contact__details { padding-inline: calc(var(--frame) + var(--panel-pad)); padding-block-start: 0; }
   }
   @media (max-width: 37.5em) {

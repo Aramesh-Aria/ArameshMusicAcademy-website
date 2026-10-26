@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.views.generic import TemplateView
 
-from apps.gallery.models import GalleryImage, GalleryPage
+from apps.gallery.models import GalleryPage
 from apps.programmes.models import Programme
 from apps.schedules.week import today_status, week_schedule
 from apps.teachers.models import Instrument, Teacher
@@ -95,12 +95,5 @@ class AboutView(PageContentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        space_page = (
-            GalleryPage.objects
-            .filter(slug=settings.ABOUT_GALLERY_SLUG, is_active=True)
-            .first()
-        )
-        context['space_images'] = (
-            space_page.images.filter(is_active=True) if space_page else GalleryImage.objects.none()
-        )
+        context['space_images'] = gallery_images(settings.ABOUT_GALLERY_SLUG)
         return context

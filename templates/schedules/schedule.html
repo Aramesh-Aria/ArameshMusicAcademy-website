@@ -39,8 +39,8 @@
             {% for session in cell.sessions %}
             <span class="week-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
             {# Only when the session offers less than the teacher's full list, named at the start of the row. #}
-            {% with offerings=session.offerings|stringformat:"s" row_offerings=row.offerings|stringformat:"s" %}
-            {% if offerings != row_offerings %}<small class="week-instruments">{{ offerings }}</small>{% endif %}
+            {% with offerings=session.offerings %}
+            {% if offerings != row.offerings %}<small class="week-instruments">{{ offerings }}</small>{% endif %}
             {% endwith %}
             {# The full note is on the phone view and in the tooltip; the grid keeps two lines so the row stays even. #}
             {% if session.notes %}<small class="week-note" title="{{ session.notes }}">{{ session.notes }}</small>{% endif %}

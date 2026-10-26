@@ -1,6 +1,7 @@
 from django.db.models import Prefetch
 from django.views.generic import DetailView, ListView
 
+from apps.core.text import meta_description
 from apps.schedules.models import ClassSession
 from apps.schedules.week import active_sessions
 
@@ -44,19 +45,14 @@ class TeacherDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         teacher = self.object
         if teacher.public_biography:
-            context['meta_description'] = ' '.join(teacher.public_biography.split())[:160]
+            context['meta_description'] = meta_description(teacher.public_biography)
         else:
             instruments = '، '.join(i.name for i in teacher.instruments.all())
             context['meta_description'] = (
                 f'{teacher.full_name} مدرس {instruments} در آموزشگاه موسیقی آرامش.'
             )
         context['teacher_programmes'] = [p for p in teacher.programmes.all() if p.is_active]
-        context['teacher_sessions'] = (
-            teacher.class_sessions.active()
-            .select_related('teacher', 'programme')
-            .prefetch_related('instruments', 'teacher__programmes')
-            .order_by('weekday_order', 'start_time')
-        )
+        context['teacher_sessions'] = active_sessions().filter(teacher=teacher).order_by('weekday_order', 'start_time')
         return context
 
 
@@ -78,7 +74,7 @@ class InstrumentDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         instrument = self.object
         if instrument.overview:
-            context['meta_description'] = ' '.join(instrument.overview.split())[:160]
+            context['meta_description'] = meta_description(instrument.overview)
         context['instrument_teachers'] = instrument.teachers.filter(is_active=True).prefetch_related('instruments')
         context['instrument_sessions'] = (
             active_sessions().filter(instruments=instrument).order_by('weekday_order', 'start_time')
