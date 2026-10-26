@@ -1,9 +1,21 @@
+from dataclasses import dataclass
+
 from django.utils import timezone
 
 from .models import ClassSession, Weekday, WEEKDAY_ORDER
 
 # The Academy is closed on Fridays unless a class is booked anyway.
 CLOSED_DAYS = {Weekday.FRIDAY}
+
+
+@dataclass(frozen=True)
+class Day:
+    """One weekday of the programme and its sessions."""
+    weekday: str
+    label: str
+    sessions: list
+    is_today: bool
+    is_closed: bool
 
 
 def today_weekday():
@@ -15,8 +27,7 @@ def today_weekday():
 def active_sessions():
     """Every active session of an active teacher, with its teacher and instruments loaded."""
     return (
-        ClassSession.objects
-        .filter(is_active=True, teacher__is_active=True)
+        ClassSession.objects.active()
         .select_related('teacher')
         .prefetch_related('instruments')
     )
@@ -35,12 +46,12 @@ def week_schedule(sessions=None):
 
     today = today_weekday()
     return [
-        {
-            'weekday': weekday.value,
-            'label': weekday.label,
-            'sessions': sessions_by_day[weekday.value],
-            'is_today': weekday == today,
-            'is_closed': weekday in CLOSED_DAYS,
-        }
+        Day(
+            weekday=weekday.value,
+            label=weekday.label,
+            sessions=sessions_by_day[weekday.value],
+            is_today=weekday == today,
+            is_closed=weekday in CLOSED_DAYS,
+        )
         for weekday in WEEKDAY_ORDER
     ]

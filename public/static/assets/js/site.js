@@ -9,6 +9,9 @@ const motion = {
   ease: (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || 'ease-out',
 };
 
+// Right to left, the next item lies to the left: ArrowLeft steps forward, ArrowRight back.
+const arrowStep = { ArrowLeft: 1, ArrowRight: -1 };
+
 // iOS Safari applies :active on touch only when a touchstart listener exists; this one lets every press state show.
 document.addEventListener('touchstart', () => {}, { passive: true });
 
@@ -48,13 +51,21 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   });
 })();
 
-// The week (`[data-week]`): day tabs over the day panels. Without JS only today's panel shows.
+// The week (`[data-week]`): day tabs over the day panels. Without JS every day shows under its own heading.
 (() => {
   document.querySelectorAll('[data-week]').forEach((week) => {
     const tablist = week.querySelector('[data-week-tabs]');
     if (!tablist) return;
     const tabs = [...tablist.querySelectorAll('[role="tab"]')];
     const title = week.querySelector('[data-week-title]');
+    // Each day becomes a tab panel, labelled by its tab instead of its own heading.
+    tabs.forEach((tab) => {
+      const panel = document.getElementById(tab.getAttribute('aria-controls'));
+      panel.setAttribute('role', 'tabpanel');
+      panel.setAttribute('aria-labelledby', tab.id);
+      panel.querySelector('.day-heading').hidden = true;
+    });
+    week.classList.add('is-tabbed');
     tablist.hidden = false;
 
     // The struck day: an ink copy of the tabs, clipped to the selected one. Moving the clip moves the
@@ -83,9 +94,15 @@ document.addEventListener('touchstart', () => {}, { passive: true });
     // First placement is instant; only later changes travel.
     strike(current());
     requestAnimationFrame(() => struck.classList.add('is-ready'));
-    new ResizeObserver(() => strike(current())).observe(tablist);
+    // A resize (or the short-label switch) re-places the block at once rather than letting it trail behind.
+    new ResizeObserver(() => {
+      const ready = struck.classList.contains('is-ready');
+      struck.classList.remove('is-ready');
+      strike(current());
+      if (ready) requestAnimationFrame(() => struck.classList.add('is-ready'));
+    }).observe(tablist);
 
-    const select = (tab, focus) => {
+    const show = (tab) => {
       tabs.forEach((t) => {
         const on = t === tab;
         t.setAttribute('aria-selected', on);
@@ -93,8 +110,14 @@ document.addEventListener('touchstart', () => {}, { passive: true });
         document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
       });
       if (title) title.textContent = tab.hasAttribute('data-today') ? 'امروز در آموزشگاه' : `${tab.dataset.label} در آموزشگاه`;
-      // Arrow keys move the block at once; only a click or tap slides it.
+    };
+    show(current());
+
+    const select = (tab, focus) => {
+      show(tab);
+      // Arrow keys move the block and swap the day at once; only a click or tap slides and fades.
       struck.classList.toggle('is-ready', !focus);
+      week.classList.toggle('is-swapping', !focus);
       strike(tab);
       if (focus) tab.focus();
     };
@@ -117,11 +140,10 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       addEventListener('pointercancel', release, { signal: press.signal });
     });
 
-    // Right to left: ArrowLeft moves to the next day, ArrowRight to the previous one.
     tablist.addEventListener('keydown', (event) => {
       const i = tabs.indexOf(document.activeElement);
       if (i < 0) return;
-      const next = { ArrowLeft: i + 1, ArrowRight: i - 1, Home: 0, End: tabs.length - 1 }[event.key];
+      const next = event.key in arrowStep ? i + arrowStep[event.key] : { Home: 0, End: tabs.length - 1 }[event.key];
       if (next === undefined) return;
       event.preventDefault();
       select(tabs[(next + tabs.length) % tabs.length], true);
@@ -213,9 +235,8 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   box.querySelector('.lightbox-next').addEventListener('click', () => show(index + 1));
   box.querySelector('.lightbox-prev').addEventListener('click', () => show(index - 1));
 
-  // Right to left: ArrowLeft moves to the next photo, ArrowRight to the previous one.
   box.addEventListener('keydown', (event) => {
-    const step = { ArrowLeft: 1, ArrowRight: -1 }[event.key];
+    const step = arrowStep[event.key];
     if (!step || group.length < 2) return;
     event.preventDefault();
     show(index + step);
@@ -263,7 +284,11 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   img.addEventListener('pointerdown', (event) => {
     // One finger only: a second one (a pinch) or a swipe during a swap is left alone.
     if (group.length < 2 || drag || swapping || !event.isPrimary) return;
-    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, t: event.timeStamp, dx: 0, live: false };
+    // Caught mid spring-back: stop it and carry on from where the photo is now, not from the centre.
+    const caught = new DOMMatrix(getComputedStyle(img).transform).m41;
+    img.getAnimations().forEach((animation) => animation.cancel());
+    drag = { id: event.pointerId, x: event.clientX - caught, y: event.clientY, t: event.timeStamp, dx: caught, live: false };
+    if (caught) img.style.transform = `translateX(${caught}px)`;
   });
   img.addEventListener('pointermove', (event) => {
     if (drag?.id !== event.pointerId) return;
@@ -280,7 +305,8 @@ document.addEventListener('touchstart', () => {}, { passive: true });
     const { dx, t, live } = drag;
     drag = null;
     img.style.transform = '';
-    if (!live) return;
+    // A photo caught mid spring-back and let go without a drag finishes springing back.
+    if (!live) { if (dx && !reduce.matches) settle(dx); return; }
     const flick = Math.abs(dx) / Math.max(event.timeStamp - t, 1) > 0.11;
     if (Math.abs(dx) >= 50 || flick) {
       if (reduce.matches) show(index + (dx > 0 ? 1 : -1));

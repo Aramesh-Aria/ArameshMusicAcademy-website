@@ -88,6 +88,17 @@ class ScheduleViewTests(TestCase):
         session.instruments.add(self.instrument)
         return session
 
+    def test_schedule_table_names_a_sessions_instruments_when_it_teaches_part_of_the_list(self):
+        self._make_session(weekday=Weekday.SATURDAY, start_time=time(9, 0), end_time=time(10, 0), is_active=True)
+        violin = Instrument.objects.create(name='Violin')
+        self._make_session(weekday=Weekday.SUNDAY, start_time=time(9, 0), end_time=time(10, 0), is_active=True).instruments.add(violin)
+
+        response = self.client.get(reverse('schedules:schedule'))
+
+        # Saturday teaches guitar only, part of the row's guitar and violin; Sunday teaches both.
+        self.assertContains(response, '<small class="week-instruments">Guitar</small>', html=True)
+        self.assertContains(response, 'class="week-instruments"', count=1)
+
     def test_schedule_displays_persian_weekdays_and_active_sessions(self):
         self._make_session(
             weekday=Weekday.SATURDAY,
@@ -126,10 +137,10 @@ class ScheduleViewTests(TestCase):
         response = self.client.get(reverse('schedules:schedule'))
         row = response.context['schedule_rows'][0]
 
-        self.assertEqual(row['cells'][0]['weekday'], Weekday.SATURDAY)
-        self.assertEqual(row['cells'][-1]['weekday'], Weekday.FRIDAY)
-        self.assertEqual(row['cells'][0]['sessions'][0].start_time, time(11, 0))
-        self.assertEqual(row['cells'][-1]['sessions'][0].start_time, time(9, 0))
+        self.assertEqual(row['cells'][0].weekday, Weekday.SATURDAY)
+        self.assertEqual(row['cells'][-1].weekday, Weekday.FRIDAY)
+        self.assertEqual(row['cells'][0].sessions[0].start_time, time(11, 0))
+        self.assertEqual(row['cells'][-1].sessions[0].start_time, time(9, 0))
 
     def test_schedule_context_contains_teacher_rows_with_instruments(self):
         self._make_session(
@@ -145,8 +156,8 @@ class ScheduleViewTests(TestCase):
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['teacher'], self.teacher)
         self.assertEqual(rows[0]['instruments'], [self.instrument])
-        self.assertEqual(rows[0]['cells'][0]['weekday'], Weekday.SATURDAY)
-        self.assertEqual(len(rows[0]['cells'][0]['sessions']), 1)
+        self.assertEqual(rows[0]['cells'][0].weekday, Weekday.SATURDAY)
+        self.assertEqual(len(rows[0]['cells'][0].sessions), 1)
 
     @patch('apps.schedules.week.timezone.localdate', return_value=date(2026, 10, 26))  # a Monday
     def test_schedule_marks_today_and_gives_the_week_by_day(self, _localdate):
@@ -160,8 +171,8 @@ class ScheduleViewTests(TestCase):
         response = self.client.get(reverse('schedules:schedule'))
         week = response.context['week_schedule']
 
-        self.assertEqual([day['weekday'] for day in week if day['is_today']], [Weekday.MONDAY])
+        self.assertEqual([day.weekday for day in week if day.is_today], [Weekday.MONDAY])
         row = response.context['schedule_rows'][0]
-        self.assertEqual([cell['weekday'] for cell in row['cells'] if cell['is_today']], [Weekday.MONDAY])
-        self.assertEqual(len(week[2]['sessions']), 1)
+        self.assertEqual([cell.weekday for cell in row['cells'] if cell.is_today], [Weekday.MONDAY])
+        self.assertEqual(len(week[2].sessions), 1)
         self.assertContains(response, '<td class="is-today">', html=False)

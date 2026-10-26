@@ -41,7 +41,7 @@ class HomeView(PageContentMixin, TemplateView):
     default_body = 'این صفحه فعلا به عنوان نقطه شروع بک‌اند و معماری Django نگه داشته شده است.'
     default_meta_description = (
         'آموزشگاه موسیقی آرامش؛ آموزش تخصصی سازهای مختلف توسط اساتید مجرب. '
-        'برای مشاوره و ثبت‌نام با ما در تماس باشید.'
+        'برای مشاوره و هماهنگی کلاس با ما در تماس باشید.'
     )
 
     def get_context_data(self, **kwargs):

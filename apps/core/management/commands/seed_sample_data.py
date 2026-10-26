@@ -110,7 +110,7 @@ class Command(BaseCommand):
         )
 
     def create_gallery_sample_data(self):
-        # Two levels only: top-level categories, then events/albums (the admin enforces the same cap).
+        # Two levels only: top-level categories, then events (the admin enforces the same cap).
         page_data = [
             {
                 'title': 'کنسرت‌های آموزشگاه',

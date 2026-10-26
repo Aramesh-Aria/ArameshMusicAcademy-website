@@ -28,6 +28,12 @@ WEEKDAY_SORT_VALUES = {
 }
 
 
+class ClassSessionQuerySet(models.QuerySet):
+    def active(self):
+        """The sessions the site shows: active, and taught by an active teacher."""
+        return self.filter(is_active=True, teacher__is_active=True)
+
+
 class ClassSession(models.Model):
     teacher = models.ForeignKey(
         'teachers.Teacher',
@@ -50,6 +56,8 @@ class ClassSession(models.Model):
     notes = models.TextField('توضیحات', blank=True, help_text='در صورت نیاز توضیح کوتاه درباره این جلسه بنویسید.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    objects = ClassSessionQuerySet.as_manager()
 
     class Meta:
         ordering = ['weekday_order', 'start_time', 'teacher__last_name']

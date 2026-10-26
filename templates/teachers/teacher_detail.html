@@ -4,6 +4,7 @@
 {% block og_title %}{{ teacher.full_name }}{% endblock %}
 {% block tw_title %}{{ teacher.full_name }}{% endblock %}
 {% block body_class %}page-teacher{% endblock %}
+{% block og_image %}{% if teacher.profile_image %}{% include 'partials/og_image.html' with url=teacher.profile_image.url width=600 height=600 alt=teacher.full_name %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
 

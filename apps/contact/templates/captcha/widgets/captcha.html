@@ -2,7 +2,7 @@
 {% spaceless %}
 <span class="captcha-row">
   <img src="{{ image }}" alt="کد امنیتی" class="captcha-image" width="200" height="70" data-captcha-image>
-  <button type="button" class="captcha-refresh" data-captcha-refresh="{% url 'captcha-refresh' %}" hidden>تصویر جدید</button>
+  <button type="button" class="captcha-refresh" data-captcha-refresh="{% url 'captcha-refresh' %}" aria-label="تصویر جدید" title="تصویر جدید" hidden><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg></button>
 </span>
 {% for widget in widget.subwidgets %}{% include widget.template_name %}{% endfor %}
 {% endspaceless %}

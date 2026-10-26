@@ -58,8 +58,8 @@ class HomeWeekScheduleTests(TestCase):
         response = self.client.get(reverse('pages:home'))
 
         days = response.context['week_schedule']
-        self.assertEqual([day['weekday'] for day in days], [w.value for w in WEEKDAY_ORDER])
-        self.assertEqual(days[0]['label'], 'شنبه')
+        self.assertEqual([day.weekday for day in days], [w.value for w in WEEKDAY_ORDER])
+        self.assertEqual(days[0].label, 'شنبه')
 
     def test_week_schedule_groups_active_sessions_by_day_in_start_order(self):
         sara = self.make_teacher('Sara')
@@ -72,15 +72,15 @@ class HomeWeekScheduleTests(TestCase):
         response = self.client.get(reverse('pages:home'))
 
         monday = response.context['week_schedule'][2]
-        self.assertEqual(monday['sessions'], [early, late])
-        self.assertEqual(response.context['week_schedule'][0]['sessions'], [])
+        self.assertEqual(monday.sessions, [early, late])
+        self.assertEqual(response.context['week_schedule'][0].sessions, [])
 
     @patch('apps.schedules.week.timezone.localdate', return_value=datetime.date(2026, 10, 26))  # a Monday
     def test_week_schedule_marks_today_in_tehran(self, _localdate):
         response = self.client.get(reverse('pages:home'))
 
-        today = [day['weekday'] for day in response.context['week_schedule'] if day['is_today']]
-        self.assertEqual(today, ['mon'])
+        today = [day.weekday for day in response.context['week_schedule'] if day.is_today]
+        self.assertEqual(today, [Weekday.MONDAY])
 
     def test_week_schedule_renders_on_the_home_page(self):
         self.make_session(self.make_teacher('Sara'), Weekday.SATURDAY, 16, 18)
@@ -89,6 +89,18 @@ class HomeWeekScheduleTests(TestCase):
 
         self.assertContains(response, 'Sara Teacher')
         self.assertContains(response, '16:00')
+
+    def test_template_comments_do_not_leak_into_the_page(self):
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertNotContains(response, '{#')
+        self.assertNotContains(response, '#}')
+
+    def test_every_day_is_listed_under_its_own_heading_without_javascript(self):
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'class="day-heading"', count=7)
+        self.assertNotContains(response, 'role="tabpanel"')
 
     def test_an_empty_day_on_the_home_page_links_to_the_full_week(self):
         response = self.client.get(reverse('pages:home'))
@@ -105,6 +117,25 @@ class HomeWeekScheduleTests(TestCase):
         self.assertIsNotNone(response.context['director'])
         self.assertEqual(len(response.context['home_teachers']), 3)
         self.assertNotIn(response.context['director'], response.context['home_teachers'])
+
+
+    def test_the_director_intro_shows_beside_the_portrait_not_the_biography(self):
+        director = self.make_teacher('A')
+        director.home_intro = 'بنیان‌گذار آموزشگاه'
+        director.biography = 'رزومهٔ کامل استاد'
+        director.save()
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, '<p class="home-plate-intro">بنیان‌گذار آموزشگاه</p>', html=True)
+        self.assertNotContains(response, 'رزومهٔ کامل استاد')
+
+    def test_a_director_without_an_intro_shows_no_empty_paragraph(self):
+        self.make_teacher('A')
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertNotContains(response, 'home-plate-intro')
 
 
 class PageViewTests(TestCase):

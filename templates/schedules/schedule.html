@@ -38,6 +38,8 @@
           <td class="{% if cell.is_today %}is-today{% endif %}">
             {% for session in cell.sessions %}
             <span class="week-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
+            {# Only when the session teaches less than the teacher's full list, named at the start of the row. #}
+            {% if session.instruments.all|length != row.instruments|length %}<small class="week-instruments">{{ session.instruments.all|join:"، " }}</small>{% endif %}
             {% if session.notes %}<small class="week-note">{{ session.notes }}</small>{% endif %}
             {% empty %}
             <span class="visually-hidden">بدون کلاس</span>

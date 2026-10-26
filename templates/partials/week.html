@@ -1,7 +1,9 @@
-{# The week by day (`week_schedule`): day tabs over each day's programme, today open. Wired by site.js.
-   `full_week_link` adds a link to the schedule page under an empty day. #}
+{% comment %}
+  The week by day (`week_schedule`). Without JS every day is listed under its own heading; site.js turns
+  them into day tabs with today open. `full_week_link` adds a link to the schedule page under an empty day.
+{% endcomment %}
 <div class="week" data-week>
-  <h2 class="week-title" id="week-title" data-week-title>امروز در آموزشگاه</h2>
+  <h2 class="week-title" id="week-title" data-week-title>این هفته در آموزشگاه</h2>
   <div class="days" role="tablist" aria-labelledby="week-title" data-week-tabs hidden>
     {% for day in week_schedule %}
     <button type="button" role="tab" id="day-tab-{{ day.weekday }}" aria-controls="day-{{ day.weekday }}"
@@ -15,7 +17,8 @@
   </div>
 
   {% for day in week_schedule %}
-  <div class="day" role="tabpanel" id="day-{{ day.weekday }}" aria-labelledby="day-tab-{{ day.weekday }}"{% if not day.is_today %} hidden{% endif %}>
+  <section class="day" id="day-{{ day.weekday }}" aria-labelledby="day-heading-{{ day.weekday }}">
+    <h3 class="day-heading" id="day-heading-{{ day.weekday }}">{{ day.label }}{% if day.is_today %} <small>امروز</small>{% endif %}</h3>
     {% if day.sessions %}
     <ul class="programme" role="list">
       {% for session in day.sessions %}
@@ -27,10 +30,10 @@
       {% endfor %}
     </ul>
     {% elif day.is_closed %}
-    <p class="day-empty">جمعه‌ها آموزشگاه تعطیل است.</p>
+    <p class="day-empty">{{ day.label }}‌ها آموزشگاه تعطیل است.</p>
     {% else %}
     <p class="day-empty">برای {{ day.label }} کلاسی در برنامه نیست.{% if full_week_link %} <a href="{% url 'schedules:schedule' %}">برنامهٔ کامل هفته</a>{% endif %}</p>
     {% endif %}
-  </div>
+  </section>
   {% endfor %}
 </div>

@@ -175,9 +175,17 @@ SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7748', '+98 990 233 8431', '+98 21 4445 7746', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '
 # The way here: route links in Neshan and Google Maps, and the embedded map.
-SITE_MAP_NESHAN = 'https://neshan.org/maps/@35.745776,51.331922,17z'
-SITE_MAP_GOOGLE = 'https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z'
-SITE_MAP_EMBED = 'https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed'
+SITE_MAP_NESHAN = 'https://nshn.ir/3b_bvoW-GxMk71'
+# The Google Maps route link is off for now; uncomment to show it again beside Neshan.
+# SITE_MAP_GOOGLE = 'https://maps.google.com/?cid=2591427652321268837'
+# Google's "Share > Embed a map" URL for the Academy's place, so the map shows its place card
+# (name, address, "open in Maps"). Bare coordinates only drop an unlabelled pin.
+SITE_MAP_EMBED = (
+    'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1619.6!2d51.331922!3d35.7457756'
+    '!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f8dfd180b638fef%3A0x23f699b845bbd465'
+    '!2s%D8%A2%D9%85%D9%88%D8%B2%D8%B4%DA%AF%D8%A7%D9%87%20%D9%85%D9%88%D8%B3%DB%8C%D9%82%DB%8C%20%D8%A2%D8%B1%D8%A7%D9%85%D8%B4'
+    '!5e0!3m2!1sfa!2s!4v1761480000000!5m2!1sfa!2s'
+)
 
 # Social media (leave empty to hide the link). Override via env vars if needed.
 SITE_INSTAGRAM = os.environ.get('SITE_INSTAGRAM', 'https://www.instagram.com/arameshmusic.academy/')
@@ -266,6 +274,11 @@ JAZZMIN_SETTINGS = {
     'changeform_format': 'single',
     'show_ui_builder': False,
     'related_modal_active': True,
+
+    # Load nothing from the internet, so the admin still opens when Iran's international
+    # internet is cut. static_dev/vendor/bootswatch/flatly/ shadows jazzmin's flatly theme
+    # with its Google Fonts @import removed; the admin falls back to system fonts.
+    'use_google_fonts_cdn': False,
 }
 
 JAZZMIN_UI_TWEAKS = {

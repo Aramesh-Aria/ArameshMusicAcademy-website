@@ -1,7 +1,6 @@
 # agents.md
 
-This file provides guidance to Opencode when working with code in this repository.
-
+This file provides guidance to Opencode when working with code in this repository. It mirrors CLAUDE.md; keep the two in step.
 
 ## Commands
 
@@ -10,7 +9,7 @@ source .venv/bin/activate                    # Python 3.12
 
 DEBUG=True python manage.py runserver        # DEBUG defaults to False; True is needed for static serving + error pages
 python manage.py makemigrations && python manage.py migrate
-python manage.py seed_sample_data            # populate an empty DB (teachers, sessions, gallery, testimonials…)
+python manage.py seed_sample_data            # populate an empty DB (instruments, teachers, sessions, gallery pages and images; no testimonials, videos or page content)
 python manage.py collectstatic --noinput     # required after any static change (see Static files)
 
 python manage.py test                                         # all tests
@@ -26,10 +25,10 @@ There is no linter or frontend build step configured.
 
 **Apps** live under `apps/` and are installed as `apps.<name>`. App labels are the bare names, so migrations and table names don't include the `apps.` prefix.
 - `core`: no models. `context_processors.site_info` injects site contact info, social links, hours and year into every template. `admin_config.ArameshAdminConfig` replaces `django.contrib.admin` in `INSTALLED_APPS` so the admin sidebar can show the unread contact-message count. Also holds `sitemaps.py`, `image_utils.process_image` and the `seed_sample_data` command.
-- `pages`: `SitePageContent`, CMS-editable content for the named pages `home`, `about` and `schedule`, with hardcoded fallbacks in the views.
-- `teachers`: `Instrument`, plus `Teacher` (M2M to Instrument, Jalali birth date).
+- `pages`: `SitePageContent`, CMS-editable content for the named pages `home`, `about` and `schedule`, with hardcoded fallbacks in the views. Home and About both take their photos from the gallery page whose slug is `ABOUT_GALLERY_SLUG`.
+- `teachers`: `Instrument`, plus `Teacher` (M2M to Instrument, required biography and portrait).
 - `schedules`: `ClassSession` has an FK to `Teacher`, an **M2M to `Instrument`** (no Course model, see ADR-0001), a Sat→Fri weekday enum, and start/end times with teacher-overlap validation in `clean()`. The view builds a rowspan grid grouped by teacher.
-- `gallery`: `GalleryPage` is a self-FK tree routed by slug path (`gallery/<path:slug_path>/`). Nesting is capped at 2 levels in `clean()`. It also has `GalleryImage` and `Video` (a YouTube/Aparat embed built from a URL; videos are never uploaded). `context_processors.gallery_nav_tree` feeds the navbar dropdown on every page.
+- `gallery`: `GalleryPage` is a self-FK tree routed by slug path (`gallery/<path:slug_path>/`). Nesting is capped at 2 levels only by the admin form, which offers top-level pages as the only parent choices. `clean()` just blocks cycles and duplicate slugs. It also has `GalleryImage` and `Video` (a YouTube/Aparat embed built from a URL; videos are never uploaded). `context_processors.gallery_nav_tree` feeds the navbar dropdown on every page.
 - `contact`: a form protected by django-simple-captcha. The view saves `ContactMessage` first, then emails `CONTACT_NOTIFICATION_EMAIL`. SMTP errors are logged and swallowed, so they never block the visitor.
 - `testimonials`: `Testimonial`, parent quotes shown on the home page.
 

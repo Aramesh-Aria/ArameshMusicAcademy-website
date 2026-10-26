@@ -3,6 +3,7 @@
 
 {% block title %}{% if page_title == 'آموزشگاه موسیقی آرامش' %}{{ page_title }}{% else %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endif %}{% endblock %}
 {% block body_class %}page-home{% endblock %}
+{% block og_image %}{% if page_hero_image %}{% include 'partials/og_image.html' with url=page_hero_image.url alt=page_title %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
 
@@ -32,6 +33,7 @@
     <figcaption>
       <a href="{{ director.get_absolute_url }}">{{ director.full_name }}</a>
       {% if director.instruments.all %}<span class="soft"> · {{ director.instruments.all|join:"، " }}</span>{% endif %}
+      {% if director.home_intro %}<p class="home-plate-intro">{{ director.home_intro|linebreaksbr }}</p>{% endif %}
     </figcaption>
   </figure>
   {% endif %}
@@ -50,11 +52,11 @@
       <h2 id="rooms-title">فضای آموزشگاه</h2>
       <a href="{{ gallery_preview_images.0.gallery_page.get_absolute_url }}">همهٔ تصاویر</a>
     </header>
-    <div class="home-rooms-plates">
+    <ul class="plates" role="list">
       {% for image in gallery_preview_images %}
-      <img class="mono" src="{{ image.image.url }}" width="480" height="600" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async">
+      <li><img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async"></li>
       {% endfor %}
-    </div>
+    </ul>
   </div>
 </section>
 {% endif %}
@@ -84,7 +86,7 @@
       {% if site_address %}<p>{{ site_address }}</p>{% endif %}
       <p class="cluster home-visit-routes">
         <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        <a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>
+        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
       </p>
     </div>
     <iframe class="home-visit-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"

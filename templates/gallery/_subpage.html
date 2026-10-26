@@ -1,0 +1,12 @@
+{# One child gallery page in an index: its 3:2 cover and title, or without a cover a paper plate set with the title. #}
+<li class="subpage">
+  {% if page.cover_image %}
+  <img class="subpage-cover mono" src="{{ page.cover_image.url }}" width="900" height="600" alt="" loading="lazy" decoding="async">
+  <h2 class="subpage-title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
+  {% else %}
+  <div class="subpage-cover subpage-plate">
+    <h2 class="subpage-title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
+  </div>
+  {% endif %}
+  {% if page.description %}<p class="subpage-text">{{ page.description|truncatewords:18 }}</p>{% endif %}
+</li>

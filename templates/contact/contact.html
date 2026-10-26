@@ -2,14 +2,14 @@
 {% load site_tags %}
 
 {% block title %}تماس با ما | آموزشگاه موسیقی آرامش{% endblock %}
-{% block meta_description %}تماس با آموزشگاه موسیقی آرامش: تلفن، نشانی، ساعت‌های کاری و فرم پیام برای مشاوره و ثبت‌نام.{% endblock %}
+{% block meta_description %}تماس با آموزشگاه موسیقی آرامش: تلفن، نشانی، ساعت‌های کاری و فرم پیام برای مشاوره و هماهنگی کلاس.{% endblock %}
 {% block body_class %}page-contact{% endblock %}
 
 {% block content %}
 <section class="contact grid" aria-labelledby="contact-title">
   <header class="contact-head">
     <h1 id="contact-title">تماس با ما</h1>
-    <p>برای مشاوره، ثبت‌نام یا هماهنگی کلاس تماس بگیرید، یا پیام بگذارید تا با شما تماس بگیریم.</p>
+    <p>برای مشاوره یا هماهنگی کلاس تماس بگیرید، یا پیام بگذارید تا با شما تماس بگیریم.</p>
   </header>
 
   {# ── The form, first on every screen. ── #}
@@ -63,18 +63,18 @@
       {% if site_address %}<p>{{ site_address }}</p>{% endif %}
       <p class="cluster contact-routes">
         <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        <a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>
+        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
       </p>
       <iframe class="contact-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
               src="{{ site_map_embed }}"></iframe>
     </div>
 
-    {% if site_email %}
+    <!-- {% if site_email %}
     <div class="contact-block">
       <h2>ایمیل</h2>
       <p><a href="mailto:{{ site_email }}" class="ltr">{{ site_email }}</a></p>
     </div>
-    {% endif %}
+    {% endif %} -->
   </aside>
 </section>
 {% endblock %}

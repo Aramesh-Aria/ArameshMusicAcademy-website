@@ -20,7 +20,7 @@ class TeacherListView(ListView):
                 'instruments',
                 Prefetch(
                     'class_sessions',
-                    queryset=ClassSession.objects.filter(is_active=True).order_by('weekday_order', 'start_time'),
+                    queryset=ClassSession.objects.active().order_by('weekday_order', 'start_time'),
                     to_attr='active_sessions',
                 ),
             )
@@ -50,8 +50,7 @@ class TeacherDetailView(DetailView):
                 f'{teacher.full_name} مدرس {instruments} در آموزشگاه موسیقی آرامش.'
             )
         context['teacher_sessions'] = (
-            teacher.class_sessions
-            .filter(is_active=True)
+            teacher.class_sessions.active()
             .prefetch_related('instruments')
             .order_by('weekday_order', 'start_time')
         )

@@ -39,7 +39,7 @@ class TeacherAdmin(admin.ModelAdmin):
             )
         }),
         ('پروفایل آموزشی', {
-            'fields': ('instruments', 'biography')
+            'fields': ('instruments', 'biography', 'home_intro')
         }),
         ('انتشار', {
             'fields': ('is_active', 'display_order')

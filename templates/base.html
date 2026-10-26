@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
-    <meta name="description" content="{% block meta_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب. برای مشاوره و ثبت‌نام با ما در تماس باشید.' }}{% endblock %}">
+    <meta name="description" content="{% block meta_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب. برای مشاوره و هماهنگی کلاس با ما در تماس باشید.' }}{% endblock %}">
     <link rel="canonical" href="{% block canonical %}https://{{ request.get_host }}{{ request.path }}{% endblock %}">
 
     <link rel="preload" href="{% static 'assets/fonts/amiri-fa-400.woff2' %}" as="font" type="font/woff2" crossorigin>
@@ -33,18 +33,13 @@
     <meta property="og:title" content="{% block og_title %}{{ page_title|default:'آموزشگاه موسیقی آرامش' }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:image" content="{% block og_image %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
-    <meta property="og:image:secure_url" content="{% block og_image_secure %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
-    <meta property="og:image:type" content="image/jpeg">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="آموزشگاه موسیقی آرامش">
+    {# A page with its own photo (a teacher, a gallery page, a page hero) overrides this block. #}
+    {% block og_image %}{% static 'assets/img/og-image.jpg' as og_default %}{% include 'partials/og_image.html' with url=og_default width=1200 height=630 alt='آموزشگاه موسیقی آرامش' %}{% endblock %}
 
     {# ── Twitter / X card ── #}
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="{% block tw_title %}{{ page_title|default:'آموزشگاه موسیقی آرامش' }}{% endblock %}">
     <meta name="twitter:description" content="{% block tw_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب.' }}{% endblock %}">
-    <meta name="twitter:image" content="{% block tw_image %}https://{{ request.get_host }}{% static 'assets/img/og-image.jpg' %}{% endblock %}">
 
     <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" sizes="any">
     <link href="{% static 'assets/img/favicon-32x32.png' %}" rel="icon" type="image/png" sizes="32x32">

@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from django.views.generic import TemplateView
 
 from .models import WEEKDAY_ORDER
@@ -39,10 +41,8 @@ class ScheduleView(PageContentMixin, TemplateView):
             {
                 'teacher': row['teacher'],
                 'instruments': sorted(row['instruments'].values(), key=lambda instrument: instrument.name),
-                'cells': [
-                    {'weekday': day['weekday'], 'is_today': day['is_today'], 'sessions': row['cells'][day['weekday']]}
-                    for day in week
-                ],
+                # Each cell is that day, holding only this teacher's sessions.
+                'cells': [replace(day, sessions=row['cells'][day.weekday]) for day in week],
             }
             for row in rows_by_teacher.values()
         ]

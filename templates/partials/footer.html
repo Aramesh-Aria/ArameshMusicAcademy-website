@@ -12,7 +12,7 @@
       <p>{{ site_address }}</p>
       <p class="cluster footer-routes">
         <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        <a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>
+        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
       </p>
     </section>
     {% endif %}

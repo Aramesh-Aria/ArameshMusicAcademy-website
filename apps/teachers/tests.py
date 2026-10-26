@@ -1,5 +1,9 @@
+from datetime import time
+
 from django.test import TestCase
 from django.urls import reverse
+
+from apps.schedules.models import ClassSession, Weekday
 
 from .models import Instrument, Teacher
 
@@ -44,6 +48,13 @@ class TeacherViewTests(TestCase):
         self.assertContains(response, first.full_name)
         self.assertNotContains(response, 'Hidden Teacher')
 
+    def test_teacher_page_previews_with_the_teachers_portrait(self):
+        teacher = self.make_teacher('Sara', 'Karimi')
+
+        response = self.client.get(teacher.get_absolute_url())
+
+        self.assertContains(response, f'<meta property="og:image" content="https://testserver{teacher.profile_image.url}">', html=True)
+
     def test_inactive_teacher_detail_returns_404(self):
         inactive_teacher = self.make_teacher('Hidden', 'Teacher', is_active=False)
 
@@ -52,10 +63,6 @@ class TeacherViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_teacher_detail_lists_active_sessions(self):
-        from datetime import time
-
-        from apps.schedules.models import ClassSession, Weekday
-
         teacher = self.make_teacher('Sara', 'Karimi')
         session = ClassSession.objects.create(
             teacher=teacher,
@@ -72,10 +79,6 @@ class TeacherViewTests(TestCase):
         self.assertContains(response, 'برنامهٔ هفتگی')
 
     def test_teacher_list_prefetches_active_sessions_in_week_order(self):
-        from datetime import time
-
-        from apps.schedules.models import ClassSession, Weekday
-
         teacher = self.make_teacher('Sara', 'Karimi')
         monday = ClassSession.objects.create(
             teacher=teacher, weekday=Weekday.MONDAY, start_time=time(9, 0), end_time=time(10, 0),

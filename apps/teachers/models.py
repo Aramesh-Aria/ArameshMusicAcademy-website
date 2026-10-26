@@ -34,6 +34,12 @@ class Teacher(models.Model):
         help_text='یک یا چند ساز که این استاد تدریس می‌کند را انتخاب کنید.',
     )
     biography = models.TextField('بیوگرافی', help_text='توضیح کوتاه یا کامل درباره سابقه و فعالیت‌های استاد.')
+    home_intro = models.TextField(
+        'معرفی در صفحه اصلی',
+        blank=True,
+        help_text='چند جمله برای آشنایی بازدیدکننده با استاد، کنار تصویرش در صفحه اصلی. '
+                  'فقط برای استادی نمایش داده می‌شود که اول فهرست است (مدیر آموزشگاه). جدا از بیوگرافی است.',
+    )
     profile_image = models.ImageField('تصویر پروفایل', upload_to='teachers/', help_text='تصویر پرتره استاد را بارگذاری کنید.')
     is_active = models.BooleanField('فعال', default=True, help_text='فقط اساتید فعال در سایت نمایش داده می‌شوند.')
     display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در لیست اساتید.')
