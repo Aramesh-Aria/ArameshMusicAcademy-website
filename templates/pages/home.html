@@ -44,7 +44,7 @@
     <span class="today__dot" aria-hidden="true"></span>
     <a href="{% url 'schedules:schedule' %}">
       {% if today.state == 'open' %}
-      <b>امروز، {{ today.day_label }}:</b> {% if today.taught|length > 5 %}{{ today.taught|slice:":4"|join:"، " }} و …{% else %}{{ today.taught|join:"، " }}{% endif %}، تا ساعت {{ today.until|clock }}
+      <b>امروز، {{ today.day_label }}:</b> {% if today.taught|length > 5 %}{{ today.taught|slice:":4"|join:"، " }} و {{ today.taught|length|add:"-4" }} مورد دیگر{% else %}{{ today.taught|join:"، " }}{% endif %}، تا ساعت {{ today.until|clock }}
       {% elif today.is_friday %}
       <b>جمعه‌ها آموزشگاه تعطیل است.</b>{% if today.next_from %} {{ today.next_label }} از ساعت {{ today.next_from|clock }} پاسخگوی شما هستیم.{% endif %}
       {% elif today.state == 'over' %}
