@@ -87,6 +87,18 @@ class TodayStatusTests(TestCase):
         self.assertEqual(today.taught, ['سنتور', 'پیانو', 'موسیقی کودک'])  # no children-only instrument
         self.assertEqual(today.until, datetime.time(19, 30))
 
+    def test_before_the_first_class_it_says_from_when(self, _localdate):
+        today = today_status(week_schedule(), now=self.at(8))
+
+        self.assertEqual(today.state, 'before')
+        self.assertEqual((today.since, today.until), (datetime.time(10), datetime.time(19, 30)))
+
+    def test_before_the_first_class_the_home_page_says_from_when(self, _localdate):
+        with patch('apps.schedules.week.timezone.localtime', return_value=self.at(8)):
+            response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, '<b>امروز، دوشنبه:</b> سنتور، پیانو، موسیقی کودک، از ساعت 10 تا 19:30', html=False)
+
     def test_after_the_last_class_it_says_when_classes_resume(self, _localdate):
         today = today_status(week_schedule(), now=self.at(20))
 

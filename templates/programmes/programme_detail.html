@@ -5,7 +5,7 @@
 {% block og_image %}{% if programme.photos %}{% include 'partials/og_image.html' with url=programme.photos.0.url alt=programme.name %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
-{# ── The Programme: what it is, who it is for, beside its photos. ── #}
+{# ── The Programme: what it is, who it is for, beside its photos (the text alone until it has some). ── #}
 <article class="split panel on-stone page-head" aria-labelledby="programme-title">
   <div class="split__text">
     <h1 id="programme-title">{{ programme.name }}</h1>
@@ -13,9 +13,11 @@
     <div class="prose">{{ programme.long_description|linebreaks }}</div>
   </div>
   {% with photos=programme.photos %}
-  <div class="split__media frame vt{% if photos %} crossfade{% else %} frame--shape{% endif %}" style="--vt: programme-{{ programme.pk }}">
-    {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% empty %}{% include 'components/santur.html' %}{% endfor %}
+  {% if photos %}
+  <div class="split__media frame vt crossfade" style="--vt: programme-{{ programme.pk }}">
+    {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% endfor %}
   </div>
+  {% endif %}
   {% endwith %}
 </article>
 

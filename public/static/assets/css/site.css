@@ -118,7 +118,7 @@
     --leading-ui: 1.4;          /* buttons, labels, nav: one line */
     --leading-body: 1.85;
     --leading-body-stone: 1.8;
-    --measure: 36em;            /* about 65 Persian characters */
+    --measure: 36em;            /* about 85 Persian characters, some 15 words: Persian letters join and run narrow */
 
     /* Space: one scale, for gaps and section rhythm. */
     --space-1: 0.25rem;  /*   4 */
@@ -534,6 +534,9 @@
   }
   .card:active { transform: scale(0.99); }
   .card .frame { aspect-ratio: 3 / 2; }
+  /* A card with no photo yet is its text alone, set at the foot so it lines up with photographed neighbours. */
+  .card:not(:has(.frame)) { justify-content: flex-end; }
+  .card:not(:has(.frame)) .chip { position: static; align-self: start; margin: var(--space-3) var(--space-3) 0; }
   .card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
   .card__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); flex: 1; align-content: start; }
   .card__title { font-size: var(--display-s); }
@@ -1370,6 +1373,18 @@
   .split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
   .split__text p { max-inline-size: var(--measure); }
   .split__media { align-self: stretch; min-block-size: 26rem; }
+  /* A split with nothing to show beside its text (a Programme with no photos yet) is the text alone. */
+  .split:not(:has(.split__media)) { grid-template-columns: minmax(0, 1fr); padding-inline-end: var(--panel-pad); }
+  /* On a wide screen its name takes the media's place, beside the text. */
+  @media (min-width: 56.3125em) {
+    .split:not(:has(.split__media)) .split__text {
+      grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+      column-gap: var(--panel-pad);
+      align-items: start;
+    }
+    .split:not(:has(.split__media)) .split__text > :not(.prose) { grid-column: 1; }
+    .split:not(:has(.split__media)) .split__text > .prose { grid-column: 2; grid-row: 1 / span 2; }
+  }
   /* A portrait cropped to a wide frame keeps the face, which sits in the top third. */
   .split__media--face img { object-position: 50% 20%; }
   /* A teacher: the square portrait stays in view beside a long biography. */

@@ -62,12 +62,14 @@ def week_schedule(sessions=None):
 class Today:
     """What the home page says about today, in the Academy's time zone.
 
-    `state` is 'open' while today's classes run, 'over' once they have ended, and 'closed' on a day with
-    none. `taught` names what is taught today; `next_label` and `next_from` say when classes resume.
+    `state` is 'before' until today's first class starts, 'open' while they run, 'over' once they have ended,
+    and 'closed' on a day with none. `taught` names what is taught today, from `since` until `until`;
+    `next_label` and `next_from` say when classes resume.
     """
     state: str
     day_label: str
     taught: list
+    since: time | None
     until: time | None
     next_label: str
     next_from: time | None
@@ -79,13 +81,16 @@ def today_status(days, now=None):
     now = now or timezone.localtime()
     index = next(i for i, day in enumerate(days) if day.is_today)
     today = days[index]
+    since = min((s.start_time for s in today.sessions), default=None)
     until = max((s.end_time for s in today.sessions), default=None)
 
     taught = Offerings.combine(today.sessions).names
 
     following = [days[(index + step) % 7] for step in range(1, 8)]
     resume = next((day for day in following if day.sessions), None)
-    if until and now.time() < until:
+    if since and now.time() < since:
+        state = 'before'
+    elif until and now.time() < until:
         state = 'open'
     else:
         state = 'over' if today.sessions else 'closed'
@@ -93,6 +98,7 @@ def today_status(days, now=None):
         state=state,
         day_label=today.label,
         taught=taught,
+        since=since,
         until=until,
         next_label='فردا' if resume is following[0] else (resume.label if resume else ''),
         next_from=min(s.start_time for s in resume.sessions) if resume else None,
