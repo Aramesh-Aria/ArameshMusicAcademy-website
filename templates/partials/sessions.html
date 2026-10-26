@@ -1,11 +1,12 @@
 {% load site_tags %}
-{# Class times as a list: the day, the hours, the teacher. Expects `sessions`; `show_offerings` adds what each teaches. #}
+{% comment %}Class times as a list: the day, the hours, the teacher. Expects `sessions`; `show_offerings` adds what each
+   teaches, and `hide_teacher` leaves the name out on the teacher's own page.{% endcomment %}
 <ul class="times" role="list">
   {% for session in sessions %}
   <li>
     <span class="times__day">{{ session.get_weekday_display }}</span>
     <span class="times__hours">{{ session.start_time|clock }} تا {{ session.end_time|clock }}</span>
-    <a class="times__teacher" href="{{ session.teacher.get_absolute_url }}">{{ session.teacher.full_name }}</a>
+    {% if not hide_teacher %}<a class="times__teacher" href="{{ session.teacher.get_absolute_url }}">{{ session.teacher.full_name }}</a>{% endif %}
     {% if show_offerings %}<span class="times__what">{{ session.offerings }}</span>{% endif %}
   </li>
   {% endfor %}

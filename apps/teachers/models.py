@@ -154,5 +154,11 @@ class Teacher(models.Model):
                 Teacher.objects.filter(pk=self.pk).update(profile_image=result_name)
                 self.profile_image.name = result_name
 
+    @property
+    def public_biography(self):
+        """The biography, or '' while it is only a placeholder such as '.' (the live site has two)."""
+        text = self.biography.strip()
+        return text if any(char.isalpha() for char in text) else ''
+
     def get_absolute_url(self):
         return reverse('teachers:teacher_detail', kwargs={'pk': self.pk})

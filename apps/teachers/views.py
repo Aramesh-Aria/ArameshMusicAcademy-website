@@ -37,19 +37,20 @@ class TeacherDetailView(DetailView):
         return (
             Teacher.objects
             .filter(is_active=True)
-            .prefetch_related('instruments')
+            .prefetch_related('instruments', 'programmes')
         )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         teacher = self.object
-        if teacher.biography:
-            context['meta_description'] = ' '.join(teacher.biography.split())[:160]
+        if teacher.public_biography:
+            context['meta_description'] = ' '.join(teacher.public_biography.split())[:160]
         else:
             instruments = '، '.join(i.name for i in teacher.instruments.all())
             context['meta_description'] = (
                 f'{teacher.full_name} مدرس {instruments} در آموزشگاه موسیقی آرامش.'
             )
+        context['teacher_programmes'] = [p for p in teacher.programmes.all() if p.is_active]
         context['teacher_sessions'] = (
             teacher.class_sessions.active()
             .select_related('teacher', 'programme')

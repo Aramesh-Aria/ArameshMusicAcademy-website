@@ -7,49 +7,37 @@
 {% block og_image %}{% if teacher.profile_image %}{% include 'partials/og_image.html' with url=teacher.profile_image.url width=600 height=600 alt=teacher.full_name %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
-
-{# ── The performer page: name, instruments, biography and week on one sheet, the portrait beside it. ── #}
-<section class="teacher-page grid" aria-labelledby="teacher-title">
-  <article class="teacher-sheet sheet sheet-torn">
-    <p class="teacher-back"><a href="{% url 'teachers:teacher_list' %}">اساتید</a></p>
+{# ── The teacher: name, from whom they learned, what they teach, the biography, the portrait beside it. ── #}
+<article class="split split--portrait panel on-stone page-head" aria-labelledby="teacher-title">
+  <div class="split__text">
     <h1 id="teacher-title">{{ teacher.full_name }}</h1>
-    {% if teacher.instruments.all %}
-    <p class="teacher-page-instruments">{{ teacher.instruments.all|join:"، " }}</p>
-    {% endif %}
-
-    {% if teacher.biography %}
-    <div class="teacher-page-bio prose">{{ teacher.biography|linebreaks }}</div>
-    {% endif %}
-
-    <section class="teacher-week" aria-labelledby="week-title">
-      <h2 id="week-title">برنامهٔ هفتگی</h2>
-      {% if teacher_sessions %}
-      {% regroup teacher_sessions by get_weekday_display as days %}
-      <dl class="teacher-days">
-        {% for day in days %}
-        <div class="teacher-day">
-          <dt>{{ day.grouper }}</dt>
-          {% for session in day.list %}
-          <dd>
-            <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
-            <span class="soft">{{ session.offerings }}</span>
-          </dd>
-          {% endfor %}
-        </div>
-        {% endfor %}
-      </dl>
-      {% else %}
-      <p class="soft">زمان کلاس‌های این استاد هنوز در برنامه ثبت نشده است. برای هماهنگی تماس بگیرید.</p>
+    {% if teacher.lineage %}<p class="split__lead">{{ teacher.lineage }}</p>{% endif %}
+    <dl class="facts">
+      {% with offered=teacher.instruments.all %}{% if offered %}
+      <div><dt>سازها</dt><dd>{% for instrument in offered %}{% if not instrument.children_only %}<a href="{{ instrument.get_absolute_url }}">{{ instrument.name }}</a>{% else %}{{ instrument.name }}{% endif %}{% if not forloop.last %}، {% endif %}{% endfor %}</dd></div>
+      {% endif %}{% endwith %}
+      {% if teacher_programmes %}
+      <div><dt>دوره‌ها</dt><dd>{% for programme in teacher_programmes %}<a href="{{ programme.get_absolute_url }}">{{ programme.name }}</a>{% if not forloop.last %}، {% endif %}{% endfor %}</dd></div>
       {% endif %}
-    </section>
-  </article>
+    </dl>
+    {% if teacher.public_biography %}<div class="prose">{{ teacher.public_biography|linebreaks }}</div>{% endif %}
+  </div>
+  <div class="split__media frame frame--portrait">{% include 'partials/portrait.html' with teacher=teacher %}</div>
+</article>
 
-  <figure class="teacher-plate">
-    {% include 'partials/portrait.html' with teacher=teacher %}
-  </figure>
+<section class="section" aria-labelledby="week-title">
+  <header class="section__head section__head--row">
+    <h2 id="week-title">برنامهٔ هفتگی</h2>
+    {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
+  </header>
+  {% if teacher_sessions %}
+  {% include 'partials/sessions.html' with sessions=teacher_sessions show_offerings=True hide_teacher=True %}
+  {% else %}
+  <p class="section__intro section__note">زمان کلاس‌های این استاد هنوز در برنامه ثبت نشده است. برای هماهنگی تماس بگیرید.</p>
+  {% endif %}
 </section>
 
-{% with title='برای هماهنگی کلاس با '|add:teacher.full_name|add:' تماس بگیرید' %}
-{% include 'partials/page_call.html' %}
+{% with band_title='برای هماهنگی کلاس با '|add:teacher.full_name|add:' تماس بگیرید' %}
+{% include 'partials/contact_band.html' %}
 {% endwith %}
 {% endblock %}

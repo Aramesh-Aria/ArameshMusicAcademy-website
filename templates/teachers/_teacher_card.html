@@ -4,4 +4,5 @@
   <h3 class="teacher-card__name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
   {% with offered=teacher.instruments.all %}{% if offered %}<p class="teacher-card__teaches">{{ offered|join:"، " }}</p>{% endif %}{% endwith %}
   {% if teacher.lineage %}<p class="teacher-card__lineage">{{ teacher.lineage }}</p>{% endif %}
+  {% if teacher.active_sessions %}<p class="teacher-card__days"><span class="visually-hidden">روزهای کلاس: </span>{% for session in teacher.active_sessions %}{% ifchanged session.weekday %}{% if not forloop.first %}، {% endif %}{{ session.get_weekday_display }}{% endifchanged %}{% endfor %}</p>{% endif %}
 </article>

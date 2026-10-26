@@ -141,3 +141,29 @@ class InstrumentPageTests(TestCase):
 
         self.assertContains(response, 'مسعود آرامش')
         self.assertNotContains(response, 'پنهان')
+
+
+class TeacherPageTests(TestCase):
+    def test_a_placeholder_biography_is_not_shown(self):
+        teacher = Teacher.objects.create(first_name='علی', last_name='شمس', biography=' . ')
+
+        response = self.client.get(teacher.get_absolute_url())
+
+        self.assertEqual(teacher.public_biography, '')
+        self.assertNotContains(response, '<div class="prose">')
+        self.assertIn('علی شمس مدرس', response.context['meta_description'])
+
+    def test_instruments_and_programmes_are_listed_separately(self):
+        from apps.programmes.models import Programme
+
+        teacher = Teacher.objects.create(first_name='علی', last_name='شمس', biography='نوازنده')
+        teacher.instruments.add(Instrument.objects.create(name='پیانو', slug='piano'))
+        teacher.programmes.add(Programme.objects.create(
+            name='تئوری و سلفژ', slug='theory', short_description='.', long_description='.',
+        ))
+
+        response = self.client.get(teacher.get_absolute_url())
+
+        self.assertContains(response, '<dt>سازها</dt>', html=True)
+        self.assertContains(response, '<dt>دوره‌ها</dt>', html=True)
+        self.assertContains(response, 'href="/programmes/theory/"')

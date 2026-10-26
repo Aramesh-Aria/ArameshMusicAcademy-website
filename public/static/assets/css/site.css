@@ -810,6 +810,7 @@
   .teacher-card__name a::after { content: ""; position: absolute; inset: 0; }
   .teacher-card__teaches { font-weight: 700; font-size: var(--text-s); }
   .teacher-card__lineage { color: var(--text-soft); font-size: var(--text-s); line-height: 1.7; }
+  .teacher-card__days { margin-block-start: var(--space-1); font-size: var(--text-s); }
   .teacher-card .frame img { transition: transform var(--dur-develop) var(--ease-out); }
   @media (hover: hover) and (pointer: fine) {
     .teacher-card:hover .frame img { transform: scale(1.03); }
@@ -836,6 +837,16 @@
       padding-inline: calc(var(--frame) + var(--space-3));
     }
     .portrait-row > li { scroll-snap-align: start; }
+    /* The full list stays a grid: two portraits a row. */
+    .portrait-row--grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-auto-flow: row;
+      gap: var(--space-6) var(--space-3);
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+    .portrait-row--grid .teacher-card__name { font-size: var(--text-l); }
   }
 
   /* ── Class times: day, hours, teacher, as rows on the ground ── */
@@ -1408,6 +1419,15 @@
   /* An Instrument with no photo: its name in large Amiri where the photo would be. */
   .split__media.type-tile { aspect-ratio: auto; background: color-mix(in oklab, var(--saffron) 14%, var(--stone)); }
   .split__media.type-tile::after { content: none; }
+  /* A teacher: the square portrait stays in view beside a long biography. */
+  .split--portrait { align-items: start; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
+  .split--portrait .split__media { align-self: start; min-block-size: 0; aspect-ratio: 1; position: sticky; inset-block-start: 5.5rem; }
+  .split--portrait .split__media > .portrait { inline-size: 100%; block-size: 100%; }
+  .split__lead { font-size: var(--text-l); color: var(--text-soft); line-height: 1.6; }
+  .facts { display: grid; gap: var(--space-2); }
+  .facts > div { display: flex; flex-wrap: wrap; gap: 0 var(--space-3); }
+  .facts dt { color: var(--text-soft); }
+  .facts dd { font-weight: 700; }
 
   .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
   .programme-row > li, .programme-row .programme-card { block-size: 100%; }
@@ -1461,6 +1481,7 @@
     .split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
     .split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
     .split__media.type-tile { aspect-ratio: 3 / 2; }
+    .split--portrait .split__media { position: static; max-inline-size: 22rem; }
     @media (max-width: 37.5em) {
       /* The Programme cards scroll sideways like the teachers. */
       .programme-row {

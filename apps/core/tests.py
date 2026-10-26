@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from apps.programmes.models import Programme
+from apps.teachers.models import Teacher
 
 from .templatetags.site_tags import fa_digits, local_phone, tel_href
 
@@ -48,6 +49,17 @@ class BaseLayoutTests(TestCase):
         self.assertContains(response, 'href="/programmes/theory/"', count=2)  # navbar and menu
         self.assertNotContains(response, 'دورهٔ پنهان')
         self.assertContains(response, 'href="%s"' % reverse('instruments:instrument_list'))
+
+
+class TemplateCommentTests(TestCase):
+    def test_no_page_leaks_a_template_comment(self):
+        teacher = Teacher.objects.create(first_name='علی', last_name='شمس', biography='.')
+        for url in ('/', '/about/', '/teachers/', teacher.get_absolute_url(), '/schedule/', '/gallery/', '/contact/',
+                    '/instruments/'):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertNotContains(response, '{#')
+                self.assertNotContains(response, '#}')
 
 
 class PublicDomainTests(TestCase):

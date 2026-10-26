@@ -5,41 +5,18 @@
 {% block body_class %}page-teachers{% endblock %}
 
 {% block content %}
-
-{# ── The performers: one programme entry per teacher. ── #}
-<section class="teachers grid" aria-labelledby="teachers-title">
-  <header class="section-head">
+<section class="section page-head" aria-labelledby="teachers-title">
+  <header class="section__head section__head--row">
     <h1 id="teachers-title">اساتید</h1>
-    {% if teachers %}<p class="soft"><span class="num">{{ teachers|length }}</span> استاد</p>{% endif %}
+    {% if teachers %}<p class="section__intro"><span class="num">{{ teachers|length }}</span> استاد</p>{% endif %}
   </header>
-
-  <div class="teachers-sheet sheet sheet-torn">
-    {% if teachers %}
-    <ul class="performers" role="list">
-      {% for teacher in teachers %}
-      <li class="performer">
-        {% include 'partials/portrait.html' with teacher=teacher lazy=True class='performer-portrait' %}
-        <div class="performer-text">
-          <h2><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h2>
-          {% if teacher.instruments.all %}
-          <p class="performer-instruments">{{ teacher.instruments.all|join:"، " }}</p>
-          {% endif %}
-        </div>
-        <p class="performer-days">
-          {% if teacher.active_sessions %}
-          <span class="visually-hidden">روزهای کلاس: </span>{% for session in teacher.active_sessions %}{% ifchanged session.weekday %}{% if not forloop.first %}، {% endif %}{{ session.get_weekday_display }}{% endifchanged %}{% endfor %}
-          {% else %}
-          <span class="soft">برای زمان کلاس تماس بگیرید</span>
-          {% endif %}
-        </p>
-      </li>
-      {% endfor %}
-    </ul>
-    {% else %}
-    <p class="teachers-empty">فهرست اساتید به‌زودی در اینجا قرار می‌گیرد. برای آشنایی با اساتید با آموزشگاه تماس بگیرید.</p>
-    {% endif %}
-  </div>
+  {% if teachers %}
+  <ul class="portrait-row portrait-row--grid" role="list">
+    {% for teacher in teachers %}<li>{% include 'teachers/_teacher_card.html' %}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="section__note">فهرست اساتید به‌زودی در اینجا قرار می‌گیرد. برای آشنایی با اساتید با آموزشگاه تماس بگیرید.</p>
+  {% endif %}
 </section>
-
-{% include 'partials/page_call.html' %}
+{% include 'partials/contact_band.html' %}
 {% endblock %}
