@@ -1,20 +1,43 @@
 {% extends 'base.html' %}
-{# Step 10 routes this page so the navbar can link it; step 11 lays it out. #}
 
-{% block title %}{{ instrument.name }} | آموزشگاه موسیقی آرامش{% endblock %}
+{% block title %}آموزش {{ instrument.name }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-instrument{% endblock %}
+{% block og_image %}{% if instrument.photo %}{% include 'partials/og_image.html' with url=instrument.photo.url alt=instrument.name %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
-<article class="panel" aria-labelledby="instrument-title">
-  <h1 id="instrument-title">{{ instrument.name }}</h1>
-  {{ instrument.overview|linebreaks }}
-  {% if instrument_teachers %}
-  <ul role="list">
-    {% for teacher in instrument_teachers %}
-    <li><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></li>
-    {% endfor %}
-  </ul>
+{# ── The Instrument: its overview beside its photo, or its name set large when there is none. ── #}
+<article class="split panel on-stone page-head" aria-labelledby="instrument-title">
+  <div class="split__text">
+    <h1 id="instrument-title">{{ instrument.name }}</h1>
+    <div class="prose">
+      {% if instrument.overview %}{{ instrument.overview|linebreaks }}{% else %}<p>همهٔ کلاس‌های آرامش خصوصی است: یک استاد و یک هنرجو.</p>{% endif %}
+    </div>
+  </div>
+  {% if instrument.photo %}
+  <div class="split__media frame"><img src="{{ instrument.photo.url }}" alt="{{ instrument.name }}" width="1200" height="800" fetchpriority="high"></div>
+  {% else %}
+  <div class="split__media frame type-tile" aria-hidden="true">{% include 'components/santur.html' %}<span class="type-tile__name">{{ instrument.name }}</span></div>
   {% endif %}
 </article>
-{% include 'partials/page_call.html' %}
+
+{% if instrument_teachers %}
+<section class="section" aria-labelledby="teachers-title">
+  <header class="section__head"><h2 id="teachers-title">استادان {{ instrument.name }}</h2></header>
+  <ul class="portrait-row" role="list">
+    {% for teacher in instrument_teachers %}<li>{% include 'teachers/_teacher_card.html' %}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if instrument_sessions %}
+<section class="section" aria-labelledby="times-title">
+  <header class="section__head section__head--row">
+    <h2 id="times-title">زمان کلاس‌ها</h2>
+    {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
+  </header>
+  {% include 'partials/sessions.html' with sessions=instrument_sessions %}
+</section>
+{% endif %}
+
+{% include 'partials/contact_band.html' %}
 {% endblock %}

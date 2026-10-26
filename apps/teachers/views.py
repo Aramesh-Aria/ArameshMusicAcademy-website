@@ -2,6 +2,7 @@ from django.db.models import Prefetch
 from django.views.generic import DetailView, ListView
 
 from apps.schedules.models import ClassSession
+from apps.schedules.week import active_sessions
 
 from .models import Instrument, Teacher
 
@@ -77,5 +78,8 @@ class InstrumentDetailView(DetailView):
         instrument = self.object
         if instrument.overview:
             context['meta_description'] = ' '.join(instrument.overview.split())[:160]
-        context['instrument_teachers'] = instrument.teachers.filter(is_active=True)
+        context['instrument_teachers'] = instrument.teachers.filter(is_active=True).prefetch_related('instruments')
+        context['instrument_sessions'] = (
+            active_sessions().filter(instruments=instrument).order_by('weekday_order', 'start_time')
+        )
         return context

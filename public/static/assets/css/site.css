@@ -1405,6 +1405,9 @@
   .split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
   .split__text p { max-inline-size: var(--measure); }
   .split__media { align-self: stretch; min-block-size: 26rem; }
+  /* An Instrument with no photo: its name in large Amiri where the photo would be. */
+  .split__media.type-tile { aspect-ratio: auto; background: color-mix(in oklab, var(--saffron) 14%, var(--stone)); }
+  .split__media.type-tile::after { content: none; }
 
   .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
   .programme-row > li, .programme-row .programme-card { block-size: 100%; }
@@ -1457,6 +1460,7 @@
     .split { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
     .split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
     .split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
+    .split__media.type-tile { aspect-ratio: 3 / 2; }
     @media (max-width: 37.5em) {
       /* The Programme cards scroll sideways like the teachers. */
       .programme-row {

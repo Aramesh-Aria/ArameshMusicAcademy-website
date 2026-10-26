@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
-{# Step 10 routes this page so the navbar can link it; step 11 lays it out. #}
 
 {% block title %}سازها | آموزشگاه موسیقی آرامش{% endblock %}
+{% block meta_description %}سازهایی که در آموزشگاه موسیقی آرامش آموزش داده می‌شود، با استادان و روزهای کلاس هر ساز.{% endblock %}
 {% block body_class %}page-instruments{% endblock %}
 
 {% block content %}
-<section class="panel" aria-labelledby="instruments-title">
-  <h1 id="instruments-title">همه سازها</h1>
-  <ul role="list">
-    {% for instrument in instruments %}
-    <li><a href="{{ instrument.get_absolute_url }}">{{ instrument.name }}</a></li>
-    {% endfor %}
+<section class="section page-head" aria-labelledby="instruments-title">
+  <header class="section__head">
+    <h1 id="instruments-title">سازهایی که آموزش می‌دهیم</h1>
+    <p class="section__intro">همهٔ کلاس‌های آرامش خصوصی است: یک استاد و یک هنرجو.</p>
+  </header>
+  <ul class="tile-grid" role="list">
+    {% for instrument in instruments %}<li>{% include 'teachers/_instrument_tile.html' %}</li>{% endfor %}
   </ul>
 </section>
-{% include 'partials/page_call.html' %}
+{% include 'partials/contact_band.html' %}
 {% endblock %}
