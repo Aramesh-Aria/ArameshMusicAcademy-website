@@ -11,6 +11,8 @@ def site_info(request):
         'site_email': getattr(settings, 'SITE_EMAIL', 'info@arameshmusicacademy.com'),
         'site_phones': phones,
         'site_phone_primary': phones[0] if len(phones) > 0 else '',
+        # The second number is the mobile, listed beside the landline wherever contact details are.
+        'site_phone_mobile': phones[1] if len(phones) > 1 else '',
         'site_address': getattr(settings, 'SITE_ADDRESS', 'تهران، خیابان نمونه، آموزشگاه موسیقی آرامش'),
         'site_map_neshan': getattr(settings, 'SITE_MAP_NESHAN', ''),
         'site_map_google': getattr(settings, 'SITE_MAP_GOOGLE', ''),

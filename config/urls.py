@@ -30,6 +30,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('apps.pages.urls')),
     path('teachers/', include('apps.teachers.urls')),
+    path('programmes/', include('apps.programmes.urls')),
+    path('instruments/', include('apps.teachers.instrument_urls')),
     path('schedule/', include('apps.schedules.urls')),
     path('gallery/', include(gallery_urls)),
     path('contact/', include('apps.contact.urls')),

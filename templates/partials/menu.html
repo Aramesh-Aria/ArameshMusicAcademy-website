@@ -1,52 +1,39 @@
 {% load static site_tags %}
-{% with ns=request.resolver_match.namespace un=request.resolver_match.url_name %}
-{# The phone menu: a modal <dialog>, so focus stays inside and Escape closes it. Opened by site.js. #}
-<dialog class="site-menu sheet" id="site-menu" aria-label="منو">
-  <div class="site-menu-bar">
-    <a class="site-mark" href="{% url 'pages:home' %}">
-      <img src="{% static 'assets/img/logo-ink.webp' %}" width="400" height="232" alt="آموزشگاه موسیقی آرامش" loading="lazy">
+{% with ns=request.resolver_match.namespace un=request.resolver_match.url_name slug=request.resolver_match.kwargs.slug %}
+{# The phone menu: a full-screen modal <dialog>, so focus stays inside and Escape closes it. Opened by site.js. #}
+<dialog class="menu-sheet" id="site-menu" aria-label="منو">
+  <div class="menu-sheet__bar">
+    <a class="navbar__logo" href="{% url 'pages:home' %}">
+      <img src="{% static 'assets/img/logo-saffron.webp' %}" width="400" height="235" alt="آموزشگاه موسیقی آرامش" loading="lazy">
     </a>
-    <button class="menu-close" type="button" data-menu-close>
-      بستن <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
-    </button>
+    <button class="btn btn--secondary btn--sm" type="button" data-menu-close data-motion="ring"><span class="btn__label">بستن</span><span class="btn__disc" aria-hidden="true"><svg class="btn__glyph"><use href="#i-close"/></svg></span></button>
   </div>
 
   <nav aria-label="منو">
-    <ul class="site-menu-links" role="list">
+    <ul class="menu-sheet__links" role="list">
       <li><a href="{% url 'pages:home' %}"{% if un == 'home' %} aria-current="page"{% endif %}>خانه</a></li>
       <li><a href="{% url 'pages:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>درباره ما</a></li>
+      <li>
+        <span class="menu-sheet__group">دوره‌ها</span>
+        <ul class="menu-sheet__sub" role="list">
+          {% for programme in nav_programmes %}
+          <li><a href="{{ programme.get_absolute_url }}"{% if ns == 'programmes' and slug == programme.slug %} aria-current="page"{% endif %}>{{ programme.name }}</a></li>
+          {% endfor %}
+          <li><a href="{% url 'instruments:instrument_list' %}"{% if ns == 'instruments' and un == 'instrument_list' %} aria-current="page"{% endif %}>همه سازها</a></li>
+        </ul>
+      </li>
       <li><a href="{% url 'teachers:teacher_list' %}"{% if ns == 'teachers' %} aria-current="page"{% endif %}>اساتید</a></li>
       <li><a href="{% url 'schedules:schedule' %}"{% if ns == 'schedules' %} aria-current="page"{% endif %}>برنامه کلاس‌ها</a></li>
-      <li>
-        <a href="{% url 'gallery:gallery_root' %}"{% if ns == 'gallery' %} aria-current="page"{% endif %}>گالری</a>
-        {% if gallery_nav_tree %}
-        <ul class="site-menu-sub" role="list">
-          {% for node in gallery_nav_tree %}
-          <li>
-            <a href="{{ node.page.get_absolute_url }}">{{ node.page.title }}</a>
-            {% if node.children %}
-            <ul role="list">
-              {% for child in node.children %}
-              <li><a href="{{ child.page.get_absolute_url }}">{{ child.page.title }}</a></li>
-              {% endfor %}
-            </ul>
-            {% endif %}
-          </li>
-          {% endfor %}
-        </ul>
-        {% endif %}
-      </li>
+      <li><a href="{% url 'gallery:gallery_root' %}"{% if ns == 'gallery' %} aria-current="page"{% endif %}>گالری</a></li>
       <li><a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>تماس</a></li>
     </ul>
   </nav>
 
-  {% if site_phones %}
-  <ul class="site-menu-phones" role="list">
-    {% for phone in site_phones %}
-    <li><a href="{{ phone|tel_href }}"><span class="num ltr">{{ phone|local_phone }}</span></a></li>
-    {% endfor %}
-  </ul>
+  {% if site_phone_primary %}
+  <div class="menu-sheet__foot">
+    {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" block=True %}
+    {% if site_map_neshan %}{% include "components/button.html" with label="مسیر در نشان" href=site_map_neshan rel="noopener" icon="route" variant="secondary" block=True %}{% endif %}
+  </div>
   {% endif %}
-  {% if site_address %}<p class="site-menu-address soft">{{ site_address }}</p>{% endif %}
 </dialog>
 {% endwith %}

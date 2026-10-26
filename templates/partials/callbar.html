@@ -1,8 +1,0 @@
-{% load site_tags %}
-{# Phones only: call and directions, always under the thumb. #}
-{% if site_phone_primary %}
-<nav class="callbar" aria-label="تماس سریع">
-  {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href icon="phone" size="sm" %}
-  {% include "components/button.html" with label="مسیر" href=site_map_neshan rel="noopener" icon="route" variant="secondary" size="sm" %}
-</nav>
-{% endif %}

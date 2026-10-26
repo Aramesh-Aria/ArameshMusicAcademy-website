@@ -159,3 +159,12 @@ class AdminPagesTests(TestCase):
             for suffix in ['', 'add/']:
                 with self.subTest(path=path, suffix=suffix):
                     self.assertEqual(self.client.get(f'/admin/{path}/{suffix}').status_code, 200)
+
+
+class ProgrammePageTests(TestCase):
+    def test_an_active_programme_has_a_page_and_an_inactive_one_does_not(self):
+        Programme.objects.create(name='گروه نوازی', slug='ensemble', short_description='.', long_description='پنجشنبه‌ها')
+        Programme.objects.create(name='پنهان', slug='hidden', short_description='.', long_description='.', is_active=False)
+
+        self.assertContains(self.client.get('/programmes/ensemble/'), 'پنجشنبه‌ها')
+        self.assertEqual(self.client.get('/programmes/hidden/').status_code, 404)

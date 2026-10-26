@@ -1,47 +1,43 @@
 {% load static site_tags %}
-{# The back of the programme: everything a Visitor needs to call or visit, on every page. #}
-<footer class="site-footer" id="site-footer">
-  <div class="grid">
-    <a class="site-mark footer-mark" href="{% url 'pages:home' %}">
-      <img src="{% static 'assets/img/logo-paper.webp' %}" width="400" height="232" alt="آموزشگاه موسیقی آرامش" loading="lazy">
-    </a>
-
+{# The close of every page: how to reach and visit the Academy, then the logo across the full width. #}
+<footer class="footer">
+  <div class="footer__blocks">
     {% if site_address %}
-    <section class="footer-block footer-address" aria-labelledby="footer-address">
-      <h2 id="footer-address">نشانی</h2>
+    <section class="footer__block footer__block--address" aria-labelledby="footer-address">
+      <h2 class="label" id="footer-address">نشانی</h2>
       <p>{{ site_address }}</p>
-      <p class="cluster footer-routes">
-        <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
-      </p>
+      {% if site_map_neshan %}
+      <p>{% include "components/button.html" with label="مسیر در نشان" href=site_map_neshan rel="noopener" variant="quiet" icon="arrow" %}</p>
+      {% endif %}
     </section>
     {% endif %}
 
     {% if site_hours %}
-    <section class="footer-block footer-hours" aria-labelledby="footer-hours">
-      <h2 id="footer-hours">ساعت‌ها</h2>
+    <section class="footer__block" aria-labelledby="footer-hours">
+      <h2 class="label" id="footer-hours">ساعت‌ها</h2>
       <ul role="list">
         {% for line in site_hours %}<li>{{ line }}</li>{% endfor %}
       </ul>
     </section>
     {% endif %}
 
-    {% if site_phones %}
-    <section class="footer-block footer-phones" aria-labelledby="footer-phones">
-      <h2 id="footer-phones">تلفن</h2>
-      <ul role="list">
-        {% for phone in site_phones %}
-        <li><a href="{{ phone|tel_href }}"><span class="num ltr">{{ phone|local_phone }}</span></a></li>
-        {% endfor %}
+    {% if site_phone_primary %}
+    <section class="footer__block" aria-labelledby="footer-phones">
+      <h2 class="label" id="footer-phones">تلفن</h2>
+      <ul class="footer__phones" role="list">
+        <li><a href="{{ site_phone_primary|tel_href }}"><span class="num ltr">{{ site_phone_primary|local_phone }}</span></a></li>
+        {% if site_phone_mobile %}
+        <li><a href="{{ site_phone_mobile|tel_href }}"><span class="num ltr">{{ site_phone_mobile|local_phone }}</span> <span class="footer__note">موبایل</span></a></li>
+        {% endif %}
       </ul>
     </section>
     {% endif %}
 
-    <nav class="footer-block footer-pages" aria-labelledby="footer-pages">
-      <h2 id="footer-pages">صفحه‌ها</h2>
-      <ul role="list">
-        <li><a href="{% url 'pages:home' %}">خانه</a></li>
+    <nav class="footer__block" aria-labelledby="footer-pages">
+      <h2 class="label" id="footer-pages">صفحه‌ها</h2>
+      <ul class="footer__pages" role="list">
         <li><a href="{% url 'pages:about' %}">درباره ما</a></li>
+        <li><a href="{% url 'instruments:instrument_list' %}">همه سازها</a></li>
         <li><a href="{% url 'teachers:teacher_list' %}">اساتید</a></li>
         <li><a href="{% url 'schedules:schedule' %}">برنامه کلاس‌ها</a></li>
         <li><a href="{% url 'gallery:gallery_root' %}">گالری</a></li>
@@ -50,9 +46,13 @@
     </nav>
   </div>
 
-  <div class="footer-base">
+  <a class="footer__logo" href="{% url 'pages:home' %}">
+    <img src="{% static 'assets/img/logo-saffron.png' %}" width="938" height="551" alt="آموزشگاه موسیقی آرامش" loading="lazy">
+  </a>
+
+  <div class="footer__base">
     <p>© <span class="num">{{ current_year }}</span> آموزشگاه موسیقی آرامش</p>
-    <ul class="footer-social cluster" role="list">
+    <ul class="footer__social" role="list">
       {% if site_instagram %}<li><a href="{{ site_instagram }}" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-instagram"/></svg>اینستاگرام</a></li>{% endif %}
       {% if site_telegram %}<li><a href="{{ site_telegram }}" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-telegram"/></svg>تلگرام</a></li>{% endif %}
       {% if site_email %}<li><a href="mailto:{{ site_email }}"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>ایمیل</a></li>{% endif %}

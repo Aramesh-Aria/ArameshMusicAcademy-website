@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{# Step 10 routes this page so the navbar can link it; step 11 lays it out. #}
+
+{% block title %}{{ instrument.name }} | آموزشگاه موسیقی آرامش{% endblock %}
+{% block body_class %}page-instrument{% endblock %}
+
+{% block content %}
+<article class="panel" aria-labelledby="instrument-title">
+  <h1 id="instrument-title">{{ instrument.name }}</h1>
+  {{ instrument.overview|linebreaks }}
+  {% if instrument_teachers %}
+  <ul role="list">
+    {% for teacher in instrument_teachers %}
+    <li><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</article>
+{% include 'partials/page_call.html' %}
+{% endblock %}

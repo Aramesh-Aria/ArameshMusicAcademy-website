@@ -92,8 +92,9 @@ class TeacherViewTests(TestCase):
         for index in range(3):
             self.make_teacher(f'Extra{index}', 'Teacher')
 
-        # The gallery menu, then teachers, instruments and sessions: four queries however many teachers there are.
-        with self.assertNumQueries(4):
+        # The gallery and Programme menus, then teachers, instruments and sessions: five queries however many
+        # teachers there are.
+        with self.assertNumQueries(5):
             response = self.client.get(reverse('teachers:teacher_list'))
             teachers = list(response.context['teachers'])
             sessions = teachers[0].active_sessions
@@ -116,3 +117,27 @@ class InstrumentModelTests(TestCase):
         self.assertEqual(latin.slug, 'piano')
         self.assertEqual(persian.slug, f'instrument-{persian.pk}')
         self.assertEqual(Instrument.objects.get(pk=persian.pk).slug, persian.slug)
+
+
+class InstrumentPageTests(TestCase):
+    def test_the_instrument_list_leaves_out_childrens_instruments(self):
+        Instrument.objects.create(name='سنتور', slug='santur')
+        Instrument.objects.create(name='بلز', slug='glockenspiel', children_only=True)
+
+        response = self.client.get(reverse('instruments:instrument_list'))
+
+        self.assertContains(response, 'href="/instruments/santur/"')
+        self.assertNotContains(response, 'بلز')
+
+    def test_an_instrument_page_names_its_active_teachers(self):
+        santur = Instrument.objects.create(name='سنتور', slug='santur')
+        for name, active in (('مسعود', True), ('پنهان', False)):
+            teacher = Teacher.objects.create(
+                first_name=name, last_name='آرامش', biography='.', is_active=active,
+            )
+            teacher.instruments.add(santur)
+
+        response = self.client.get(santur.get_absolute_url())
+
+        self.assertContains(response, 'مسعود آرامش')
+        self.assertNotContains(response, 'پنهان')

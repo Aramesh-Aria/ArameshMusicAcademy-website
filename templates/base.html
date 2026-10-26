@@ -47,7 +47,7 @@
     <link href="{% static 'assets/img/favicon-16x16.png' %}" rel="icon" type="image/png" sizes="16x16">
     <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon" sizes="180x180">
     <link href="{% static 'assets/img/site.webmanifest' %}" rel="manifest">
-    <meta name="theme-color" content="#12201b">
+    <meta name="theme-color" content="#17130f">
 
     {% block analytics %}{% if google_analytics_id %}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
@@ -71,7 +71,6 @@
 </main>
 
 {% include 'partials/footer.html' %}
-{% include 'partials/callbar.html' %}
 {% include 'partials/menu.html' %}
 {% block page_specific_js %}{% endblock %}
 </body>

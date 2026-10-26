@@ -3,7 +3,8 @@ from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from apps.gallery.models import GalleryPage
-from apps.teachers.models import Teacher
+from apps.programmes.models import Programme
+from apps.teachers.models import Instrument, Teacher
 
 
 class PublicSitemap(Sitemap):
@@ -25,6 +26,7 @@ class StaticViewSitemap(PublicSitemap):
             'schedules:schedule',
             'contact:contact',
             'teachers:teacher_list',
+            'instruments:instrument_list',
             'gallery:gallery_root',
         ]
 
@@ -57,8 +59,32 @@ class GalleryPageSitemap(PublicSitemap):
         return obj.get_absolute_url()
 
 
+class ProgrammeSitemap(PublicSitemap):
+    priority = 0.7
+    changefreq = 'monthly'
+
+    def items(self):
+        return Programme.objects.active()
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+
+class InstrumentSitemap(PublicSitemap):
+    priority = 0.6
+    changefreq = 'monthly'
+
+    def items(self):
+        return Instrument.objects.main()
+
+    def lastmod(self, obj):
+        return obj.updated_at
+
+
 sitemaps = {
     'static': StaticViewSitemap,
+    'programmes': ProgrammeSitemap,
+    'instruments': InstrumentSitemap,
     'teachers': TeacherSitemap,
     'gallery': GalleryPageSitemap,
 }

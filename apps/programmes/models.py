@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 
 PHOTO_FIELDS = ('photo_1', 'photo_2', 'photo_3')
 
@@ -82,6 +83,9 @@ class Programme(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('programmes:programme_detail', kwargs={'slug': self.slug})
 
     @property
     def photos(self):

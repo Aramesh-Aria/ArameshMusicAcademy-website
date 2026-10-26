@@ -768,7 +768,15 @@
   }
   .menu-sheet::backdrop { background: var(--ground); }
   .menu-sheet__bar { display: flex; align-items: center; justify-content: space-between; padding-inline-start: var(--space-4); }
-  .menu-sheet__links { display: grid; gap: var(--space-1); margin-block: var(--space-6) auto; }
+  /* The pages scroll between the bar and the foot, so the call never leaves the sheet. */
+  .menu-sheet > nav { flex: 1; min-block-size: 0; overflow-y: auto; overscroll-behavior: contain; }
+  .menu-sheet__links { display: grid; gap: var(--space-1); margin-block: var(--space-5); }
+  .menu-sheet__group {
+    display: block;
+    padding: var(--space-3) var(--space-4) var(--space-1);
+    font-size: var(--text-s);
+    color: var(--label, var(--saffron));
+  }
   .menu-sheet__links a {
     display: flex;
     align-items: center;
@@ -780,7 +788,69 @@
   }
   .menu-sheet__links a[aria-current] { color: var(--saffron); }
   .menu-sheet__links .menu-sheet__sub a { min-block-size: 2.75rem; padding-inline-start: var(--space-7); font-size: var(--text-m); font-weight: 400; color: var(--stone-soft); }
-  .menu-sheet__foot { display: grid; gap: var(--space-2); padding-block-start: var(--space-5); }
+  .menu-sheet__foot { display: grid; gap: var(--space-2); padding-block-start: var(--space-4); }
+  .menu-sheet .navbar__logo img { block-size: 2.375rem; }
+
+
+  /* ── Footer: reach and visit, then the logo across the full width ── */
+  .footer {
+    margin-block-start: var(--section);
+    padding: 0 var(--frame) max(var(--space-5), env(safe-area-inset-bottom));
+    color: var(--stone);
+  }
+  .footer__blocks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: var(--space-7) var(--space-6);
+    padding-inline: var(--panel-pad);
+    font-size: var(--text-s);
+    line-height: var(--leading-body);
+  }
+  .footer__block--address { grid-column: span 2; }
+  .footer__block .label { display: block; margin-block-end: var(--space-3); }
+  .footer__block p + p { margin-block-start: var(--space-2); }
+  .footer__block a:not(.btn) { text-decoration: none; }
+  .footer__phones a, .footer__pages a, .footer__social a {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+  }
+  .footer__note { color: var(--stone-soft); }
+  .footer__pages { columns: 2; column-gap: var(--space-5); }
+  @media (hover: hover) and (pointer: fine) {
+    .footer__block a:not(.btn):hover, .footer__social a:hover {
+      text-decoration: underline;
+      text-decoration-thickness: 2px;
+      text-decoration-color: var(--saffron);
+    }
+  }
+  /* As wide as the frame allows, up to the master's own 938px so the calligraphy never softens. */
+  .footer__logo {
+    display: block;
+    max-inline-size: calc(58.625rem + 2 * var(--panel-pad));
+    margin-block: var(--space-9) var(--space-5);
+    padding-inline: var(--panel-pad);
+  }
+  .footer__logo img { inline-size: 100%; block-size: auto; }
+  .footer__base {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2) var(--space-6);
+    padding-block-start: var(--space-4);
+    padding-inline: var(--panel-pad);
+    border-block-start: 1px solid color-mix(in oklab, var(--stone) 18%, var(--ground));
+    font-size: var(--text-xs);
+    color: var(--stone-soft);
+  }
+  .footer__social { display: flex; flex-wrap: wrap; gap: 0 var(--space-5); }
+  .footer__social a { text-decoration: none; }
+  @media (max-width: 56.25em) {
+    .footer__block--address { grid-column: 1 / -1; }
+    .footer__logo { margin-block-start: var(--space-8); }
+  }
 
 
   /* ── Accordion (FAQ): native <details>, the answer opening to its own height ── */
@@ -909,107 +979,14 @@
     inset-inline-start: var(--space-3);
     z-index: 30;
     padding: var(--space-2) var(--space-4);
-    background: var(--paper);
+    border-radius: var(--radius-pill);
+    background: var(--saffron);
     color: var(--ink);
+    font-weight: 700;
     transform: translateY(-200%);
   }
   .skip-link:focus { transform: none; }
   main:focus { outline: none; }
-
-  .site-mark { display: block; flex: none; }
-  .site-mark img { inline-size: auto; block-size: 4rem; }
-
-
-  /* Header: the wordmark at the start, the pages, the phone at the end. Not sticky: paper does not follow you. */
-  .site-header {
-    position: relative;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: var(--space-7);
-    padding: var(--space-4) var(--margin) 0;
-  }
-
-  .site-nav ul {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-1) var(--space-6);
-  }
-  .site-nav a, .site-nav summary {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-1);
-    min-block-size: 2.75rem;
-    text-decoration: none;
-  }
-  .site-nav [aria-current] {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.35em;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .site-nav a:hover, .site-nav summary:hover {
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 0.35em;
-    }
-  }
-
-  .header-phone {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    margin-inline-start: auto;
-    min-block-size: 2.75rem;
-    text-decoration: none;
-    color: var(--text);
-  }
-
-  .menu-toggle {
-    margin-inline-start: auto;
-    min-block-size: 2.75rem;
-    min-inline-size: 2.75rem;
-    padding: 0 var(--space-3);
-    background: none;
-    border: 0;
-    font-size: var(--text-l);
-  }
-  .menu-toggle, .menu-close, .gallery-menu summary { transition: transform var(--dur-press) var(--ease-out); }
-  .menu-toggle:active, .menu-close:active, .gallery-menu summary:active { transform: scale(var(--press-scale)); }
-
-
-  /* The gallery disclosure: a sheet of categories, each with its events. */
-  .gallery-menu { position: relative; }
-  .gallery-menu summary { list-style: none; cursor: pointer; }
-  .gallery-menu summary::-webkit-details-marker { display: none; }
-  .gallery-menu summary .icon { transition: transform var(--dur-move) var(--ease-out); }
-  .gallery-menu details[open] summary .icon { transform: rotate(180deg); }
-
-  .gallery-panel {
-    position: absolute;
-    inset-block-start: calc(100% + var(--space-2));
-    inset-inline-start: calc(-1 * var(--space-6));
-    inline-size: max-content;
-    min-inline-size: 17rem;
-    max-inline-size: min(26rem, 90vw);
-    padding: var(--space-5) var(--space-6) var(--space-6);
-    box-shadow: 0 1.25rem 2.5rem -1rem rgb(0 0 0 / 0.55);
-  }
-  .site-nav .gallery-panel ul { display: block; }
-  .gallery-panel > ul > li + li { margin-block-start: var(--space-3); }
-  .gallery-panel a { min-block-size: 2.25rem; }
-  .gallery-panel > ul > li > a { font-weight: 700; }
-  .gallery-panel li ul {
-    padding-inline-start: var(--space-4);
-    font-size: var(--text-s);
-    color: var(--text-soft);
-  }
-  .site-nav .gallery-panel-all {
-    margin-block-start: var(--space-4);
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-  }
 
   /* Photo plates in balanced columns, each at its own ratio (home, About, gallery pages). */
   .plates {
@@ -1030,8 +1007,8 @@
   }
 
 
-  /* The two full-screen dialogs, lightbox and phone menu, share one frame: the whole viewport on the ground. */
-  .lightbox, .site-menu {
+  /* The lightbox: the whole viewport on the ground. */
+  .lightbox {
     inline-size: 100%;
     max-inline-size: none;
     block-size: 100dvh;
@@ -1040,7 +1017,7 @@
     border: 0;
     overscroll-behavior: contain;
   }
-  .lightbox::backdrop, .site-menu::backdrop { background: var(--ground); }
+  .lightbox::backdrop { background: var(--ground); }
 
   /* The lightbox: one photo on the dark ground, with its caption, the count and the way out. */
   .lightbox {
@@ -1127,80 +1104,6 @@
   @media (hover: hover) and (pointer: fine) {
     .lightbox button:hover { background: color-mix(in oklab, var(--on-ground), transparent 88%); }
   }
-
-
-  /* The phone menu: a full-height paper sheet. */
-  .site-menu {
-    padding: var(--space-4) var(--margin) calc(var(--space-7) + env(safe-area-inset-bottom));
-    overflow-y: auto;
-    transition:
-      opacity var(--dur-move) var(--ease-out),
-      transform var(--dur-move) var(--ease-out),
-      overlay var(--dur-move) allow-discrete,
-      display var(--dur-move) allow-discrete;
-  }
-  .site-menu:not([open]) { opacity: 0; transform: translateY(0.75rem); transition-duration: var(--dur-state); }
-  @starting-style {
-    .site-menu[open] { opacity: 0; transform: translateY(0.75rem); }
-  }
-  /* Reduced motion: the overlays still fade in briefly, but the menu no longer rises. */
-  @media (prefers-reduced-motion: reduce) {
-    .lightbox, .site-menu { transition-property: opacity, overlay, display; transition-duration: var(--dur-state); }
-  }
-
-  .site-menu-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-  .menu-close {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-block-size: 2.75rem;
-    padding: 0 var(--space-3);
-    background: none;
-    border: 0;
-    font-size: var(--text-l);
-  }
-
-  .site-menu-links {
-    margin-block-start: var(--space-7);
-    font-size: var(--text-xl);
-    font-weight: 700;
-    line-height: 1.3;
-  }
-  .site-menu-links a {
-    display: inline-block;
-    padding-block: var(--space-1);
-    text-decoration: none;
-  }
-  .site-menu-links [aria-current] {
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-  }
-  .site-menu-sub {
-    margin-block: var(--space-1) var(--space-3);
-    padding-inline-start: var(--space-4);
-    font-size: var(--text-l);
-    font-weight: 400;
-    color: var(--text-soft);
-  }
-  .site-menu-sub ul {
-    padding-inline-start: var(--space-4);
-    font-size: var(--text-m);
-  }
-  .site-menu-phones {
-    margin-block-start: var(--space-7);
-    font-size: var(--text-l);
-  }
-  .site-menu-phones a {
-    display: inline-block;
-    padding-block: var(--space-1);
-    text-decoration: none;
-  }
-  .site-menu-address { margin-block-start: var(--space-4); max-inline-size: 24em; }
 
 
   /* Portrait plates: 1:1, printed in the darkroom. A missing upload shows initials on paper. */
@@ -1312,100 +1215,6 @@
   }
 
 
-  /* Call bar: phones only, call and directions under the thumb. */
-  .callbar { display: none; }
-
-
-  /* Footer: the back of the programme. */
-  .site-footer {
-    padding-block: var(--section) var(--space-7);
-  }
-  .site-footer .grid { row-gap: var(--space-7); align-items: start; }
-  .footer-mark img { block-size: 6.5rem; }
-  @media (min-width: 56.3125em) {
-    .footer-mark { grid-column: span 2; }
-    .footer-address { grid-column: span 3; }
-    .footer-hours { grid-column: span 3; }
-    .footer-phones { grid-column: span 2; }
-    .footer-pages { grid-column: span 2; }
-  }
-
-  .footer-block h2 {
-    margin-block-end: var(--space-3);
-    font-size: var(--text-s);
-    font-weight: 400;
-    color: var(--text-soft);
-  }
-  .footer-block li + li { margin-block-start: var(--space-1); }
-  .footer-block a { text-decoration: none; }
-  @media (hover: hover) and (pointer: fine) {
-    .footer-block a:hover { text-decoration: underline; }
-  }
-  .footer-phones a {
-    display: inline-flex;
-    align-items: center;
-    min-block-size: 2.75rem;
-  }
-  .footer-phones li + li { margin-block-start: 0; }
-  .footer-routes { --cluster: var(--space-1) var(--space-5); margin-block-start: var(--space-3); }
-  .footer-routes a { text-decoration: underline; }
-
-  .footer-base {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4) var(--space-6);
-    margin-block-start: var(--space-9);
-    padding-inline: var(--margin);
-    font-size: var(--text-s);
-    color: var(--text-soft);
-  }
-  .footer-social { --cluster: var(--space-2) var(--space-6); }
-  .footer-social a {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    min-block-size: 2.75rem;
-    text-decoration: none;
-  }
-  @media (hover: hover) and (pointer: fine) {
-    .footer-social a:hover { color: var(--text); }
-  }
-
-
-  /* Phones and narrow tablets: the menu button and the call bar replace the inline navigation. */
-  @media (max-width: 56.25em) {
-    .site-nav, .header-phone { display: none; }
-    .menu-toggle { display: inline-flex; align-items: center; }
-    .site-mark img { block-size: 2.9rem; }
-    .site-header { padding-block-start: var(--space-3); }
-
-    .callbar {
-      position: fixed;
-      inset-inline: 0;
-      inset-block-end: 0;
-      z-index: 10;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: var(--space-3);
-      padding: var(--space-3) var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom));
-      background: var(--ground);
-    }
-    .callbar .btn { font-size: var(--text-m); }
-    body:has(.callbar) { padding-block-end: calc(4.5rem + env(safe-area-inset-bottom)); }
-
-    .footer-mark img { block-size: 5rem; }
-    .footer-base { margin-block-start: var(--space-8); }
-  }
-  /* Tablets: the footer's blocks pair up instead of running in one long column. */
-  @media (min-width: 37.5em) and (max-width: 56.25em) {
-    .site-footer .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); }
-    .footer-mark { grid-column: 1 / -1; }
-  }
-  @media (min-width: 56.3125em) {
-    .menu-toggle { display: none; }
-  }
 }
 
 

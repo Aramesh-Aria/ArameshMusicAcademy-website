@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 
+from apps.programmes.models import Programme
+
 from .templatetags.site_tags import fa_digits, local_phone, tel_href
 
 
@@ -31,9 +33,21 @@ class BaseLayoutTests(TestCase):
         self.assertContains(response, 'href="%s"' % reverse('gallery:gallery_root'))
 
     def test_the_current_section_is_marked_in_the_navigation(self):
-        response = self.client.get(reverse('contact:contact'))
+        response = self.client.get(reverse('teachers:teacher_list'))
 
-        self.assertContains(response, 'aria-current="page"', count=2)  # header and menu
+        self.assertContains(response, 'aria-current="page"', count=2)  # navbar and menu
+
+    def test_the_programmes_menu_lists_the_active_programmes_and_all_instruments(self):
+        Programme.objects.create(name='تئوری و سلفژ', slug='theory', short_description='.', long_description='.')
+        Programme.objects.create(
+            name='دورهٔ پنهان', slug='hidden', short_description='.', long_description='.', is_active=False,
+        )
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'href="/programmes/theory/"', count=2)  # navbar and menu
+        self.assertNotContains(response, 'دورهٔ پنهان')
+        self.assertContains(response, 'href="%s"' % reverse('instruments:instrument_list'))
 
 
 class PublicDomainTests(TestCase):
