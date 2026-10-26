@@ -1,0 +1,9 @@
+{# One teacher on the home page: `size` is lead or small; `bio_words` truncates the biography. #}
+<figure class="teacher-{{ size }}">
+  <a href="{{ teacher.get_absolute_url }}" tabindex="-1" aria-hidden="true">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</a>
+  <figcaption>
+    <h3><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
+    <p class="teacher-instruments">{{ teacher.instruments.all|join:"، " }}</p>
+    {% if teacher.biography %}<p class="teacher-bio">{% if bio_words %}{{ teacher.biography|truncatewords:bio_words }}{% else %}{{ teacher.biography }}{% endif %}</p>{% endif %}
+  </figcaption>
+</figure>

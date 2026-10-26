@@ -8,7 +8,7 @@
 
 {# ── The performers: one programme entry per teacher. ── #}
 <section class="teachers grid" aria-labelledby="teachers-title">
-  <header class="teachers-head">
+  <header class="section-head">
     <h1 id="teachers-title">اساتید</h1>
     {% if teachers %}<p class="soft"><span class="num">{{ teachers|length }}</span> استاد</p>{% endif %}
   </header>
@@ -22,7 +22,7 @@
         <div class="performer-text">
           <h2><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h2>
           {% if teacher.instruments.all %}
-          <p class="performer-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+          <p class="performer-instruments">{{ teacher.instruments.all|join:"، " }}</p>
           {% endif %}
         </div>
         <p class="performer-days">

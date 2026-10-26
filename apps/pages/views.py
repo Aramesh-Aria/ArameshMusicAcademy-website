@@ -46,12 +46,13 @@ class HomeView(PageContentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # The first teacher stands in the hero as the director; the next three fill the teachers section.
-        context['featured_teachers'] = list(
-            Teacher.objects
-            .filter(is_active=True)
-            .prefetch_related('instruments')[:4]
-        )
+        teachers = list(Teacher.objects.filter(is_active=True).prefetch_related('instruments')[:4])
+        # Without a hero photo the first teacher stands in the hero as the director, and the next three
+        # fill the teachers section; with one, the first three do.
+        if context.get('page_hero_image'):
+            context['director'], context['home_teachers'] = None, teachers[:3]
+        else:
+            context['director'], context['home_teachers'] = (teachers[0] if teachers else None), teachers[1:4]
         context['week_schedule'] = week_schedule()
         space_page = (
             GalleryPage.objects

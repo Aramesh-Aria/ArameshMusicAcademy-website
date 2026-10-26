@@ -174,6 +174,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7748', '+98 990 233 8431', '+98 21 4445 7746', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '
+# The way here: route links in Neshan and Google Maps, and the embedded map.
+SITE_MAP_NESHAN = 'https://neshan.org/maps/@35.745776,51.331922,17z'
+SITE_MAP_GOOGLE = 'https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z'
+SITE_MAP_EMBED = 'https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed'
 
 # Social media (leave empty to hide the link). Override via env vars if needed.
 SITE_INSTAGRAM = os.environ.get('SITE_INSTAGRAM', 'https://www.instagram.com/arameshmusic.academy/')

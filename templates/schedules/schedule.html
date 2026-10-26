@@ -20,9 +20,9 @@
       <thead>
         <tr>
           <th scope="col">استاد</th>
-          {% for weekday in weekdays %}
-          <th scope="col" class="{% if weekday == today %}is-today{% endif %}{% if weekday.value == 'fri' %} is-off{% endif %}">
-            {{ weekday.label }}{% if weekday == today %}<small>امروز</small>{% elif weekday.value == 'fri' %}<small>تعطیل</small>{% endif %}
+          {% for day in week_schedule %}
+          <th scope="col" class="{% if day.is_today %}is-today{% endif %}{% if day.is_closed %} is-off{% endif %}">
+            {{ day.label }}{% if day.is_today %}<small>امروز</small>{% elif day.is_closed %}<small>تعطیل</small>{% endif %}
           </th>
           {% endfor %}
         </tr>
@@ -32,10 +32,10 @@
         <tr>
           <th scope="row">
             <a href="{{ row.teacher.get_absolute_url }}">{{ row.teacher.full_name }}</a>
-            {% if row.instruments %}<span>{% for instrument in row.instruments %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>{% endif %}
+            {% if row.instruments %}<span>{{ row.instruments|join:"، " }}</span>{% endif %}
           </th>
           {% for cell in row.cells %}
-          <td class="{% if cell.weekday == today %}is-today{% endif %}">
+          <td class="{% if cell.is_today %}is-today{% endif %}">
             {% for session in cell.sessions %}
             <span class="week-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
             {% if session.notes %}<small class="week-note">{{ session.notes }}</small>{% endif %}

@@ -160,7 +160,8 @@ class ScheduleViewTests(TestCase):
         response = self.client.get(reverse('schedules:schedule'))
         week = response.context['week_schedule']
 
-        self.assertEqual(response.context['today'], Weekday.MONDAY)
         self.assertEqual([day['weekday'] for day in week if day['is_today']], [Weekday.MONDAY])
+        row = response.context['schedule_rows'][0]
+        self.assertEqual([cell['weekday'] for cell in row['cells'] if cell['is_today']], [Weekday.MONDAY])
         self.assertEqual(len(week[2]['sessions']), 1)
         self.assertContains(response, '<td class="is-today">', html=False)

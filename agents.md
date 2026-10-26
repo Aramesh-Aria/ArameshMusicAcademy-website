@@ -22,7 +22,7 @@ There is no linter or frontend build step configured.
 
 ## Architecture
 
-**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, Vazirmatn, Bootstrap 5 RTL). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
+**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, Amiri, no CSS framework). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
 
 **Apps** live under `apps/` and are installed as `apps.<name>`. App labels are the bare names, so migrations and table names don't include the `apps.` prefix.
 - `core`: no models. `context_processors.site_info` injects site contact info, social links, hours and year into every template. `admin_config.ArameshAdminConfig` replaces `django.contrib.admin` in `INSTALLED_APPS` so the admin sidebar can show the unread contact-message count. Also holds `sitemaps.py`, `image_utils.process_image` and the `seed_sample_data` command.
@@ -49,7 +49,7 @@ There is no linter or frontend build step configured.
 
 ## Static and media files
 
-- Edit sources in `static_dev/`. It is **gitignored and dev-only** (`STATICFILES_DIRS`). Custom code is in `static_dev/assets/css/main.css` and `static_dev/assets/js/main.js`. Vendor libraries (Bootstrap, AOS, GLightbox, Swiper, Isotope) are pre-built files under `static_dev/assets/vendor/`.
+- Edit sources in `static_dev/`. It is **gitignored and dev-only** (`STATICFILES_DIRS`). All styling is in `static_dev/assets/css/site.css` (plain CSS in cascade layers) and all behaviour in `static_dev/assets/js/site.js` (small vanilla modules, loaded with defer). There are no vendor libraries.
 - After editing, run `collectstatic` and **commit `public/static/`** (`STATIC_ROOT`). Production serves that directory through WhiteNoise.
 - Static URL is `/public/static/` and media URL is `/public/media/` (not the Django defaults). Uploads go to `public/media/`, which `config/urls.py` serves explicitly.
 

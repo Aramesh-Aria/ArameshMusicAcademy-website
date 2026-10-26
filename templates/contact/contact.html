@@ -62,11 +62,11 @@
       <h2>نشانی</h2>
       {% if site_address %}<p>{{ site_address }}</p>{% endif %}
       <p class="cluster contact-routes">
-        <a href="https://neshan.org/maps/@35.745776,51.331922,17z" rel="noopener">مسیر در نشان</a>
-        <a href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z" rel="noopener">مسیر در گوگل‌مپ</a>
+        <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
+        <a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>
       </p>
       <iframe class="contact-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-              src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe>
+              src="{{ site_map_embed }}"></iframe>
     </div>
 
     {% if site_email %}

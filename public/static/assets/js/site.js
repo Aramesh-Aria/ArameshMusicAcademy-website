@@ -79,7 +79,7 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       const box = tab.getBoundingClientRect();
       struck.style.clipPath = `inset(${box.top - list.top}px ${list.right - box.right}px ${list.bottom - box.bottom}px ${box.left - list.left}px)`;
     };
-    const current = () => tabs.find((t) => t.getAttribute('aria-selected') === 'true') || tabs[0];
+    const current = () => tabs.find((t) => t.getAttribute('aria-selected') === 'true');
     // First placement is instant; only later changes travel.
     strike(current());
     requestAnimationFrame(() => struck.classList.add('is-ready'));
@@ -99,9 +99,6 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       if (focus) tab.focus();
     };
 
-    // With no day marked today (a clock mismatch), open on the first day.
-    if (!tabs.some((t) => t.getAttribute('aria-selected') === 'true')) select(tabs[0], false);
-
     tablist.addEventListener('click', (event) => {
       const tab = event.target.closest('[role="tab"]');
       if (tab) select(tab, false);
@@ -113,9 +110,11 @@ document.addEventListener('touchstart', () => {}, { passive: true });
       const twin = twins[tabs.indexOf(event.target.closest('[role="tab"]'))];
       if (!twin) return;
       twin.classList.add('is-pressed');
-      const release = () => twin.classList.remove('is-pressed');
-      addEventListener('pointerup', release, { once: true });
-      addEventListener('pointercancel', release, { once: true });
+      // Whichever ends the press, up or cancel, removes both listeners.
+      const press = new AbortController();
+      const release = () => { twin.classList.remove('is-pressed'); press.abort(); };
+      addEventListener('pointerup', release, { signal: press.signal });
+      addEventListener('pointercancel', release, { signal: press.signal });
     });
 
     // Right to left: ArrowLeft moves to the next day, ArrowRight to the previous one.
@@ -160,11 +159,10 @@ document.addEventListener('touchstart', () => {}, { passive: true });
 // Lightbox: links with `data-lightbox="<group>"` open their photo in a modal <dialog>. Without JS they open the file.
 (() => {
   const links = [...document.querySelectorAll('a[data-lightbox]')];
-  const probe = document.createElement('dialog');
-  if (!links.length || typeof probe.showModal !== 'function') return;
+  const box = document.createElement('dialog');
+  if (!links.length || typeof box.showModal !== 'function') return;
 
   const icon = (id) => `<svg class="icon" aria-hidden="true"><use href="#${id}"></use></svg>`;
-  const box = document.createElement('dialog');
   box.className = 'lightbox';
   box.setAttribute('aria-label', 'تصویر');
   box.innerHTML = `
@@ -356,12 +354,12 @@ document.addEventListener('touchstart', () => {}, { passive: true });
 // Photos develop once: an image still loading when this runs comes up out of the paper tone as it arrives.
 // Images already decoded, and every image without JS, simply show.
 (() => {
-  document.querySelectorAll('.plates img, .home-rooms-plates img, img.album-cover, img.portrait, .home-plate img, .about-plate img')
-    .forEach((image) => {
-      if (image.complete) return;
-      image.classList.add('develops', 'is-developing');
-      const done = () => image.classList.remove('is-developing');
-      image.addEventListener('load', done, { once: true });
-      image.addEventListener('error', done, { once: true });
-    });
+  // Every photo carries the darkroom `.mono` treatment, so that class marks them.
+  document.querySelectorAll('img.mono').forEach((image) => {
+    if (image.complete) return;
+    image.classList.add('develops', 'is-developing');
+    const done = () => image.classList.remove('is-developing');
+    image.addEventListener('load', done, { once: true });
+    image.addEventListener('error', done, { once: true });
+  });
 })();

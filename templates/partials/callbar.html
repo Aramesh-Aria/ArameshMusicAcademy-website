@@ -3,6 +3,6 @@
 {% if site_phone_primary %}
 <nav class="callbar" aria-label="تماس سریع">
   <a class="btn" href="{{ site_phone_primary|tel_href }}"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>تماس</a>
-  <a class="btn btn-paper" href="https://neshan.org/maps/@35.745776,51.331922,17z" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>مسیر</a>
+  <a class="btn btn-paper" href="{{ site_map_neshan }}" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>مسیر</a>
 </nav>
 {% endif %}

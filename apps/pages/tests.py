@@ -24,7 +24,7 @@ class HomeContextTests(TestCase):
 
         response = self.client.get(reverse('pages:home'))
 
-        self.assertIn(teacher, list(response.context['featured_teachers']))
+        self.assertEqual(response.context['director'], teacher)
         self.assertEqual(len(response.context['testimonials']), 1)
         self.assertIn('gallery_preview_images', response.context)
         self.assertTrue(response.context['meta_description'])
@@ -90,13 +90,21 @@ class HomeWeekScheduleTests(TestCase):
         self.assertContains(response, 'Sara Teacher')
         self.assertContains(response, '16:00')
 
-    def test_featured_teachers_holds_the_director_and_three_more(self):
+    def test_an_empty_day_on_the_home_page_links_to_the_full_week(self):
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'برنامهٔ کامل هفته')
+        self.assertContains(response, 'جمعه‌ها آموزشگاه تعطیل است.')
+
+    def test_home_shows_the_director_in_the_hero_and_three_more_teachers(self):
         for name in ['A', 'B', 'C', 'D', 'E']:
             self.make_teacher(name)
 
         response = self.client.get(reverse('pages:home'))
 
-        self.assertEqual(len(response.context['featured_teachers']), 4)
+        self.assertIsNotNone(response.context['director'])
+        self.assertEqual(len(response.context['home_teachers']), 3)
+        self.assertNotIn(response.context['director'], response.context['home_teachers'])
 
 
 class PageViewTests(TestCase):

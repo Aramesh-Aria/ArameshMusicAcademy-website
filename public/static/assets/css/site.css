@@ -240,21 +240,10 @@
     column-gap: var(--gutter);
     padding-inline: var(--margin);
   }
-  .grid > .span-full { grid-column: 1 / -1; }
   /* Below 900px the grid is one column. Components set their spans only above that width. */
   @media (max-width: 56.25em) {
     .grid { grid-template-columns: minmax(0, 1fr); }
   }
-
-  /* A plain inset container, for content that does not need the grid. */
-  .wrap { padding-inline: var(--margin); }
-
-  /* Chapter rhythm: space between the big parts of a page. */
-  .section { padding-block: var(--section); }
-  .section-start { padding-block-start: var(--section); }
-
-  /* Vertical flow with one gap. --stack overrides it per use. */
-  .stack { display: flex; flex-direction: column; gap: var(--stack, var(--space-5)); }
 
   /* Things side by side that wrap when they run out of room. */
   .cluster {
@@ -464,19 +453,23 @@
   }
 
 
-  /* The lightbox: one photo on the dark ground, with its caption, the count and the way out. */
-  .lightbox {
+  /* The two full-screen dialogs, lightbox and phone menu, share one frame: the whole viewport on the ground. */
+  .lightbox, .site-menu {
     inline-size: 100%;
     max-inline-size: none;
     block-size: 100dvh;
     max-block-size: none;
     margin: 0;
     border: 0;
+    overscroll-behavior: contain;
+  }
+  .lightbox::backdrop, .site-menu::backdrop { background: var(--ground); }
+
+  /* The lightbox: one photo on the dark ground, with its caption, the count and the way out. */
+  .lightbox {
     padding: 0;
     background: var(--ground);
     color: var(--on-ground);
-    overscroll-behavior: contain;
-    opacity: 1;
     transition:
       opacity var(--dur-move) var(--ease-out),
       overlay var(--dur-move) allow-discrete,
@@ -490,7 +483,6 @@
   @starting-style {
     .lightbox[open] { opacity: 0; }
   }
-  .lightbox::backdrop { background: var(--ground); }
 
   .lightbox-bar {
     display: flex;
@@ -562,17 +554,8 @@
 
   /* The phone menu: a full-height paper sheet. */
   .site-menu {
-    inline-size: 100%;
-    max-inline-size: none;
-    block-size: 100dvh;
-    max-block-size: none;
-    margin: 0;
-    border: 0;
     padding: var(--space-4) var(--margin) calc(var(--space-7) + env(safe-area-inset-bottom));
     overflow-y: auto;
-    overscroll-behavior: contain;
-    opacity: 1;
-    transform: none;
     transition:
       opacity var(--dur-move) var(--ease-out),
       transform var(--dur-move) var(--ease-out),
@@ -583,7 +566,6 @@
   @starting-style {
     .site-menu[open] { opacity: 0; transform: translateY(0.75rem); }
   }
-  .site-menu::backdrop { background: var(--ground); }
 
   .site-menu-bar {
     display: flex;
@@ -642,7 +624,6 @@
 
   /* Portrait plates: 1:1, printed in the darkroom. A missing upload shows initials on paper. */
   .portrait {
-    display: block;
     inline-size: 100%;
     aspect-ratio: 1;
     object-fit: cover;
@@ -651,7 +632,6 @@
   .portrait-initials {
     display: grid;
     place-items: center;
-    background: var(--paper-2);
     color: var(--ink-soft);
     font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
     font-weight: 700;
@@ -685,17 +665,12 @@
   @media (hover: hover) and (pointer: fine) {
     .days [role="tab"]:hover { background: var(--paper-2); }
   }
-  .days [aria-selected="true"],
-  .days [aria-selected="true"]:hover { background: var(--ink); color: var(--paper); }
-  .days [aria-selected="true"] small { color: var(--on-ground-soft); }
   .days [role="tab"]:focus-visible { outline-offset: 2px; }
   .days [role="tab"]:active { transform: scale(var(--press-scale)); }
 
   /* The struck day (site.js): an ink copy of the tabs, clipped to the selected one, so fill and label
      travel together. The real tabs keep their place underneath and take the clicks and focus. */
   .days.has-struck { position: relative; }
-  .days.has-struck [aria-selected="true"] { background: transparent; color: inherit; }
-  .days.has-struck [aria-selected="true"] small { color: var(--text-soft); }
   .days-struck {
     position: absolute;
     inset: 0;
@@ -753,7 +728,6 @@
   /* Footer: the back of the programme. */
   .site-footer {
     padding-block: var(--section) var(--space-7);
-    row-gap: var(--space-7);
   }
   .site-footer .grid { row-gap: var(--space-7); align-items: start; }
   .footer-mark img { block-size: 6.5rem; }
@@ -812,7 +786,7 @@
   /* Phones and narrow tablets: the menu button and the call bar replace the inline navigation. */
   @media (max-width: 56.25em) {
     .site-nav, .header-phone { display: none; }
-    .menu-toggle:not([hidden]) { display: inline-flex; align-items: center; }
+    .menu-toggle { display: inline-flex; align-items: center; }
     .site-mark img { block-size: 2.9rem; }
     .site-header { padding-block-start: var(--space-3); }
 
@@ -846,11 +820,14 @@
 
 /* ── pages ─────────────────────────────────────────────────────────── */
 @layer pages {
-  /* ── home: the programme sheet ── */
-  .home-hero {
-    padding-block-start: var(--space-6);
-    align-items: start;
+  /* Every page opens the same distance below the header. */
+  .home-hero, .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
+  @media (max-width: 56.25em) {
+    .home-hero, .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
   }
+
+  /* ── home: the programme sheet ── */
+  .home-hero { align-items: start; }
   .home-sheet {
     display: flex;
     flex-direction: column;
@@ -862,13 +839,7 @@
     font-size: var(--text-l);
   }
   .home-sheet .week { margin-block-start: var(--space-7); }
-  .home-sheet-foot {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-4) var(--space-6);
-    padding-block: var(--space-7) var(--space-7);
-  }
+  .home-sheet-foot { padding-block: var(--space-7); }
 
   .home-plate { margin: 0; }
   .home-plate figcaption {
@@ -884,7 +855,6 @@
     .home-plate-wide { grid-column: 8 / span 5; }
   }
   @media (max-width: 56.25em) {
-    .home-hero { padding-block-start: var(--space-4); }
     .home-sheet-foot .btn { inline-size: 100%; }
     .home-plate { margin-block-start: var(--space-7); }
   }
@@ -1016,10 +986,7 @@
 
 
   /* ── about: the letter, the rooms, the call ── */
-  .about-hero {
-    padding-block-start: var(--space-6);
-    align-items: start;
-  }
+  .about-hero { align-items: start; }
   .about-body {
     margin-block-start: var(--space-6);
     font-size: var(--text-l);
@@ -1051,23 +1018,13 @@
     .about-plate { grid-column: 9 / span 4; position: sticky; inset-block-start: var(--space-6); padding-block-start: var(--space-2); }
   }
   @media (max-width: 56.25em) {
-    .about-hero { padding-block-start: var(--space-4); }
     .about-plate { margin-block-start: var(--space-7); }
     .page-call .btn { inline-size: 100%; }
   }
 
 
   /* ── teachers: the performers, one programme entry each ── */
-  .teachers { padding-block-start: var(--space-6); }
-  .teachers-head {
-    grid-column: 1 / -1;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-2) var(--space-5);
-    margin-block-end: var(--space-6);
-  }
+  .teachers .section-head { margin-block-end: var(--space-6); }
   .teachers-sheet { grid-column: 1 / -1; }
   .performer {
     position: relative;
@@ -1093,8 +1050,7 @@
   }
   .teachers-empty { font-size: var(--text-l); max-inline-size: var(--measure); padding-block-end: var(--space-7); }
   @media (max-width: 56.25em) {
-    .teachers { padding-block-start: var(--space-4); }
-    .teachers-head { margin-block-end: var(--space-5); }
+    .teachers .section-head { margin-block-end: var(--space-5); }
     .performer {
       grid-template-columns: 5.5rem minmax(0, 1fr);
       gap: var(--space-2) var(--space-4);
@@ -1107,10 +1063,7 @@
 
 
   /* ── teacher: the performer page ── */
-  .teacher-page {
-    padding-block-start: var(--space-6);
-    align-items: start;
-  }
+  .teacher-page { align-items: start; }
   .teacher-back { font-size: var(--text-s); margin-block-end: var(--space-4); }
   .teacher-back a { color: var(--text-soft); }
   .teacher-page-instruments {
@@ -1149,7 +1102,6 @@
     .teacher-plate { grid-column: 9 / span 4; position: sticky; inset-block-start: var(--space-6); padding-block-start: var(--space-2); }
   }
   @media (max-width: 56.25em) {
-    .teacher-page { padding-block-start: var(--space-4); }
     /* The face comes first on a phone, at a size that leaves the name on screen. */
     .teacher-plate { order: -1; inline-size: min(100%, 15rem); margin-block-end: var(--space-5); }
     .teacher-day { grid-template-columns: 6rem minmax(0, 1fr); }
@@ -1157,19 +1109,17 @@
 
 
   /* ── schedule: the week diagram, and the week by day on smaller screens ── */
-  .schedule { padding-block-start: var(--space-6); }
   .schedule-head { margin-block-end: var(--space-7); }
   .schedule-head p { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
   .schedule-sheet { grid-column: 1 / -1; }
 
   .week-table {
     inline-size: 100%;
-    border-collapse: collapse;
     table-layout: fixed;
   }
   .week-table th,
   .week-table td {
-    padding: var(--space-3) var(--space-3);
+    padding: var(--space-3);
     text-align: start;
     vertical-align: top;
   }
@@ -1214,7 +1164,6 @@
   }
 
   @media (max-width: 56.25em) {
-    .schedule { padding-block-start: var(--space-4); }
     .schedule-head { margin-block-end: var(--space-6); }
     .week-table { display: none; }
     .schedule-by-day { display: block; }
@@ -1223,7 +1172,6 @@
 
 
   /* ── gallery: the album index, photos and videos ── */
-  .gallery { padding-block-start: var(--space-6); }
   .gallery-head { grid-column: 1 / -1; margin-block-end: var(--space-7); }
   .gallery-intro { margin-block-start: var(--space-4); font-size: var(--text-l); }
 
@@ -1238,7 +1186,7 @@
     gap: var(--space-8) var(--space-6);
   }
   .album { position: relative; }
-  .album-cover { display: block; inline-size: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--paper-2); }
+  .album-cover { inline-size: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--paper-2); }
   .album-plate {
     display: flex;
     align-items: flex-end;
@@ -1256,7 +1204,7 @@
   @media (hover: hover) and (pointer: fine) {
     .album-cover { transition: filter var(--dur-state) var(--ease-out); }
     .album:hover .album-cover { filter: grayscale(1) contrast(1.06) brightness(1.08); }
-    .album:hover .album-plate { filter: none; background: var(--paper-2); }
+    .album:hover .album-plate { background: var(--paper-2); }
     .album:hover .album-title a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   }
 
@@ -1271,7 +1219,6 @@
   /* A paper poster in the player's 16:9; the iframe replaces it on a click. */
   .video-poster,
   .video iframe {
-    display: block;
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     border: 0;
@@ -1326,7 +1273,6 @@
     .gallery-empty { grid-column: 1 / span 8; }
   }
   @media (max-width: 56.25em) {
-    .gallery { padding-block-start: var(--space-4); }
     .gallery-head { margin-block-end: var(--space-6); }
     .albums { gap: var(--space-7) var(--space-4); }
     .album-plate .album-title { font-size: var(--text-l); }
@@ -1334,7 +1280,7 @@
 
 
   /* ── contact: the form on paper, the other ways in beside it ── */
-  .contact { padding-block-start: var(--space-6); align-items: start; row-gap: 0; }
+  .contact { align-items: start; row-gap: 0; }
   .contact-head { grid-column: 1 / -1; margin-block-end: var(--space-7); }
   .contact-head p { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
   .contact-form-title { font-size: var(--text-l); margin-block-end: var(--space-5); }
@@ -1342,7 +1288,7 @@
   .contact-form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-5);
+    gap: var(--space-5);
     padding-block-end: var(--space-7);
   }
   .field-wide { grid-column: 1 / -1; }
@@ -1404,7 +1350,6 @@
   }
   .contact-routes { --cluster: var(--space-1) var(--space-5); margin-block-start: var(--space-3); }
   .contact-map {
-    display: block;
     inline-size: 100%;
     aspect-ratio: 4 / 3;
     margin-block-start: var(--space-4);
@@ -1419,7 +1364,6 @@
     .contact-details { grid-column: 9 / span 4; padding-block-start: var(--space-2); }
   }
   @media (max-width: 56.25em) {
-    .contact { padding-block-start: var(--space-4); }
     .contact-head { margin-block-end: var(--space-6); }
     .contact-details { margin-block-start: var(--section); }
   }
@@ -1430,7 +1374,6 @@
 
 
   /* ── contact success: the tear-off stub ── */
-  .stub { padding-block: var(--space-6) 0; }
   .stub-sheet { grid-column: 1 / -1; }
   .stub-text { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
   .stub-call { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); margin-block-start: var(--space-7); }
@@ -1462,7 +1405,6 @@
     .stub-sheet { grid-column: 3 / span 8; }
   }
   @media (max-width: 56.25em) {
-    .stub { padding-block-start: var(--space-4); }
     .stub-call .btn { inline-size: 100%; }
   }
 }
@@ -1488,6 +1430,4 @@
   .develops.is-developing { opacity: 0; }
 
   .soft { color: var(--text-soft); }
-  .text-s { font-size: var(--text-s); }
-  .text-l { font-size: var(--text-l); }
 }

@@ -1,7 +1,7 @@
 from django.views.generic import TemplateView
 
-from .models import ClassSession, WEEKDAY_ORDER
-from .week import today_weekday, week_schedule
+from .models import WEEKDAY_ORDER
+from .week import active_sessions, week_schedule
 from apps.pages.views import PageContentMixin
 from apps.pages.models import SitePageContent
 
@@ -14,55 +14,36 @@ class ScheduleView(PageContentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        sessions = (
-            ClassSession.objects
-            .filter(is_active=True, teacher__is_active=True)
-            .select_related('teacher')
-            .prefetch_related('instruments')
-            .order_by(
-                'teacher__display_order',
-                'teacher__last_name',
-                'weekday_order',
-                'start_time',
-            )
-        )
+        sessions = list(active_sessions().order_by(
+            'teacher__display_order',
+            'teacher__last_name',
+            'weekday_order',
+            'start_time',
+        ))
 
         rows_by_teacher = {}
         for session in sessions:
-            key = session.teacher_id
-            if key not in rows_by_teacher:
-                rows_by_teacher[key] = {
-                    'teacher': session.teacher,
-                    'instruments': {},
-                    'cells': {weekday.value: [] for weekday in WEEKDAY_ORDER},
-                }
-            rows_by_teacher[key]['cells'][session.weekday].append(session)
-            for instrument in session.instruments.all():
-                rows_by_teacher[key]['instruments'][instrument.pk] = instrument
-
-        schedule_rows = []
-        for color_index, row in enumerate(rows_by_teacher.values()):
-            instruments = sorted(
-                row['instruments'].values(),
-                key=lambda instrument: instrument.name,
-            )
-            schedule_rows.append({
-                'teacher': row['teacher'],
-                'instruments': instruments,
-                'color_index': color_index % 6,
-                'cells': [
-                    {
-                        'weekday': weekday.value,
-                        'label': weekday.label,
-                        'sessions': row['cells'][weekday.value],
-                    }
-                    for weekday in WEEKDAY_ORDER
-                ],
+            row = rows_by_teacher.setdefault(session.teacher_id, {
+                'teacher': session.teacher,
+                'instruments': {},
+                'cells': {weekday.value: [] for weekday in WEEKDAY_ORDER},
             })
+            row['cells'][session.weekday].append(session)
+            for instrument in session.instruments.all():
+                row['instruments'][instrument.pk] = instrument
 
-        context['weekdays'] = WEEKDAY_ORDER
-        context['schedule_rows'] = schedule_rows
-        # The desktop week strikes today's column; phones get the week by day, as on the home page.
-        context['today'] = today_weekday()
-        context['week_schedule'] = week_schedule()
+        # One fetch serves both views: the desktop table by teacher, and the week by day for phones.
+        week = week_schedule(sessions)
+        context['week_schedule'] = week
+        context['schedule_rows'] = [
+            {
+                'teacher': row['teacher'],
+                'instruments': sorted(row['instruments'].values(), key=lambda instrument: instrument.name),
+                'cells': [
+                    {'weekday': day['weekday'], 'is_today': day['is_today'], 'sessions': row['cells'][day['weekday']]}
+                    for day in week
+                ],
+            }
+            for row in rows_by_teacher.values()
+        ]
         return context

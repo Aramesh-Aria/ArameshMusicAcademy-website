@@ -1,4 +1,4 @@
-{# Home teachers section. Expects `teachers`: up to three, the first shown large. #}
+{# Home teachers section. Expects `teachers`: up to three, the first shown large with the biography. #}
 {% if teachers %}
 <section class="home-teachers grid" aria-labelledby="teachers-title">
   <header class="section-head">
@@ -6,28 +6,13 @@
     <a href="{% url 'teachers:teacher_list' %}">همهٔ اساتید</a>
   </header>
 
-  {% for teacher in teachers %}
-  {% if forloop.first %}
-  <figure class="teacher-lead">
-    <a href="{{ teacher.get_absolute_url }}" tabindex="-1" aria-hidden="true">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</a>
-    <figcaption>
-      <h3><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
-      <p class="teacher-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
-      {% if teacher.biography %}<p class="teacher-bio">{{ teacher.biography|truncatewords:45 }}</p>{% endif %}
-    </figcaption>
-  </figure>
-  {% if teachers|length > 1 %}<div class="teacher-side">{% endif %}
-  {% else %}
-    <figure class="teacher-small">
-      <a href="{{ teacher.get_absolute_url }}" tabindex="-1" aria-hidden="true">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</a>
-      <figcaption>
-        <h3><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
-        <p class="teacher-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
-        {% if teacher.biography %}<p class="teacher-bio">{{ teacher.biography }}</p>{% endif %}
-      </figcaption>
-    </figure>
-  {% if forloop.last %}</div>{% endif %}
+  {% include 'pages/_home_teacher.html' with teacher=teachers.0 size='lead' bio_words=45 %}
+  {% if teachers|length > 1 %}
+  <div class="teacher-side">
+    {% for teacher in teachers|slice:"1:" %}
+    {% include 'pages/_home_teacher.html' with teacher=teacher size='small' bio_words=None %}
+    {% endfor %}
+  </div>
   {% endif %}
-  {% endfor %}
 </section>
 {% endif %}

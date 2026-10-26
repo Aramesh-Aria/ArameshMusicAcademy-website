@@ -5,7 +5,6 @@
 {% block body_class %}page-home{% endblock %}
 
 {% block content %}
-{% with director=featured_teachers.0 %}
 
 {# ── The programme sheet: who is teaching today, and the call. ── #}
 <section class="home-hero grid" aria-labelledby="home-title">
@@ -13,9 +12,9 @@
     <h1 id="home-title">{{ page_title }}</h1>
     {% if page_body %}<p class="home-lead">{{ page_body|linebreaksbr }}</p>{% endif %}
 
-    {% include 'partials/week.html' %}
+    {% include 'partials/week.html' with full_week_link=True %}
 
-    <div class="home-sheet-foot">
+    <div class="home-sheet-foot cluster">
       {% if site_phone_primary %}
       <a class="btn" href="{{ site_phone_primary|tel_href }}">تماس <span class="num ltr">{{ site_phone_primary|local_phone }}</span></a>
       {% endif %}
@@ -32,7 +31,7 @@
     {% include 'partials/portrait.html' with teacher=director %}
     <figcaption>
       <a href="{{ director.get_absolute_url }}">{{ director.full_name }}</a>
-      {% if director.instruments.all %}<span class="soft"> · {% for instrument in director.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>{% endif %}
+      {% if director.instruments.all %}<span class="soft"> · {{ director.instruments.all|join:"، " }}</span>{% endif %}
     </figcaption>
   </figure>
   {% endif %}
@@ -40,8 +39,7 @@
 
 
 {# ── Teachers: one large with the biography, two beside. The director already stands in the hero. ── #}
-{% if page_hero_image %}{% with teachers=featured_teachers|slice:":3" %}{% include 'pages/_home_teachers.html' %}{% endwith %}
-{% else %}{% with teachers=featured_teachers|slice:"1:4" %}{% include 'pages/_home_teachers.html' %}{% endwith %}{% endif %}
+{% include 'pages/_home_teachers.html' with teachers=home_teachers %}
 
 
 {# ── The rooms: photos of the Academy as tipped-in plates. ── #}
@@ -85,14 +83,12 @@
       <h2 id="visit-title">به آموزشگاه سر بزنید</h2>
       {% if site_address %}<p>{{ site_address }}</p>{% endif %}
       <p class="cluster home-visit-routes">
-        <a href="https://neshan.org/maps/@35.745776,51.331922,17z" rel="noopener">مسیر در نشان</a>
-        <a href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z" rel="noopener">مسیر در گوگل‌مپ</a>
+        <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
+        <a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>
       </p>
     </div>
     <iframe class="home-visit-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-            src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe>
+            src="{{ site_map_embed }}"></iframe>
   </div>
 </section>
-
-{% endwith %}
 {% endblock %}

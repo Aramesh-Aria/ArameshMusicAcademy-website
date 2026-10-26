@@ -13,7 +13,7 @@
     <p class="teacher-back"><a href="{% url 'teachers:teacher_list' %}">اساتید</a></p>
     <h1 id="teacher-title">{{ teacher.full_name }}</h1>
     {% if teacher.instruments.all %}
-    <p class="teacher-page-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+    <p class="teacher-page-instruments">{{ teacher.instruments.all|join:"، " }}</p>
     {% endif %}
 
     {% if teacher.biography %}
@@ -31,7 +31,7 @@
           {% for session in day.list %}
           <dd>
             <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
-            <span class="soft">{% for instrument in session.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>
+            <span class="soft">{{ session.instruments.all|join:"، " }}</span>
           </dd>
           {% endfor %}
         </div>

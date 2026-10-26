@@ -1,14 +1,15 @@
-{# The week by day (`week_schedule`): day tabs over each day's programme, today open. Wired by site.js. #}
+{# The week by day (`week_schedule`): day tabs over each day's programme, today open. Wired by site.js.
+   `full_week_link` adds a link to the schedule page under an empty day. #}
 <div class="week" data-week>
   <h2 class="week-title" id="week-title" data-week-title>امروز در آموزشگاه</h2>
   <div class="days" role="tablist" aria-labelledby="week-title" data-week-tabs hidden>
     {% for day in week_schedule %}
     <button type="button" role="tab" id="day-tab-{{ day.weekday }}" aria-controls="day-{{ day.weekday }}"
             aria-selected="{% if day.is_today %}true{% else %}false{% endif %}" tabindex="{% if day.is_today %}0{% else %}-1{% endif %}"
-            aria-label="{{ day.label }}{% if day.is_today %}، امروز{% elif day.weekday == 'fri' and not day.sessions %}، تعطیل{% endif %}"
+            aria-label="{{ day.label }}{% if day.is_today %}، امروز{% elif day.is_closed and not day.sessions %}، تعطیل{% endif %}"
             data-label="{{ day.label }}"{% if day.is_today %} data-today{% endif %}>
       <span class="day-full">{{ day.label }}</span><span class="day-short">{{ day.label|slice:":1" }}</span>
-      <small>{% if day.is_today %}امروز{% elif day.weekday == 'fri' and not day.sessions %}تعطیل{% endif %}</small>
+      <small>{% if day.is_today %}امروز{% elif day.is_closed and not day.sessions %}تعطیل{% endif %}</small>
     </button>
     {% endfor %}
   </div>
@@ -21,14 +22,14 @@
       <li>
         <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
         <a class="programme-name" href="{{ session.teacher.get_absolute_url }}">{{ session.teacher.full_name }}</a>
-        <span class="programme-instruments">{% for instrument in session.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>
+        <span class="programme-instruments">{{ session.instruments.all|join:"، " }}</span>
       </li>
       {% endfor %}
     </ul>
-    {% elif day.weekday == 'fri' %}
+    {% elif day.is_closed %}
     <p class="day-empty">جمعه‌ها آموزشگاه تعطیل است.</p>
     {% else %}
-    <p class="day-empty">برای {{ day.label }} کلاسی در برنامه نیست.{% if request.resolver_match.url_name != 'schedule' %} <a href="{% url 'schedules:schedule' %}">برنامهٔ کامل هفته</a>{% endif %}</p>
+    <p class="day-empty">برای {{ day.label }} کلاسی در برنامه نیست.{% if full_week_link %} <a href="{% url 'schedules:schedule' %}">برنامهٔ کامل هفته</a>{% endif %}</p>
     {% endif %}
   </div>
   {% endfor %}
