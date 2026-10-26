@@ -6,8 +6,8 @@
 {% block og_image %}{% with cover=current_page.display_cover %}{% if current_page.cover_image %}{% include 'partials/og_image.html' with url=cover.url width=900 height=600 alt=current_page.title %}{% elif cover %}{% include 'partials/og_image.html' with url=cover.url alt=current_page.title %}{% else %}{{ block.super }}{% endif %}{% endwith %}{% endblock %}
 
 {% block content %}
-<section class="gallery grid" aria-labelledby="gallery-title">
-  <header class="gallery-head">
+<section class="section page-head gallery" aria-labelledby="gallery-title">
+  <header class="section__head">
     {% if current_page %}
     <nav class="crumbs" aria-label="مسیر">
       <ol role="list">
@@ -17,71 +17,74 @@
     </nav>
     {% endif %}
     <h1 id="gallery-title">{% if current_page %}{{ current_page.title }}{% else %}گالری{% endif %}</h1>
-    {% if current_page.intro_text %}<div class="gallery-intro prose">{{ current_page.intro_text|linebreaks }}</div>{% endif %}
+    {% if current_page.intro_text %}<div class="section__intro prose">{{ current_page.intro_text|linebreaks }}</div>{% endif %}
   </header>
 
   {# ── Child pages: the categories at the root, the events inside a category. ── #}
   {% if child_pages %}
-  <ul class="subpages" role="list">
+  <ul class="album-grid" role="list">
     {% for page in child_pages %}{% include 'gallery/_subpage.html' %}{% endfor %}
   </ul>
   {% endif %}
-
-  {# ── Photos at their own ratios, opening in the lightbox. ── #}
-  {% if images %}
-  <section class="gallery-block" aria-labelledby="photos-title">
-    <header class="section-head">
-      <h2 id="photos-title">{% if child_pages or videos %}تصاویر{% else %}<span class="visually-hidden">تصاویر</span>{% endif %}</h2>
-      <span class="soft"><span class="num">{{ images|length }}</span> تصویر</span>
-    </header>
-    <ul class="plates" role="list">
-      {% for image in images %}
-      <li>
-        <a class="plate-link" href="{{ image.image.url }}" data-lightbox="gallery"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-          <img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" loading="lazy" decoding="async">
-        </a>
-      </li>
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  {# ── Videos: a paper poster each; the YouTube or Aparat player loads only on a click. ── #}
-  {% if videos %}
-  <section class="gallery-block" aria-labelledby="videos-title">
-    <header class="section-head">
-      <h2 id="videos-title">{% if child_pages or images %}ویدیوها{% else %}<span class="visually-hidden">ویدیوها</span>{% endif %}</h2>
-      <span class="soft"><span class="num">{{ videos|length }}</span> ویدیو</span>
-    </header>
-    <ul class="videos" role="list">
-      {% for video in videos %}
-      {% if video.embed_url %}
-      <li class="video">
-        <a class="video-poster sheet" href="{{ video.video_url }}" rel="noopener" data-video="{{ video.embed_url }}" data-video-platform="{{ video.platform }}">
-          <span class="video-play"><svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg></span>
-          <span class="video-poster-title">{{ video.title }}</span>
-          <span class="video-poster-meta">پخش از {{ video.get_platform_display }}</span>
-        </a>
-        {% if video.caption %}<p class="video-caption">{{ video.caption }}</p>{% endif %}
-      </li>
-      {% endif %}
-      {% endfor %}
-    </ul>
-  </section>
-  {% endif %}
-
-  {# ── Nothing here yet. ── #}
-  {% if not child_pages and not images and not videos %}
-  <div class="gallery-empty sheet">
-    <p>{% if current_page %}هنوز تصویری در این گالری قرار نگرفته است.{% else %}گالری به‌زودی با تصاویر آموزشگاه پر می‌شود.{% endif %}</p>
-    <p class="cluster">
-      {% if current_page.parent %}<a href="{{ current_page.parent.get_absolute_url }}">بازگشت به {{ current_page.parent.title }}</a>{% endif %}
-      {% if current_page %}<a href="{% url 'gallery:gallery_root' %}">همهٔ گالری‌ها</a>{% endif %}
-      <a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a>
-    </p>
-  </div>
-  {% endif %}
 </section>
 
-{% include 'partials/page_call.html' %}
+{# ── Photos at their own ratios, opening in the lightbox. ── #}
+{% if images %}
+<section class="section" aria-labelledby="photos-title">
+  <header class="section__head section__head--row">
+    <h2 id="photos-title">تصاویر</h2>
+    <p class="section__intro"><span class="num">{{ images|length }}</span> تصویر</p>
+  </header>
+  <ul class="plates" role="list">
+    {% for image in images %}
+    <li>
+      <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="gallery"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
+        <img src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" loading="lazy" decoding="async">
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{# ── Videos: a stone poster each; the YouTube or Aparat player loads only on a click. ── #}
+{% if videos %}
+<section class="section" aria-labelledby="videos-title">
+  <header class="section__head section__head--row">
+    <h2 id="videos-title">ویدیوها</h2>
+    <p class="section__intro"><span class="num">{{ videos|length }}</span> ویدیو</p>
+  </header>
+  <ul class="videos" role="list">
+    {% for video in videos %}
+    {% if video.embed_url %}
+    <li class="video">
+      <a class="video-poster on-stone" href="{{ video.video_url }}" rel="noopener" data-video="{{ video.embed_url }}" data-video-platform="{{ video.platform }}">
+        <span class="video-play"><svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg></span>
+        <span class="video-poster-title">{{ video.title }}</span>
+        <span class="video-poster-meta">پخش از {{ video.get_platform_display }}</span>
+      </a>
+      {% if video.caption %}<p class="video-caption">{{ video.caption }}</p>{% endif %}
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{# ── Nothing here yet: the santur shape where the photos will go, and the ways on. ── #}
+{% if not child_pages and not images and not videos %}
+<section class="split panel on-stone gallery-empty" aria-label="گالری خالی">
+  <div class="split__text">
+    <p class="split__lead">{% if current_page %}هنوز تصویری در این گالری قرار نگرفته است.{% else %}گالری به‌زودی با تصاویر آموزشگاه پر می‌شود.{% endif %}</p>
+    <div class="cluster">
+      {% if current_page.parent %}{% include "components/button.html" with label="بازگشت به "|add:current_page.parent.title href=current_page.parent.get_absolute_url variant="secondary" %}{% endif %}
+      {% if current_page %}{% url 'gallery:gallery_root' as gallery_url %}{% include "components/button.html" with label="همهٔ گالری‌ها" href=gallery_url variant="secondary" %}{% endif %}
+      {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کلاس‌ها" href=schedule_url variant="quiet" %}
+    </div>
+  </div>
+  <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
+</section>
+{% endif %}
+
+{% include 'partials/contact_band.html' %}
 {% endblock %}

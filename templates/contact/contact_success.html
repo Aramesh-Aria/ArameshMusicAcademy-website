@@ -6,22 +6,21 @@
 {% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
 
 {% block content %}
-{# ── The tear-off stub: the message is in, here is what happens next. ── #}
-<section class="stub grid" aria-labelledby="stub-title">
-  <div class="stub-sheet sheet sheet-torn">
-    <h1 id="stub-title">پیام شما رسید</h1>
-    <p class="stub-text">پیام‌تان در آموزشگاه ثبت شد. در ساعت‌های کاری آن را می‌خوانیم و با شماره یا ایمیلی که گذاشته‌اید با شما تماس می‌گیریم.</p>
+{# ── The message is in: what happens next, a quicker way, and the ways on. ── #}
+<section class="split panel on-stone page-head notice" aria-labelledby="notice-title">
+  <div class="split__text">
+    <h1 id="notice-title">پیام شما رسید</h1>
+    <p class="split__lead">پیام‌تان در آموزشگاه ثبت شد. در ساعت‌های کاری آن را می‌خوانیم و با شماره یا ایمیلی که گذاشته‌اید با شما تماس می‌گیریم.</p>
     {% if site_phone_primary %}
-    <p class="stub-call">
-      <span class="soft">اگر زودتر پاسخ می‌خواهید:</span>
-      {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
-    </p>
+    <p>اگر زودتر پاسخ می‌خواهید:</p>
+    {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
     {% endif %}
-    <p class="cluster stub-links">
-      <a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a>
-      <a href="{% url 'teachers:teacher_list' %}">اساتید</a>
-      <a href="{% url 'pages:home' %}">صفحهٔ اصلی</a>
-    </p>
+    <ul class="notice__links" role="list">
+      <li><a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a></li>
+      <li><a href="{% url 'teachers:teacher_list' %}">اساتید</a></li>
+      <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
+    </ul>
   </div>
+  <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
 </section>
 {% endblock %}

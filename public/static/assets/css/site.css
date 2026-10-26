@@ -1334,12 +1334,6 @@
 
 /* ── pages ─────────────────────────────────────────────────────────── */
 @layer pages {
-  /* Every page opens the same distance below the header. */
-  .about-hero, .teachers, .teacher-page, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
-  @media (max-width: 56.25em) {
-    .about-hero, .teachers, .teacher-page, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
-  }
-
   /* ── home ── */
   /* The hero: a full-height frame of the Academy's own rooms. Copy sits at the start over a side and bottom
      scrim; the slide bars ride the far top corner; today's strip sits in the far bottom corner. */
@@ -1502,44 +1496,6 @@
     .mosaic > li:first-child { grid-row: auto; grid-column: span 2; }
   }
 
-  /* ── about: the letter, the rooms, the call ── */
-  .about-hero { align-items: start; }
-  .about-body {
-    margin-block-start: var(--space-6);
-    font-size: var(--text-l);
-    line-height: 1.7;
-  }
-  .about-signature {
-    margin-block-start: var(--space-7);
-    padding-block-end: var(--space-7);
-    font-weight: 700;
-  }
-  .about-signature::before { content: "— "; color: var(--text-soft); font-weight: 400; }
-  .about-plate { margin: 0; }
-  .about-plate img { inline-size: 100%; aspect-ratio: 3 / 2; object-fit: cover; }
-
-  .about-rooms { padding-block-start: var(--section); }
-
-  .page-call { padding-block: var(--section) 0; }
-  .page-call-inner {
-    grid-column: 1 / -1;
-    border-block-start: 1px solid color-mix(in oklab, var(--on-ground), transparent 75%);
-    padding-block-start: var(--space-7);
-  }
-  .page-call h2 { max-inline-size: 18em; }
-  .page-call .cluster { margin-block-start: var(--space-6); }
-
-  @media (min-width: 56.3125em) {
-    .about-letter { grid-column: 2 / span 8; }
-    .has-plate .about-letter { grid-column: 1 / span 7; }
-    .about-plate { grid-column: 9 / span 4; position: sticky; inset-block-start: var(--space-6); padding-block-start: var(--space-2); }
-  }
-  @media (max-width: 56.25em) {
-    .about-plate { margin-block-start: var(--space-7); }
-    .page-call .btn { inline-size: 100%; }
-  }
-
-
   /* ── teachers: the performers, one programme entry each ── */
   .teachers .section-head { margin-block-end: var(--space-6); }
   .teachers-sheet { grid-column: 1 / -1; }
@@ -1684,68 +1640,56 @@
   }
 
 
-  /* ── gallery: the child pages, photos and videos ── */
-  .gallery-head { grid-column: 1 / -1; margin-block-end: var(--space-7); }
-  .gallery-intro { margin-block-start: var(--space-4); font-size: var(--text-l); }
-
-  .crumbs ol { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); margin-block-end: var(--space-3); font-size: var(--text-s); }
+  /* ── gallery: album cards, photos at their own ratios, video posters ── */
+  .crumbs ol { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-2); font-size: var(--text-s); }
   .crumbs li + li::before { content: "/"; margin-inline-end: var(--space-2); color: var(--text-soft); }
-  .crumbs a { color: var(--text-soft); }
+  .crumbs a { color: var(--text-soft); text-decoration: none; }
+  @media (hover: hover) and (pointer: fine) {
+    .crumbs a:hover { color: var(--text); text-decoration: underline; text-decoration-color: var(--saffron); }
+  }
 
-  .subpages {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
-    gap: var(--space-8) var(--space-6);
-  }
-  .subpage { position: relative; }
-  .subpage-cover { inline-size: 100%; aspect-ratio: 3 / 2; object-fit: cover; background: var(--paper-2); }
-  .subpage-plate {
+  .album-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: var(--frame); }
+  .album {
+    position: relative;
     display: flex;
-    align-items: flex-end;
-    padding: var(--space-5);
-    background: var(--paper);
-    color: var(--ink);
+    flex-direction: column;
+    block-size: 100%;
+    padding: var(--space-3);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+    transition: transform var(--dur-press) var(--ease-out);
   }
+  .album:active { transform: scale(0.99); }
+  .album .frame { aspect-ratio: 3 / 2; }
+  .album .frame img { transition: transform var(--dur-develop) var(--ease-out); }
+  .album__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); }
   /* Three lines at most, so one long title can't stretch its row; the full title heads the page itself. */
-  .subpage-title {
+  .album__title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     overflow: hidden;
-    margin-block-start: var(--space-4);
-    font-size: var(--text-l);
+    font-size: var(--display-s);
   }
-  .subpage-plate .subpage-title { margin: 0; font-size: var(--text-xl); }
-  .subpage-plate + .subpage-text { margin-block-start: var(--space-3); }
-  .subpage-title a { text-decoration: none; }
-  /* The whole child page is the link's target; the title stays the only link in the tab order. */
-  .subpage-title a::after { content: ""; position: absolute; inset: 0; }
-  .subpage-text { margin-block-start: var(--space-1); color: var(--text-soft); font-size: var(--text-s); max-inline-size: 28em; }
+  .album__title a { text-decoration: none; }
+  .album__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  .album__text { color: var(--text-soft); font-size: var(--text-s); }
   @media (hover: hover) and (pointer: fine) {
-    .subpage-cover { transition: filter var(--dur-state) var(--ease-out); }
-    .subpage:hover .subpage-cover { filter: grayscale(1) contrast(1.06) brightness(1.08); }
-    .subpage:hover .subpage-plate { background: var(--paper-2); }
-    .subpage:hover .subpage-title a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+    .album:hover .frame img { transform: scale(1.03); }
   }
+  .album:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .album a:focus-visible { outline: none; }
 
-  .gallery-block { grid-column: 1 / -1; }
-  .subpages + .gallery-block, .gallery-block + .gallery-block { padding-block-start: var(--section); }
-
-  .videos {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 26rem), 1fr));
-    gap: var(--space-7) var(--space-6);
-  }
-  /* A paper poster in the player's 16:9; the iframe replaces it on a click. */
-  .video-poster,
-  .video iframe {
+  .videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); gap: var(--space-6) var(--frame); }
+  /* A stone poster in the player's 16:9; the iframe replaces it on a click. */
+  .video-poster, .video iframe {
     inline-size: 100%;
     aspect-ratio: 16 / 9;
     border: 0;
+    border-radius: var(--radius-panel);
   }
-  .video iframe { background: var(--paper); transition: opacity var(--dur-state) var(--ease-out); }
+  .video iframe { background: var(--ground-2); transition: opacity var(--dur-state) var(--ease-out); }
   .video iframe.is-loading { opacity: 0; }
   .video-poster {
     display: grid;
@@ -1755,131 +1699,93 @@
     padding: var(--space-5);
     overflow: hidden;
     text-decoration: none;
-    transition: background-color var(--dur-state) var(--ease-out);
+    transition: transform var(--dur-press) var(--ease-out);
   }
+  .video-poster:active { transform: scale(0.99); }
   .video-play {
     align-self: start;
     display: grid;
     place-items: center;
     inline-size: 3.5rem;
     block-size: 3.5rem;
-    background: var(--ink);
-    color: var(--paper);
+    border-radius: 50%;
+    background: var(--saffron);
+    color: var(--ink);
     font-size: var(--text-l);
     transition: transform var(--dur-press) var(--ease-out);
   }
   /* The triangle points right, the way every player points, in either direction of text. */
   .video-play .icon { transform: translateX(0.08em); }
-  .video-poster:active .video-play { transform: scale(var(--press-scale)); }
   .video-poster-title {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     overflow: hidden;
     font-size: var(--text-l);
     font-weight: 700;
     line-height: var(--leading-tight);
   }
   .video-poster-meta { font-size: var(--text-s); color: var(--text-soft); }
-  .video-caption { margin-block-start: var(--space-3); font-size: var(--text-s); color: var(--text-soft); max-inline-size: var(--measure); }
+  .video-caption { margin-block-start: var(--space-3); padding-inline: var(--space-3); font-size: var(--text-s); color: var(--text-soft); max-inline-size: var(--measure); }
   @media (hover: hover) and (pointer: fine) {
-    .video-poster:hover { background: var(--paper-2); }
+    .video-poster:hover .video-play { transform: scale(1.06); }
   }
 
-  .gallery-empty { grid-column: 1 / -1; }
-  .gallery-empty p:first-child { font-size: var(--text-l); }
-  .gallery-empty .cluster { margin-block-start: var(--space-5); }
-
-  @media (min-width: 56.3125em) {
-    .gallery-head { grid-column: 1 / span 8; }
-    .gallery-empty { grid-column: 1 / span 8; }
-  }
-  @media (max-width: 56.25em) {
-    .gallery-head { margin-block-end: var(--space-6); }
-    .subpages { gap: var(--space-7) var(--space-4); }
-    .subpage-plate .subpage-title { font-size: var(--text-l); }
+  .gallery-empty .cluster { --cluster: var(--space-3); }
+  /* On phones the shape is decoration that would push the words down: it goes. */
+  @media (max-width: 37.5em) {
+    :is(.gallery-empty, .notice) .split__media { display: none; }
   }
 
 
-  /* ── contact: the form on paper, the other ways in beside it ── */
-  .contact { align-items: start; row-gap: 0; }
-  .contact-head { grid-column: 1 / -1; margin-block-end: var(--space-7); }
-  .contact-head p { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
-  .contact-form-title { font-size: var(--text-l); margin-block-end: var(--space-5); }
-
-  .contact-form {
+  /* ── contact: the form on a stone panel, the other ways in on the ground beside it ── */
+  .contact {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5);
-    padding-block-end: var(--space-7);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
+    gap: var(--panel-pad);
+    align-items: start;
+    margin-inline-end: calc(var(--frame) + var(--space-3));
   }
+  .contact__form { margin-inline-end: 0; }
+  .contact__form > h2 { margin-block-end: var(--space-6); font-size: var(--display-s); }
+  .contact__form .form-summary { margin-block-end: var(--space-5); }
+  .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
   .field-wide { grid-column: 1 / -1; }
 
-  .contact-details { display: grid; gap: var(--space-7); }
-  .contact-block h2 { font-size: var(--text-s); color: var(--text-soft); font-weight: 400; margin-block-end: var(--space-2); }
-  .contact-phones { display: grid; gap: var(--space-1); }
-  .contact-phones a { display: inline-flex; align-items: center; min-block-size: 2.75rem; font-size: var(--text-l); text-decoration: none; }
+  .contact__details { display: grid; gap: var(--space-7); padding-block-start: var(--space-5); }
+  .contact__phones a { display: inline-flex; align-items: center; min-block-size: 2.75rem; font-size: var(--text-l); font-weight: 700; text-decoration: none; }
   @media (hover: hover) and (pointer: fine) {
-    .contact-phones a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+    .contact__phones a:hover { text-decoration: underline; text-decoration-color: var(--saffron); }
   }
-  .contact-routes { --cluster: var(--space-1) var(--space-5); margin-block-start: var(--space-3); }
-  .contact-map {
-    inline-size: 100%;
-    aspect-ratio: 4 / 3;
-    margin-block-start: var(--space-4);
-    border: 0;
-    background: var(--paper-2);
-    filter: grayscale(1) contrast(0.95);
-  }
+  .contact__note { margin-inline-start: var(--space-2); color: var(--text-soft); font-size: var(--text-s); font-weight: 400; }
+  .contact__routes { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-block-start: var(--space-4); }
+  .contact__map { aspect-ratio: 4 / 3; margin-block-start: var(--space-4); }
+  .contact__map iframe { inline-size: 100%; block-size: 100%; border: 0; }
 
-  @media (min-width: 56.3125em) {
-    .contact-head { grid-column: 1 / span 8; }
-    .contact-sheet { grid-column: 1 / span 7; }
-    .contact-details { grid-column: 9 / span 4; padding-block-start: var(--space-2); }
-  }
   @media (max-width: 56.25em) {
-    .contact-head { margin-block-end: var(--space-6); }
-    .contact-details { margin-block-start: var(--section); }
+    .contact { grid-template-columns: minmax(0, 1fr); gap: var(--section); margin-inline-end: 0; }
+    .contact__form { margin-inline: var(--frame); }
+    .contact__details { padding-inline: calc(var(--frame) + var(--panel-pad)); padding-block-start: 0; }
   }
   @media (max-width: 37.5em) {
     .contact-form { grid-template-columns: minmax(0, 1fr); }
-    .contact-form .btn { inline-size: 100%; }
+    .contact-form .btn { inline-size: 100%; justify-content: space-between; }
   }
 
 
-  /* ── contact success: the tear-off stub ── */
-  .stub-sheet { grid-column: 1 / -1; }
-  .stub-text { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
-  .stub-call { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-5); margin-block-start: var(--space-7); }
-  .stub-links { margin-block-start: var(--space-6); padding-block-end: var(--space-7); }
-  /* 404: the stub, with the missing page's number set large and the ways back as programme entries. */
-  .missing-number {
-    font-size: clamp(4rem, 2rem + 8vw, 8rem);
-    font-weight: 700;
-    line-height: 1;
-    color: var(--paper-2);
-    -webkit-text-stroke: 1px var(--ink-soft);
-  }
-  .missing-links { margin-block: var(--space-6) 0; padding-block-end: var(--space-7); }
-  .missing-links li { border-block-start: 1px solid var(--rule); }
-  .missing-links li:last-child { border-block-end: 1px solid var(--rule); }
-  .missing-links a {
+  /* ── notices (contact success, 404): a split stone panel with the ways on ── */
+  .notice__links { display: grid; inline-size: 100%; max-inline-size: 26rem; }
+  .notice__links li + li { border-block-start: 1px solid color-mix(in oklab, var(--ink) 14%, var(--stone)); }
+  .notice__links a {
     display: flex;
     align-items: center;
-    min-block-size: 3.5rem;
-    font-size: var(--text-l);
+    min-block-size: 3.25rem;
     font-weight: 700;
     text-decoration: none;
   }
   @media (hover: hover) and (pointer: fine) {
-    .missing-links a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
-  }
-
-  @media (min-width: 56.3125em) {
-    .stub-sheet { grid-column: 3 / span 8; }
-  }
-  @media (max-width: 56.25em) {
-    .stub-call .btn { inline-size: 100%; }
+    .notice__links a:hover { text-decoration: underline; text-decoration-color: var(--mark); text-decoration-thickness: 2px; }
   }
 
   /* Later sections settle as they scroll in, finished well before they are read. Movement only, so

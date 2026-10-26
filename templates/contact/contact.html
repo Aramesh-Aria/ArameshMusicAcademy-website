@@ -6,15 +6,17 @@
 {% block body_class %}page-contact{% endblock %}
 
 {% block content %}
-<section class="contact grid" aria-labelledby="contact-title">
-  <header class="contact-head">
+<section class="section page-head" aria-labelledby="contact-title">
+  <header class="section__head">
     <h1 id="contact-title">تماس با ما</h1>
-    <p>برای مشاوره یا هماهنگی کلاس تماس بگیرید، یا پیام بگذارید تا با شما تماس بگیریم.</p>
+    <p class="section__intro">برای مشاوره یا هماهنگی کلاس تماس بگیرید، یا پیام بگذارید تا با شما تماس بگیریم.</p>
   </header>
+</section>
 
-  {# ── The form, first on every screen. ── #}
-  <div class="contact-sheet sheet sheet-torn">
-    <h2 class="contact-form-title">پیام بگذارید</h2>
+<div class="contact">
+  {# ── The form on a stone panel, first on every screen. ── #}
+  <section class="panel on-stone contact__form" aria-labelledby="form-title">
+    <h2 id="form-title">پیام بگذارید</h2>
 
     {% if form.errors %}
     <div class="form-summary" role="alert" tabindex="-1" data-form-summary>
@@ -38,45 +40,40 @@
         {% include "components/button.html" with label="ارسال پیام" type="submit" busy_label="در حال ارسال…" %}
       </div>
     </form>
-  </div>
+  </section>
 
-  {# ── The other ways in: phones, the address and the way here, hours. ── #}
-  <aside class="contact-details" aria-label="راه‌های تماس">
-    {% if site_phones %}
-    <div class="contact-block">
-      <h2>تلفن</h2>
-      <ul class="contact-phones" role="list">
-        {% for phone in site_phones %}<li><a href="{{ phone|tel_href }}"><span class="num">{{ phone|local_phone }}</span></a></li>{% endfor %}
+  {# ── The other ways in, on the ground beside it: phones, hours, the address and the way here. ── #}
+  <aside class="contact__details" aria-label="راه‌های تماس">
+    {% if site_phone_primary %}
+    <div>
+      <h2 class="label">تلفن</h2>
+      <ul class="contact__phones" role="list">
+        <li><a href="{{ site_phone_primary|tel_href }}"><span class="num ltr">{{ site_phone_primary|local_phone }}</span></a></li>
+        {% if site_phone_mobile %}<li><a href="{{ site_phone_mobile|tel_href }}"><span class="num ltr">{{ site_phone_mobile|local_phone }}</span> <span class="contact__note">موبایل</span></a></li>{% endif %}
       </ul>
     </div>
     {% endif %}
 
     {% if site_hours %}
-    <div class="contact-block">
-      <h2>ساعت‌ها</h2>
+    <div>
+      <h2 class="label">ساعت‌ها</h2>
       <p>{% for line in site_hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
     </div>
     {% endif %}
 
-    <div class="contact-block">
-      <h2>نشانی</h2>
+    <div>
+      <h2 class="label">نشانی</h2>
       {% if site_address %}<p>{{ site_address }}</p>{% endif %}
-      <p class="cluster contact-routes">
-        <a href="{{ site_map_neshan }}" rel="noopener">مسیر در نشان</a>
-        {% if site_map_google %}<a href="{{ site_map_google }}" rel="noopener">مسیر در گوگل‌مپ</a>{% endif %}
-      </p>
-      <iframe class="contact-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-              src="{{ site_map_embed }}"></iframe>
+      <div class="contact__routes">
+        {% if site_map_neshan %}{% include "components/button.html" with label="مسیر در نشان" href=site_map_neshan rel="noopener" icon="route" variant="secondary" size="sm" %}{% endif %}
+        {% if site_map_google %}{% include "components/button.html" with label="مسیر در گوگل‌مپ" href=site_map_google rel="noopener" icon="route" variant="secondary" size="sm" %}{% endif %}
+      </div>
+      {% if site_map_embed %}
+      <div class="frame contact__map">
+        <iframe title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="{{ site_map_embed }}"></iframe>
+      </div>
+      {% endif %}
     </div>
-
-    {% comment %}
-    {% if site_email %}
-    <div class="contact-block">
-      <h2>ایمیل</h2>
-      <p><a href="mailto:{{ site_email }}" class="ltr">{{ site_email }}</a></p>
-    </div>
-    {% endif %}
-    {% endcomment %}
   </aside>
-</section>
+</div>
 {% endblock %}

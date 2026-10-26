@@ -1,15 +1,15 @@
-{# One child gallery page in an index: its cover (or first photo) cropped to 3:2 and its title, or with no photo at all a paper plate set with the title. #}
+{# One child gallery page in an index: a stone card with its cover (or the santur shape), its title and a line about it. The title is the link; the whole card is its target. #}
 {# The first row's covers are the page's largest paint, so they load at once; the rest wait until they're near. #}
-<li class="subpage">
-  {% with cover=page.display_cover %}
-  {% if cover %}
-  <img class="subpage-cover mono" src="{{ cover.url }}" width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async">
-  <h2 class="subpage-title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
-  {% else %}
-  <div class="subpage-cover subpage-plate">
-    <h2 class="subpage-title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
-  </div>
-  {% endif %}
-  {% endwith %}
-  {% if page.description %}<p class="subpage-text">{{ page.description|truncatewords:18 }}</p>{% endif %}
+<li>
+  <article class="album on-stone">
+    {% with cover=page.display_cover %}
+    <div class="frame{% if not cover %} frame--shape{% endif %}">
+      {% if cover %}<img src="{{ cover.url }}" width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async">{% else %}{% include 'components/santur.html' %}{% endif %}
+    </div>
+    {% endwith %}
+    <div class="album__body">
+      <h2 class="album__title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
+      {% if page.description %}<p class="album__text">{{ page.description|truncatewords:18 }}</p>{% endif %}
+    </div>
+  </article>
 </li>
