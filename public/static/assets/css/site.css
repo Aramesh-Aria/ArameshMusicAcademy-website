@@ -278,6 +278,8 @@
     line-height: var(--leading-body-stone);
     scrollbar-color: var(--ink-soft) var(--stone);
   }
+  /* A stone thing that takes focus itself (an instrument tile) rings on the ground around it, so in saffron. */
+  .on-stone:focus-visible { outline-color: var(--saffron); }
 }
 
 
@@ -541,7 +543,8 @@
   @media (hover: hover) and (pointer: fine) {
     .card:hover .frame img { transform: scale(1.03); }
   }
-  .card:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+  /* The ring sits outside the stone card, on the ground, so it takes the ground's saffron, not the card's ink. */
+  .card:has(a:focus-visible) { outline: 3px solid var(--saffron); outline-offset: 3px; }
   .card a:focus-visible { outline: none; }
   /* A Programme's age chip rides the photo's corner. */
   .programme-card .chip { position: absolute; inset-block-start: var(--space-3); inset-inline-start: var(--space-3); z-index: 1; margin: var(--space-3); }
