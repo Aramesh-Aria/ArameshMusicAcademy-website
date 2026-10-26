@@ -152,6 +152,7 @@
     --dur-fade: 1200ms;     /* hero and card crossfades */
     --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* strong ease-out: entrances, exits, presses */
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* strong ease-in-out: things moving on screen */
+    --ease-fade: cubic-bezier(0.37, 0, 0.63, 1);      /* sine in-out: a slow photo crossfade, no sudden middle */
     /* A damped spring (ratio 0.8, 1.5% overshoot) sampled into linear(); pair it with --dur-spring. */
     --ease-spring: linear(0, 0.034, 0.118, 0.227, 0.346, 0.464, 0.573, 0.669, 0.752, 0.82, 0.875, 0.918, 0.951, 0.975, 0.991, 1.003, 1.01, 1.013, 1.015, 1.015, 1.014, 1.013, 1.011, 1.009, 1.007, 1.006, 1.004, 1.003, 1.002, 1.002, 1);
     --dur-spring: 560ms;
@@ -476,7 +477,7 @@
   /* Photos that crossfade (Programme cards, the hero): stacked in one frame, the first shows until a script
      takes over and moves `.is-active`. */
   .crossfade { display: grid; isolation: isolate; }
-  .crossfade > img { grid-area: 1 / 1; transition: opacity var(--dur-fade) ease-in-out; }
+  .crossfade > img { grid-area: 1 / 1; transition: opacity var(--dur-fade) var(--ease-fade); }
   .crossfade > img:not(:first-child) { opacity: 0; }
   .crossfade[data-cycling] > img { opacity: 0; }
   /* The incoming photo fades in over the outgoing one, which stays opaque underneath until it is covered,
@@ -537,7 +538,7 @@
   /* A card with no photo yet is its text alone, set at the foot so it lines up with photographed neighbours. */
   .card:not(:has(.frame)) { justify-content: flex-end; }
   .card:not(:has(.frame)) .chip { position: static; align-self: start; margin: var(--space-3) var(--space-3) 0; }
-  .card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
+  .card .frame img { transition: transform var(--dur-zoom) var(--ease-out), opacity var(--dur-fade) var(--ease-fade); }
   .card__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); flex: 1; align-content: start; }
   .card__title { font-size: var(--display-s); }
   .card__title a { text-decoration: none; }
@@ -1324,7 +1325,7 @@
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   /* The slide titles share one cell; the active one shows. */
   .hero__titles { display: grid; }
-  .hero__titles > span { grid-area: 1 / 1; opacity: 0; transition: opacity 400ms var(--ease-out); }
+  .hero__titles > span { grid-area: 1 / 1; opacity: 0; transition: opacity var(--dur-move) var(--ease-out); }
   .hero__titles > span.is-active { opacity: 1; }
   .hero__bars { position: absolute; z-index: 2; inset-block-start: var(--space-5); inset-inline-end: var(--space-5); display: flex; gap: 0.375rem; }
   .hero__bar { inline-size: 1.75rem; block-size: 3px; border-radius: var(--radius-pill); background: rgb(235 229 220 / 0.3); overflow: hidden; }
@@ -1660,7 +1661,7 @@
 .navbar { view-transition-name: navbar; }
 .vt { view-transition-name: var(--vt); }
 ::view-transition-group(*) { animation-duration: var(--dur-move); animation-timing-function: var(--ease-in-out); }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; animation-timing-function: ease; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--dur-state); animation-timing-function: var(--ease-out); }
 /* Reduced motion: nothing travels; the page still crossfades, which is opacity only. */
 @media (prefers-reduced-motion: reduce) {
   .vt { view-transition-name: none; }
