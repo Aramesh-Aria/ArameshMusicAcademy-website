@@ -58,16 +58,20 @@
 </section>
 
 
-{# ── 2. About: a working musician leads the place. Text on stone, the rooms beside it. ── #}
+{# ── 2. About: a working musician leads the place. Text on stone, the director's portrait beside it. ── #}
 <section class="split panel on-stone" aria-labelledby="about-title">
   <div class="split__text">
     <h2 id="about-title">با مدیریت مسعود آرامش</h2>
+    {% if director.home_intro %}
+    {{ director.home_intro|linebreaks }}
+    {% else %}
     <p>مسعود آرامش، آهنگساز و نوازندهٔ سنتور با بیش از چهل سال فعالیت در موسیقی، این آموزشگاه را در سال ۱۳۹۵ در تهران بنیان گذاشت. اینجا کودکان، نوجوانان و بزرگسالان در فضایی آرام، نزد استادانی ساز و آواز می‌آموزند که بیشترشان سابقهٔ اجرا در کنسرت‌ها و جشنواره‌ها دارند.</p>
+    {% endif %}
     {% url 'pages:about' as about_url %}{% include "components/button.html" with label="دربارهٔ آموزشگاه" href=about_url variant="quiet" %}
   </div>
-  <div class="split__media frame{% if not about_photo %} frame--shape{% endif %}">
-    {% if about_photo %}
-    <img src="{{ about_photo.image.url }}" alt="{{ about_photo.title|default:about_photo.gallery_page.title }}" loading="lazy" decoding="async">
+  <div class="split__media frame{% if director.profile_image %} split__media--face{% else %} frame--shape{% endif %}">
+    {% if director.profile_image %}
+    <img src="{{ director.profile_image.url }}" alt="{{ director.full_name }}" loading="lazy" decoding="async">
     {% else %}
     {% include 'components/santur.html' %}
     {% endif %}

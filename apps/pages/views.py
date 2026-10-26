@@ -60,12 +60,13 @@ class HomeView(PageContentMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['hero_slides'] = gallery_images(settings.HERO_GALLERY_SLUG)[:6]
-        space = gallery_images(settings.ABOUT_GALLERY_SLUG)
-        context['about_photo'] = space[0] if space else None
-        context['gallery_preview_images'] = space[1:6]
+        context['gallery_preview_images'] = gallery_images(settings.ABOUT_GALLERY_SLUG)[:5]
         context['programmes'] = Programme.objects.active()
         context['instruments'] = Instrument.objects.main()
-        context['home_teachers'] = Teacher.objects.filter(is_active=True).prefetch_related('instruments')[:8]
+        home_teachers = list(Teacher.objects.filter(is_active=True).prefetch_related('instruments')[:8])
+        context['home_teachers'] = home_teachers
+        # The director heads the teacher list; the about panel shows their portrait and home_intro.
+        context['director'] = home_teachers[0] if home_teachers else None
         sections = {
             content.page_key: content
             for content in SitePageContent.objects.filter(

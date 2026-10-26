@@ -1365,6 +1365,8 @@
   .split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
   .split__text p { max-inline-size: var(--measure); }
   .split__media { align-self: stretch; min-block-size: 26rem; }
+  /* A portrait cropped to a wide frame keeps the face, which sits in the top third. */
+  .split__media--face img { object-position: 50% 20%; }
   /* A teacher: the square portrait stays in view beside a long biography. */
   .split--portrait { align-items: start; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
   .split--portrait .split__media { align-self: start; min-block-size: 0; aspect-ratio: 1; position: sticky; inset-block-start: 5.5rem; }
