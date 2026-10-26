@@ -14,3 +14,5 @@ INTERVIEW_PREP.md
 /.claude
 .claude/skills/
 .claude/agents/
+/.playwright-mcp
+/.taste-skill

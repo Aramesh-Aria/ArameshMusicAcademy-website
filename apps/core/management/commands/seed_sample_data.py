@@ -110,20 +110,11 @@ class Command(BaseCommand):
         )
 
     def create_gallery_sample_data(self):
+        # Two levels only: top-level categories, then events/albums (the admin enforces the same cap).
         page_data = [
-            {
-                'title': 'گالری تصاویر',
-                'slug': 'gallery-root',
-                'parent': None,
-                'description': 'نمونه ساختار اولیه برای گالری سایت.',
-                'intro_text': 'این بخش شامل پوشه‌های نمونه برای شروع مدیریت گالری است.',
-                'display_order': 1,
-                'cover_color': '#7D2A1D',
-            },
             {
                 'title': 'کنسرت‌های آموزشگاه',
                 'slug': 'academy-concerts',
-                'parent_slug': 'gallery-root',
                 'description': 'تصاویر اجراها و برنامه‌های داخلی آموزشگاه.',
                 'intro_text': 'عکس‌های مربوط به اجراهای هنرجویان و اساتید.',
                 'display_order': 1,
@@ -141,7 +132,6 @@ class Command(BaseCommand):
             {
                 'title': 'آموزشگاه و متفرقه',
                 'slug': 'academy-misc',
-                'parent_slug': 'gallery-root',
                 'description': 'تصاویر محیط آموزشگاه و برنامه‌های عمومی.',
                 'intro_text': 'عکس‌هایی از کلاس‌ها، محیط و رویدادهای غیررسمی.',
                 'display_order': 2,

@@ -1,0 +1,298 @@
+<!doctype html>
+<!--
+  PROTOTYPE, throwaway. Direction B, "Santur poster", as full pages: ?page=home (default) or ?page=schedule.
+  Real live content and the academy's own photos. The testimonial text is a marked placeholder: no real quotes exist yet.
+-->
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype B: Santur poster</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root {
+  --ground: #f3f4f1; --ink: #161616; --soft: #3d3d3a; --saffron: #f2b705; --quiet: #e4e5e0;
+  --m: clamp(16px, 3.3vw, 48px); --gap: 24px;
+  /* the santur: one trapezoid, used for the hero, masks, buttons and marks */
+  --trap: polygon(0 0, 100% 0, 80% 100%, 0 100%);
+  --trap-up: polygon(12% 0, 88% 0, 100% 100%, 0 100%);
+  --trap-btn: polygon(0 0, 100% 0, 92% 100%, 8% 100%);
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--ground); color: var(--ink); font: 400 18px/1.65 "Estedad", sans-serif; overflow-x: clip; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-underline-offset: 6px; }
+h1, h2, h3 { margin: 0; font-family: "Lalezar"; font-weight: 400; line-height: 1.08; text-wrap: balance; }
+::selection { background: var(--saffron); color: var(--ink); }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.tel { unicode-bidi: isolate; direction: ltr; }
+.page { display: none; } .page.is-on { display: block; }
+.duo { background: var(--saffron); position: relative; overflow: hidden; }
+.duo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.15) brightness(1.05); mix-blend-mode: multiply; }
+.btn { display: inline-block; background: var(--ink); color: #fff; text-decoration: none; font-weight: 600; font-size: 19px; padding: 15px 40px 17px; clip-path: var(--trap-btn); transition: transform 120ms var(--ease-out); }
+.btn:active { transform: scale(.97); }
+.btn.saffron { background: var(--saffron); color: var(--ink); }
+
+/* header */
+.bar { position: relative; z-index: 3; display: flex; align-items: center; gap: 48px; padding: 20px var(--m); }
+.bar .mark img { height: 54px; width: auto; }
+.bar nav { display: flex; gap: 26px; font-size: 17px; font-weight: 500; }
+.bar nav a { text-decoration: none; }
+.bar nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 3px; text-decoration-color: var(--saffron); }
+.bar .menu { display: none; margin-inline-start: auto; background: none; border: 0; font: 600 17px "Estedad"; }
+
+/* hero */
+.hero { position: relative; min-height: 100svh; overflow: hidden; }
+.hero .santur { position: absolute; inset-block: 0 -14vh; inset-inline-end: -4vw; width: 56vw; clip-path: var(--trap); }
+.hero .santur img { object-position: 50% 92%; }
+.hero .copy { position: relative; z-index: 2; width: min(44%, 640px); margin-inline-start: var(--m); padding-top: 12vh; }
+.hero h1 { font-size: clamp(64px, 6.6vw, 108px); }
+.lead { font-size: 20px; margin: 28px 0 0; max-width: 30em; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px 28px; margin-top: 40px; }
+
+/* instruments */
+.instruments { background: var(--ink); color: var(--ground); padding: 88px var(--m) 104px; }
+.instruments h2 { font-size: 48px; margin-bottom: 28px; }
+.words { display: flex; flex-wrap: wrap; gap: 2px 28px; list-style: none; margin: 0; padding: 0; }
+.words button { background: none; border: 0; padding: 0; font: 400 clamp(36px, 3.8vw, 60px)/1.25 "Lalezar"; color: #bdbdb6; cursor: pointer; transition: color 140ms; }
+.words button:hover, .words button[aria-pressed="true"] { color: var(--saffron); }
+.words button:focus-visible { outline-color: var(--saffron); }
+.who { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 16px 48px; font-size: 20px; min-height: 4em; }
+.who strong { display: block; font-family: "Lalezar"; font-weight: 400; font-size: 30px; color: #fff; }
+
+/* teachers */
+.teachers { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding: 150px var(--m) 60px; align-items: end; }
+.teachers > header { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 48px; }
+.teachers h2, .rooms h2, .visit h2 { font-size: clamp(44px, 4.4vw, 68px); }
+.lead-teacher { grid-column: 1 / span 6; margin: 0; }
+.lead-teacher .duo { aspect-ratio: 1; clip-path: var(--trap); }
+.lead-teacher h3 { font-size: 44px; margin-top: 22px; }
+.lead-teacher p { margin: 10px 0 0; max-width: 34em; }
+.side-teachers { grid-column: 7 / span 6; display: grid; gap: 48px; }
+.side-teachers figure { margin: 0; display: grid; grid-template-columns: 240px 1fr; gap: 24px; align-items: center; }
+.side-teachers .duo { aspect-ratio: 1; clip-path: var(--trap-up); }
+.side-teachers h3 { font-size: 30px; }
+.inst { color: var(--soft); font-weight: 500; }
+
+/* rooms */
+.rooms { padding: 120px 0 60px; }
+.rooms header { padding-inline: var(--m); display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 36px; }
+.strip { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; padding-inline: var(--m); }
+.strip img { height: 420px; width: auto; flex: none; filter: grayscale(1) contrast(1.08); margin-inline-end: -40px; }
+.strip img:nth-child(odd) { clip-path: polygon(0 0, 100% 0, calc(100% - 60px) 100%, 0 100%); }
+.strip img:nth-child(even) { clip-path: polygon(60px 0, 100% 0, 100% 100%, 0 100%); }
+
+/* testimonial */
+.quote { background: var(--saffron); margin-top: 140px; padding: 120px var(--m); }
+.quote h2 { font-size: 30px; margin-bottom: 28px; }
+.quote blockquote { margin: 0; font-family: "Lalezar"; font-size: clamp(36px, 3.6vw, 56px); line-height: 1.3; max-width: 22em; }
+.quote footer { margin-top: 24px; font-size: 19px; font-weight: 500; }
+.placeholder-note { display: inline-block; background: var(--ink); color: #fff; font: 600 13px/1.4 system-ui, sans-serif; padding: 3px 8px; margin-bottom: 20px; direction: ltr; }
+
+/* visit */
+.visit { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding: 140px var(--m) 120px; align-items: start; }
+.visit .info { grid-column: 1 / span 6; }
+.visit .big-tel { display: block; font: 400 clamp(44px, 4.6vw, 72px)/1.1 "Lalezar"; text-decoration: none; margin-top: 28px; }
+.visit .other-tels { display: flex; flex-wrap: wrap; gap: 6px 24px; margin-top: 14px; font-size: 18px; font-weight: 500; }
+.visit .other-tels a { text-decoration: none; }
+.visit dl { margin: 36px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 12px 28px; }
+.visit dt { font-weight: 700; }
+.visit dd { margin: 0; }
+.visit .actions { margin-top: 36px; }
+.visit .map { background: var(--quiet); grid-column: 8 / span 5; aspect-ratio: 4 / 5; clip-path: var(--trap-up); }
+.visit iframe { background: var(--quiet); width: 100%; height: 100%; border: 0; filter: grayscale(1); }
+
+/* footer: the mark, built large */
+.foot { background: var(--saffron); padding: 72px var(--m) 120px; }
+.foot img { width: min(100%, 980px); height: auto; }
+.foot .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; margin-top: 40px; font-weight: 500; }
+.foot nav { display: flex; gap: 24px; }
+
+/* schedule */
+.s-head { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding: 56px var(--m) 48px; align-items: end; }
+.s-head h1 { grid-column: 1 / span 7; font-size: clamp(64px, 6.6vw, 108px); }
+.s-head p { grid-column: 1 / span 6; margin: 16px 0 0; font-size: 20px; }
+.s-head .mark-trap { grid-column: 9 / span 4; grid-row: 1 / span 2; height: 220px; background: var(--saffron); clip-path: var(--trap); }
+.s-table { width: calc(100% - 2 * var(--m)); margin: 0 var(--m); border-collapse: collapse; }
+.s-table th, .s-table td { padding: 16px 10px; text-align: start; vertical-align: top; }
+.s-table thead th { font: 400 26px "Lalezar"; padding-bottom: 14px; }
+.s-table thead .today { background: var(--ink); color: var(--saffron); }
+.s-table tbody tr:nth-child(odd) > * { background: var(--quiet); }
+.s-table tbody th { font: 400 26px/1.15 "Lalezar"; width: 22%; }
+.s-table tbody th a { text-decoration: none; }
+.s-table tbody th span { display: block; font: 500 16px/1.5 "Estedad"; color: var(--soft); margin-top: 4px; }
+.s-table .tag { display: inline-block; background: var(--saffron); padding: 4px 16px 5px; font-weight: 600; font-size: 16px; clip-path: var(--trap-btn); white-space: nowrap; }
+.s-table .off { color: var(--soft); }
+.s-mobile { display: none; padding: 0 var(--m); }
+.s-days { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; list-style: none; margin: 0 calc(-1 * var(--m)); padding: 0 var(--m) 8px; }
+.s-days button { flex: none; border: 0; background: var(--quiet); font: 400 22px "Lalezar"; padding: 8px 18px; clip-path: var(--trap-btn); cursor: pointer; }
+.s-days button[aria-pressed="true"] { background: var(--ink); color: var(--saffron); }
+.s-list { list-style: none; margin: 20px 0 0; padding: 0; }
+.s-list li { padding: 16px 0; }
+.s-list strong { display: block; font: 400 28px/1.15 "Lalezar"; }
+.s-list .tag { display: inline-block; background: var(--saffron); padding: 3px 14px; font-weight: 600; clip-path: var(--trap-btn); margin-top: 6px; }
+.s-note { padding: 48px var(--m) 140px; font-size: 19px; }
+
+.callbar { display: none; }
+
+@media (max-width: 900px) {
+  :root { --gap: 12px; }
+  .bar nav { display: none; } .bar .menu { display: block; }
+  .bar .mark img { height: 44px; }
+  .hero { min-height: 116svh; }
+  .hero .santur { inset-block: 70svh -10svh; inset-inline: -15vw; width: 130vw; clip-path: var(--trap-up); }
+  .hero .copy { width: auto; margin-inline: var(--m); padding-top: 6svh; }
+  .hero h1 { font-size: 13vw; }
+  .lead { font-size: 17px; }
+  .actions .btn { width: 100%; text-align: center; }
+  .instruments { padding-block: 64px 72px; } .instruments h2 { font-size: 38px; }
+  .words { gap: 0 18px; } .words button { font-size: 30px; }
+  .teachers, .visit, .s-head { display: block; }
+  .teachers { padding-top: 96px; }
+  .teachers > header { margin-bottom: 24px; }
+  .side-teachers { margin-top: 48px; gap: 28px; }
+  .side-teachers figure { grid-template-columns: 112px 1fr; }
+  .lead-teacher h3 { font-size: 36px; }
+  .strip img { height: 260px; }
+  .quote { margin-top: 96px; padding-block: 72px; }
+  .visit { padding-top: 96px; } .visit .map { margin-top: 40px; aspect-ratio: 1; }
+  .visit dl { grid-template-columns: 1fr; gap: 2px; } .visit dd { margin-bottom: 12px; }
+  .callbar { display: grid; grid-template-columns: 1fr 1fr; position: fixed; inset-inline: 0; bottom: 0; z-index: 10; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--ground); }
+  .callbar a { text-align: center; text-decoration: none; padding: 12px; font-weight: 700; clip-path: var(--trap-btn); }
+  .callbar a:first-child { background: var(--ink); color: #fff; } .callbar a:last-child { background: var(--saffron); }
+  .s-head h1 { font-size: 13vw; } .s-head .mark-trap { display: none; }
+  .s-table { display: none; } .s-mobile { display: block; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="?page=home"><img src="img/logo-ink.png" width="938" height="551" alt="آموزشگاه موسیقی آرامش"></a>
+  <nav aria-label="اصلی"><a href="#">درباره ما</a><a href="#">اساتید</a><a href="?page=schedule">برنامه کلاس‌ها</a><a href="#">گالری</a><a href="#">تماس</a></nav>
+  <button class="menu" type="button" aria-expanded="false">منو</button>
+</header>
+
+<!-- ═══ HOME ═══ -->
+<main class="page" data-page="home">
+  <section class="hero" aria-labelledby="h1" style="margin-top:-94px; padding-top:94px">
+    <div class="santur duo" aria-hidden="true"><img src="img/space-3.jpg" alt=""></div>
+    <div class="copy">
+      <h1 id="h1">آموزشگاه موسیقی آرامش</h1>
+      <p class="lead">موسیقی را بیاموز، آرامش را احساس کن. آموزش سازهای ایرانی و جهانی، از سنتور و تار تا پیانو و گیتار، زیر نظر مسعود آرامش.</p>
+      <div class="actions"><a class="btn" href="tel:+982144457748">تماس <span class="tel">021 4445 7748</span></a><a href="?page=schedule">اساتید و برنامه هفته</a></div>
+    </div>
+  </section>
+
+  <section class="instruments" aria-labelledby="h-inst">
+    <h2 id="h-inst">چه سازی؟</h2>
+    <ul class="words"></ul>
+    <div class="who" aria-live="polite"></div>
+  </section>
+
+  <section class="teachers" aria-labelledby="h-t">
+    <header><h2 id="h-t">اساتید</h2><a href="#">همه <span class="tel">11</span> استاد</a></header>
+    <figure class="lead-teacher" data-teacher="0"></figure>
+    <div class="side-teachers"><figure data-teacher="1"></figure><figure data-teacher="2"></figure></div>
+  </section>
+
+  <section class="rooms" aria-labelledby="h-r">
+    <header><h2 id="h-r">فضای آموزشگاه</h2><a href="#">گالری تصاویر</a></header>
+    <div class="strip">
+      <img src="img/space-2.jpg" width="960" height="1280" alt="کلاس سنتور" loading="lazy">
+      <img src="img/space-9.jpg" width="1280" height="960" alt="کلاس پیانو" loading="lazy">
+      <img src="img/space-7.jpg" width="960" height="1280" alt="تار و سه‌تار" loading="lazy">
+      <img src="img/space-11.jpg" width="1280" height="960" alt="کلاس سازهای کوبه‌ای" loading="lazy">
+      <img src="img/space-1.jpg" width="960" height="1280" alt="سالن اجرا" loading="lazy">
+    </div>
+  </section>
+
+  <section class="quote" aria-labelledby="h-q">
+    <h2 id="h-q">از زبان والدین</h2>
+    <span class="placeholder-note">PLACEHOLDER: no real testimonial exists yet; this band is hidden until one does</span>
+    <blockquote>متن نظر یکی از والدین اینجا قرار می‌گیرد؛ چند جمله درباره تجربه فرزندشان.</blockquote>
+    <footer>نام والد · والد هنرجوی سنتور</footer>
+  </section>
+
+  <section class="visit" aria-labelledby="h-v">
+    <div class="info">
+      <h2 id="h-v">سر بزنید یا زنگ بزنید</h2>
+      <a class="big-tel tel" href="tel:+982144457748">021 4445 7748</a>
+      <div class="other-tels" data-other-phones></div>
+      <dl><dt>نشانی</dt><dd data-address></dd><dt>ساعت‌ها</dt><dd data-hours></dd></dl>
+      <div class="actions"><a class="btn" href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z">مسیر در گوگل‌مپ</a><a href="https://neshan.org/maps/@35.745776,51.331922,17z">مسیر در نشان</a></div>
+    </div>
+    <div class="map"><iframe title="موقعیت آموزشگاه روی نقشه" loading="lazy" src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe></div>
+  </section>
+</main>
+
+<!-- ═══ SCHEDULE ═══ -->
+<main class="page" data-page="schedule">
+  <section class="s-head">
+    <h1>برنامه کلاس‌ها</h1>
+    <p>زمان‌بندی کلاس‌های تخصصی. برای هماهنگی جلسه اول با آموزشگاه تماس بگیرید.</p>
+    <div class="mark-trap" aria-hidden="true"></div>
+  </section>
+  <table class="s-table"><thead></thead><tbody></tbody></table>
+  <div class="s-mobile"><ul class="s-days" aria-label="روزهای هفته"></ul><ul class="s-list" aria-live="polite"></ul></div>
+  <p class="s-note">آموزشگاه جمعه‌ها تعطیل است. <a href="tel:+982144457748">تماس <span class="tel">021 4445 7748</span></a></p>
+</main>
+
+<footer class="foot">
+  <img src="img/logo-ink.png" width="938" height="551" alt="آموزشگاه موسیقی آرامش">
+  <div class="row"><nav aria-label="شبکه‌های اجتماعی"><a href="#">اینستاگرام</a><a href="#">تلگرام</a><a href="#">ایمیل</a></nav><span>© <span class="tel">2026</span> آموزشگاه موسیقی آرامش</span></div>
+</footer>
+<div class="callbar"><a href="tel:+982144457748">تماس</a><a href="#">مسیر</a></div>
+
+<script src="data.js"></script>
+<script>
+const A = window.ACADEMY, today = A.today();
+const page = new URL(location).searchParams.get('page') === 'schedule' ? 'schedule' : 'home';
+document.querySelector(`[data-page="${page}"]`).classList.add('is-on');
+if (page === 'schedule') document.querySelector('.bar nav a[href="?page=schedule"]').setAttribute('aria-current', 'page');
+const daysOf = t => t[2].map((s, i) => s && A.days[i]).filter(Boolean).join(' و ');
+
+// Instrument wall: pick one, see who teaches it and on which days.
+const words = document.querySelector('.words'), who = document.querySelector('.who');
+if (words) {
+  [...new Set(A.teachers.flatMap(t => t[1]))].forEach(name => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.textContent = name; b.setAttribute('aria-pressed', 'false');
+    b.addEventListener('click', () => {
+      words.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+      who.innerHTML = A.teachers.filter(t => t[1].includes(name)).map(t => `<div><strong>${t[0]}</strong>${daysOf(t)}</div>`).join('');
+    });
+    li.append(b); words.append(li);
+  });
+  words.querySelectorAll('button')[1].click();   // show the santur, as the screenshot state
+}
+
+// Teachers: the director large, two beside.
+document.querySelectorAll('[data-teacher]').forEach(f => {
+  const [name, inst, , img] = A.teachers[+f.dataset.teacher];
+  const bio = f.classList.contains('lead-teacher') ? `<p>${A.bios[name]}</p>` : '';
+  f.innerHTML = `<div class="duo"><img src="img/${img}" alt="${name}" width="600" height="600"></div><figcaption><h3>${name}</h3><div class="inst">${inst.join('، ')}</div>${bio}</figcaption>`;
+});
+
+document.querySelectorAll('[data-address]').forEach(e => e.textContent = A.address);
+document.querySelectorAll('[data-hours]').forEach(e => e.innerHTML = A.hours.join('<br>'));
+document.querySelectorAll('[data-other-phones]').forEach(e => e.innerHTML = A.phones.slice(1).map(p => `<a class="tel" href="tel:${p.replace(/ /g, '')}">${p}</a>`).join(''));
+
+// Schedule.
+if (page === 'schedule') {
+  const t = document.querySelector('.s-table');
+  t.tHead.innerHTML = '<tr><th>استاد</th>' + A.days.map((d, i) => `<th class="${i === today ? 'today' : ''} ${i === 6 ? 'off' : ''}">${d}${i === 6 ? ' · تعطیل' : ''}</th>`).join('') + '</tr>';
+  t.tBodies[0].innerHTML = A.teachers.map(([n, inst, s]) => `<tr><th scope="row"><a href="#">${n}</a><span>${inst.join('، ')}</span></th>` + s.map((x, i) => `<td>${x ? `<span class="tag tel">${x}</span>` : ''}</td>`).join('') + '</tr>').join('');
+  const days = document.querySelector('.s-days'), list = document.querySelector('.s-list');
+  const show = i => {
+    days.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', k === i));
+    const on = A.teachers.filter(x => x[2][i]);
+    list.innerHTML = on.length ? on.map(x => `<li><strong>${x[0]}</strong>${x[1].join('، ')}<br><span class="tag tel">${x[2][i]}</span></li>`).join('') : '<li>جمعه‌ها آموزشگاه تعطیل است.</li>';
+  };
+  A.days.forEach((d, i) => { const li = document.createElement('li'), b = document.createElement('button'); b.type = 'button'; b.textContent = i === today ? d + ' · امروز' : d; b.addEventListener('click', () => show(i)); li.append(b); days.append(li); });
+  show(today < 0 ? 0 : today);
+}
+</script>
+</body>
+</html>

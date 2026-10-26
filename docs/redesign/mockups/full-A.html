@@ -1,0 +1,315 @@
+<!doctype html>
+<!--
+  PROTOTYPE, throwaway. Direction A, "The programme", as full pages: ?page=home (default) or ?page=schedule.
+  Real live content and the academy's own photos. The testimonial text is a marked placeholder: no real quotes exist yet.
+-->
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype A: The programme</title>
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root {
+  --ground: #12201b; --on-ground: #e4e7df; --on-ground-soft: #b9c1b7;
+  --paper: #e9ece5; --paper-2: #dde2da; --ink: #12201b; --soft: #45524c;
+  --accent: #0e7a64; --accent-ink: #fff;
+  --m: clamp(16px, 3.3vw, 48px); --gap: 24px;
+  --step-0: 17px; --step-1: 20px; --step-2: 26px; --step-3: clamp(34px, 3.4vw, 48px); --step-4: clamp(48px, 5vw, 80px);
+  --ease-out: cubic-bezier(.2,.8,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--ground); color: var(--on-ground); font: 400 var(--step-1)/1.55 "Markazi Text", serif; overflow-x: clip; -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-underline-offset: 6px; }
+h1, h2, h3 { margin: 0; font-weight: 700; line-height: 1.05; text-wrap: balance; }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.tel { unicode-bidi: isolate; direction: ltr; font-variant-numeric: tabular-nums; }
+.page { display: none; } .page.is-on { display: block; }
+.grid { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gap); padding-inline: var(--m); }
+.mono { filter: grayscale(1) contrast(1.06); }
+.sheet { background: var(--paper); color: var(--ink); }
+.btn { display: inline-block; background: var(--accent); color: var(--accent-ink); text-decoration: none; padding: 13px 26px 15px; font-size: 21px; font-weight: 600; transition: transform 120ms var(--ease-out); }
+.btn:active { transform: scale(.97); }
+.plate-initials { display: grid; place-items: center; aspect-ratio: 1; background: var(--paper-2); color: var(--soft); font-size: 44px; font-weight: 700; }
+
+/* header */
+.bar { display: flex; align-items: center; justify-content: space-between; padding: 18px var(--m) 0; }
+.bar .mark img { height: 58px; width: auto; }
+.bar nav { display: flex; gap: 28px; font-size: 20px; }
+.bar nav a { text-decoration: none; }
+.bar nav a[aria-current] { text-decoration: underline; text-decoration-thickness: 2px; }
+.bar .menu { display: none; background: none; border: 0; color: inherit; font: inherit; font-size: 20px; }
+
+/* home: the programme sheet */
+.hero { padding-top: 32px; }
+.hero .sheet { grid-column: 1 / span 7; padding: 52px 56px 0; display: flex; flex-direction: column; position: relative; margin-bottom: 10px; }
+.hero .sheet::after { content: ""; position: absolute; inset-inline: 0; bottom: -10px; height: 10px; background: radial-gradient(circle at 8px 0, transparent 5px, var(--paper) 5.5px) 0 0/16px 10px repeat-x; }
+.hero h1 { font-size: var(--step-4); }
+.lead { font-size: 22px; margin: 22px 0 0; max-width: 34em; }
+.week { margin-top: 40px; }
+.week h2 { font-size: 28px; margin-bottom: 14px; }
+.days { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.days button { border: 0; background: transparent; color: inherit; font: inherit; font-size: 20px; padding: 6px 12px 8px; min-width: 72px; line-height: 1.2; cursor: pointer; transition: background-color 160ms var(--ease-out), color 160ms; }
+.days button:hover { background: var(--paper-2); }
+.days button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+.days small { display: block; font-size: 15px; }
+.prog { list-style: none; margin: 20px 0 0; padding: 0; display: grid; grid-template-columns: max-content max-content 1fr; column-gap: 36px; row-gap: 10px; }
+.prog li { display: contents; }
+.prog .t { font-size: 19px; color: var(--soft); }
+.prog .n { font-size: 23px; font-weight: 600; }
+.prog .n a { text-decoration: none; }
+.closed { margin: 20px 0 0; font-size: 21px; }
+.sheet-foot { margin-top: auto; padding: 40px 0 44px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 32px; }
+.director { grid-column: 9 / span 4; margin: 0; padding-top: 8px; }
+.director img { width: 100%; aspect-ratio: 1; object-fit: cover; }
+.director figcaption { font-size: 17px; margin-top: 12px; }
+
+/* home: performers, one large and two beside */
+.performers { padding-block: 160px 40px; align-items: start; }
+.performers header { grid-column: 1 / span 12; display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 40px; }
+.performers h2, .rooms h2, .letters h2, .visit h2 { font-size: var(--step-3); }
+.performers header a { font-size: 21px; }
+.performers figure { margin: 0; }
+.performers img { width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+.performers h3 { font-size: 40px; }
+.performers h3 a { text-decoration: none; }
+.performers .inst { font-size: 20px; color: var(--on-ground-soft); margin-top: 4px; }
+.performers p { margin: 12px 0 0; font-size: 19px; max-width: 34em; }
+.lead-performer { grid-column: 1 / span 6; }
+.lead-performer figcaption { margin-top: 20px; }
+.side-performers { grid-column: 8 / span 5; display: grid; gap: 48px; align-self: end; }
+.side-performers figure { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: end; }
+.side-performers h3 { font-size: 32px; }
+.side-performers p { font-size: 18px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* home: rooms */
+.rooms { margin-top: 120px; }
+.rooms .sheet { grid-column: 1 / -1; padding: 64px 56px 72px; }
+.rooms header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 36px; }
+.rooms .cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.rooms .cols img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; align-self: start; }
+
+/* home: letters */
+.letters { padding-block: 160px; }
+.letters h2 { grid-column: 1 / span 4; }
+.letter { grid-column: 6 / span 6; padding: 48px 56px 52px; }
+.letter blockquote { margin: 0; font-size: 28px; line-height: 1.5; }
+.letter footer { margin-top: 24px; font-size: 19px; color: var(--soft); }
+.placeholder-note { display: inline-block; background: #f3d36b; color: #3a2e00; font: 600 13px/1.4 system-ui, sans-serif; padding: 3px 8px; margin-bottom: 18px; direction: ltr; }
+
+/* home: the back of the programme */
+.visit .sheet { grid-column: 1 / -1; display: grid; grid-template-columns: 5fr 7fr; gap: 56px; padding: 64px 56px; }
+.visit dl { margin: 28px 0 0; display: grid; grid-template-columns: max-content 1fr; gap: 14px 28px; font-size: 20px; }
+.visit dt { color: var(--soft); }
+.visit dd { margin: 0; }
+.visit .phones a { display: block; text-decoration: none; font-size: 22px; }
+.visit .routes { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; margin-top: 32px; }
+.visit iframe { background: #cfd5cc; width: 100%; height: 100%; min-height: 420px; border: 0; filter: grayscale(1) contrast(.95); }
+.foot { padding: 72px var(--m) 120px; display: flex; flex-wrap: wrap; gap: 32px; align-items: end; justify-content: space-between; }
+.foot img { height: 110px; width: auto; }
+.foot nav { display: flex; gap: 24px; font-size: 19px; }
+.foot p { margin: 0; width: 100%; font-size: 16px; color: var(--on-ground-soft); }
+
+/* schedule page */
+.sched-head { padding-top: 64px; padding-bottom: 40px; }
+.sched-head h1 { grid-column: 1 / span 8; font-size: var(--step-4); }
+.sched-head p { grid-column: 1 / span 8; font-size: 22px; margin: 18px 0 0; }
+.week-sheet { margin-inline: var(--m); padding: 28px 32px 36px; }
+.week-table { width: 100%; border-collapse: collapse; font-size: 19px; }
+.week-table th, .week-table td { padding: 14px 12px; text-align: start; vertical-align: top; }
+.week-table thead th { font-size: 20px; font-weight: 700; padding-bottom: 12px; }
+.week-table tbody tr + tr > * { border-top: 1px solid #d3d8cf; }
+.week-table tbody th { font-weight: 600; font-size: 22px; width: 24%; }
+.week-table tbody th a { text-decoration: none; }
+.week-table tbody th span { display: block; font-weight: 400; font-size: 17px; color: var(--soft); margin-top: 2px; }
+.week-table .today { background: var(--paper-2); }
+.week-table thead .today { background: var(--ink); color: var(--paper); }
+.week-table .off { color: var(--soft); }
+.week-table td .tel { font-size: 18px; }
+.by-day { display: none; }
+.sched-note { padding: 40px var(--m) 140px; font-size: 20px; }
+
+/* phone bar */
+.callbar { display: none; }
+
+@media (max-width: 900px) {
+  :root { --gap: 12px; }
+  .bar nav { display: none; } .bar .menu { display: block; }
+  .bar .mark img { height: 46px; }
+  .grid { display: block; }
+  .hero .sheet { padding: 32px 20px 0; }
+  .hero h1 { font-size: 12vw; }
+  .lead { font-size: 19px; }
+  .days { overflow-x: auto; scrollbar-width: none; margin-inline: -20px; padding-inline: 20px; }
+  .days button { min-width: 64px; font-size: 18px; }
+  .prog { grid-template-columns: max-content 1fr; column-gap: 16px; row-gap: 0; }
+  .prog .n { padding-top: 10px; font-size: 21px; } .prog .t { grid-row: span 2; padding-top: 14px; font-size: 16px; } .prog .i { grid-column: 2; font-size: 17px; }
+  .sheet-foot .btn { width: 100%; text-align: center; }
+  .director { margin-top: 32px; }
+  .performers { padding-top: 96px; }
+  .performers { display: block; } .performers header { margin-bottom: 24px; }
+  .lead-performer h3 { font-size: 32px; }
+  .side-performers { margin-top: 40px; gap: 28px; }
+  .side-performers figure { grid-template-columns: 112px 1fr; gap: 16px; align-items: center; }
+  .side-performers h3 { font-size: 26px; } .side-performers p { display: none; }
+  .rooms { margin-top: 72px; } .rooms .sheet { padding: 40px 20px 32px; } .rooms .cols { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .letters { padding-block: 96px; } .letter { margin-top: 24px; padding: 32px 20px; } .letter blockquote { font-size: 22px; }
+  .visit .sheet { display: block; padding: 40px 20px; } .visit iframe { min-height: 300px; margin-top: 32px; }
+  .visit dl { grid-template-columns: 1fr; gap: 2px; } .visit dd { margin-bottom: 14px; }
+  .foot img { height: 80px; }
+  .callbar { display: grid; grid-template-columns: 1fr 1fr; position: fixed; inset-inline: 0; bottom: 0; z-index: 10; padding: 10px 12px calc(10px + env(safe-area-inset-bottom)); background: var(--ground); gap: 10px; }
+  .callbar a { text-align: center; text-decoration: none; padding: 12px; font-size: 20px; font-weight: 600; }
+  .callbar a:first-child { background: var(--accent); color: #fff; }
+  .callbar a:last-child { background: var(--paper); color: var(--ink); }
+  .sched-head { padding-top: 32px; } .sched-head h1 { font-size: 12vw; }
+  .week-sheet { padding: 24px 20px; }
+  .week-table { display: none; } .by-day { display: block; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <a class="mark" href="?page=home"><img src="img/logo-paper.png" width="938" height="551" alt="آموزشگاه موسیقی آرامش"></a>
+  <nav aria-label="اصلی"><a href="#">درباره ما</a><a href="#">اساتید</a><a href="?page=schedule">برنامه کلاس‌ها</a><a href="#">گالری</a><a href="#">تماس</a></nav>
+  <button class="menu" type="button" aria-expanded="false">منو</button>
+</header>
+
+<!-- ═══ HOME ═══ -->
+<main class="page" data-page="home">
+  <section class="hero grid" aria-labelledby="h1">
+    <div class="sheet">
+      <h1 id="h1">آموزشگاه موسیقی آرامش</h1>
+      <p class="lead">موسیقی را بیاموز، آرامش را احساس کن. سنتور، تار، سه‌تار، تنبک، دف و آواز ایرانی، و در کنارشان پیانو، ویولن و گیتار، زیر نظر مسعود آرامش.</p>
+      <div class="week" data-week>
+        <h2 data-week-title>امروز در آموزشگاه</h2>
+        <ul class="days" aria-label="روزهای هفته"></ul>
+        <ul class="prog" aria-live="polite"></ul>
+      </div>
+      <div class="sheet-foot">
+        <a class="btn" href="tel:+982144457748">تماس <span class="tel">021 4445 7748</span></a>
+        <a href="#">پیام بگذارید تا با شما تماس بگیریم</a>
+      </div>
+    </div>
+    <figure class="director">
+      <img class="mono" src="img/teacher-masoud.jpg" width="600" height="600" alt="مسعود آرامش پشت سنتور">
+      <figcaption>مسعود آرامش · تئوری و سلفژ، سنتور، گروه نوازی</figcaption>
+    </figure>
+  </section>
+
+  <section class="performers grid" aria-labelledby="h-perf">
+    <header><h2 id="h-perf">اساتید آموزشگاه</h2><a href="#">همه <span class="tel">11</span> استاد</a></header>
+    <figure class="lead-performer" data-teacher="1"></figure>
+    <div class="side-performers"><figure data-teacher="2"></figure><figure data-teacher="3"></figure></div>
+  </section>
+
+  <section class="rooms grid" aria-labelledby="h-rooms">
+    <div class="sheet">
+      <header><h2 id="h-rooms">فضای آموزشگاه</h2><a href="#">گالری تصاویر</a></header>
+      <div class="cols">
+        <img class="mono" src="img/space-2.jpg" width="960" height="1280" alt="کلاس سنتور" loading="lazy">
+        <img class="mono" src="img/space-9.jpg" width="1280" height="960" alt="کلاس پیانو" loading="lazy">
+        <img class="mono" src="img/space-7.jpg" width="960" height="1280" alt="تار و سه‌تار" loading="lazy">
+        <img class="mono" src="img/space-1.jpg" width="960" height="1280" alt="سالن اجرا" loading="lazy">
+        <img class="mono" src="img/space-11.jpg" width="1280" height="960" alt="کلاس سازهای کوبه‌ای" loading="lazy">
+        <img class="mono" src="img/space-3.jpg" width="960" height="1280" alt="سنتورهای آموزشگاه" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="letters grid" aria-labelledby="h-letters">
+    <h2 id="h-letters">از زبان والدین</h2>
+    <figure class="letter sheet" style="margin:0">
+      <span class="placeholder-note">PLACEHOLDER: no real testimonial exists yet; this slot is hidden until one does</span>
+      <blockquote>متن نظر یکی از والدین اینجا قرار می‌گیرد؛ چند جمله درباره تجربه فرزندشان در کلاس و حال‌وهوای آموزشگاه.</blockquote>
+      <footer>نام والد · نسبت، برای مثال والد هنرجوی سنتور</footer>
+    </figure>
+  </section>
+
+  <section class="visit grid" aria-labelledby="h-visit">
+    <div class="sheet">
+      <div>
+        <h2 id="h-visit">به آموزشگاه سر بزنید</h2>
+        <dl>
+          <dt>نشانی</dt><dd data-address></dd>
+          <dt>ساعت‌ها</dt><dd data-hours></dd>
+          <dt>تلفن</dt><dd class="phones" data-phones></dd>
+        </dl>
+        <div class="routes">
+          <a class="btn" href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z">مسیر در گوگل‌مپ</a>
+          <a href="https://neshan.org/maps/@35.745776,51.331922,17z">مسیر در نشان</a>
+        </div>
+      </div>
+      <iframe title="موقعیت آموزشگاه روی نقشه" loading="lazy" src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe>
+    </div>
+  </section>
+</main>
+
+<!-- ═══ SCHEDULE ═══ -->
+<main class="page" data-page="schedule">
+  <section class="sched-head grid">
+    <h1>برنامه کلاس‌ها</h1>
+    <p>زمان‌بندی کلاس‌های تخصصی. برای هماهنگی جلسه اول با آموزشگاه تماس بگیرید.</p>
+  </section>
+  <div class="week-sheet sheet">
+    <table class="week-table"><thead></thead><tbody></tbody></table>
+    <div class="by-day week" data-week><h2 data-week-title>امروز در آموزشگاه</h2><ul class="days" aria-label="روزهای هفته"></ul><ul class="prog" aria-live="polite"></ul></div>
+  </div>
+  <p class="sched-note">آموزشگاه جمعه‌ها تعطیل است. <a href="tel:+982144457748">تماس <span class="tel">021 4445 7748</span></a></p>
+</main>
+
+<footer class="foot">
+  <img src="img/logo-paper.png" width="938" height="551" alt="آموزشگاه موسیقی آرامش">
+  <nav aria-label="شبکه‌های اجتماعی"><a href="#">اینستاگرام</a><a href="#">تلگرام</a><a href="#">ایمیل</a></nav>
+  <p>© <span class="tel">2026</span> آموزشگاه موسیقی آرامش</p>
+</footer>
+<div class="callbar"><a href="tel:+982144457748">تماس</a><a href="#">مسیر</a></div>
+
+<script src="data.js"></script>
+<script>
+const A = window.ACADEMY, today = A.today();
+const page = new URL(location).searchParams.get('page') === 'schedule' ? 'schedule' : 'home';
+document.querySelector(`[data-page="${page}"]`).classList.add('is-on');
+if (page === 'schedule') document.querySelector('.bar nav a[href="?page=schedule"]').setAttribute('aria-current', 'page');
+
+// The week's programme: every day present, the chosen one struck forward.
+document.querySelectorAll('.page.is-on [data-week]').forEach(week => {
+  const days = week.querySelector('.days'), prog = week.querySelector('.prog'), title = week.querySelector('[data-week-title]');
+  function show(i) {
+    days.querySelectorAll('button').forEach((b, k) => b.setAttribute('aria-pressed', k === i));
+    title.textContent = i === today ? 'امروز در آموزشگاه' : A.days[i] + ' در آموزشگاه';
+    const on = A.teachers.filter(t => t[2][i]);
+    week.querySelector('.closed')?.remove();
+    prog.innerHTML = on.map(t => `<li><span class="t tel">${t[2][i]}</span><span class="n"><a href="#">${t[0]}</a></span><span class="i">${t[1].join('، ')}</span></li>`).join('');
+    if (!on.length) prog.insertAdjacentHTML('afterend', '<p class="closed">جمعه‌ها آموزشگاه تعطیل است. شنبه از ساعت 10 در خدمت شما هستیم.</p>');
+  }
+  A.days.forEach((d, i) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.innerHTML = d + `<small>${i === today ? 'امروز' : i === 6 ? 'تعطیل' : '&nbsp;'}</small>`;
+    b.addEventListener('click', () => show(i)); li.append(b); days.append(li);
+  });
+  show(today < 0 ? 0 : today);
+});
+
+// Performers: one large, two beside (the director already stands in the hero).
+document.querySelectorAll('[data-teacher]').forEach(f => {
+  const [name, inst, , img] = A.teachers[+f.dataset.teacher], bio = A.bios[name];
+  f.innerHTML = `<img class="mono" src="img/${img}" alt="${name}" width="600" height="600"><figcaption><h3><a href="#">${name}</a></h3><div class="inst">${inst.join('، ')}</div>${bio ? `<p>${bio}</p>` : ''}</figcaption>`;
+});
+
+// The back of the programme.
+document.querySelectorAll('[data-address]').forEach(e => e.textContent = A.address);
+document.querySelectorAll('[data-hours]').forEach(e => e.innerHTML = A.hours.join('<br>'));
+document.querySelectorAll('[data-phones]').forEach(e => e.innerHTML = A.phones.map(p => `<a class="tel" href="tel:${p.replace(/ /g, '')}">${p}</a>`).join(''));
+
+// Schedule: the week diagram, one row per teacher, today's column struck.
+const table = document.querySelector('.week-table');
+if (table && page === 'schedule') {
+  table.tHead.innerHTML = '<tr><th>استاد</th>' + A.days.map((d, i) => `<th class="${i === today ? 'today' : ''} ${i === 6 ? 'off' : ''}">${d}${i === 6 ? ' · تعطیل' : ''}</th>`).join('') + '</tr>';
+  table.tBodies[0].innerHTML = A.teachers.map(([n, inst, s]) => `<tr><th scope="row"><a href="#">${n}</a><span>${inst.join('، ')}</span></th>` + s.map((t, i) => `<td class="${i === today ? 'today' : ''}">${t ? `<span class="tel">${t}</span>` : ''}</td>`).join('') + '</tr>').join('');
+}
+</script>
+</body>
+</html>

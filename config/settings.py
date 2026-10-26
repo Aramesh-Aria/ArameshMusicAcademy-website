@@ -181,8 +181,8 @@ SITE_TELEGRAM = os.environ.get('SITE_TELEGRAM', 'https://t.me/arameshmusicacadem
 
 # Working hours shown on the contact page — one entry per displayed line.
 SITE_HOURS = [
-    'شنبه تا چهارشنبه: ۱۰ تا ۲۱ (به غیر از ایام تعطیل)',
-    'پنج‌شنبه: ۱۰ تا ۱۴',
+    'شنبه تا چهارشنبه: 10 تا 21 (به غیر از ایام تعطیل)',
+    'پنج‌شنبه: 10 تا 14',
 ]
 
 # Email
