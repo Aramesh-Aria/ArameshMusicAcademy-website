@@ -9,7 +9,7 @@ source .venv/bin/activate                    # Python 3.12
 
 DEBUG=True python manage.py runserver        # DEBUG defaults to False; True is needed for static serving + error pages
 python manage.py makemigrations && python manage.py migrate
-python manage.py seed_sample_data            # populate an empty DB (instruments, teachers, sessions, gallery pages and images; no testimonials, videos or page content)
+python manage.py seed_sample_data            # load the real academy content scraped from aramesh-academy.ir (teachers, sessions, academy-space gallery, About text; no testimonials or videos). Data + photos: apps/core/management/commands/seed_data/
 python manage.py collectstatic --noinput     # required after any static change (see Static files)
 
 python manage.py test                                         # all tests
