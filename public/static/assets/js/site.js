@@ -3,6 +3,15 @@
   Each one does nothing when its markup is absent, and every page reads fine without this file.
 */
 
+// Motion tokens from site.css, so scripted motion keeps the same curves and honours reduced motion.
+const motion = {
+  ms: (name) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0,
+  ease: (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim() || 'ease-out',
+};
+
+// iOS Safari applies :active on touch only when a touchstart listener exists; this one lets every press state show.
+document.addEventListener('touchstart', () => {}, { passive: true });
+
 // Phone menu: a modal <dialog>, so the browser holds focus inside it and Escape closes it.
 (() => {
   const menu = document.getElementById('site-menu');
@@ -48,6 +57,34 @@
     const title = week.querySelector('[data-week-title]');
     tablist.hidden = false;
 
+    // The struck day: an ink copy of the tabs, clipped to the selected one. Moving the clip moves the
+    // fill and the paper-coloured label together, so the block slides instead of jumping.
+    const struck = tablist.cloneNode(true);
+    struck.removeAttribute('role');
+    struck.removeAttribute('aria-labelledby');
+    struck.removeAttribute('data-week-tabs');
+    struck.setAttribute('aria-hidden', 'true');
+    struck.inert = true;
+    struck.className += ' days-struck';
+    struck.querySelectorAll('[id]').forEach((el) => el.removeAttribute('id'));
+    struck.querySelectorAll('button').forEach((el) => {
+      ['role', 'aria-controls', 'aria-selected', 'aria-label'].forEach((a) => el.removeAttribute(a));
+      el.tabIndex = -1;
+    });
+    tablist.append(struck);
+    tablist.classList.add('has-struck');
+
+    const strike = (tab) => {
+      const list = tablist.getBoundingClientRect();
+      const box = tab.getBoundingClientRect();
+      struck.style.clipPath = `inset(${box.top - list.top}px ${list.right - box.right}px ${list.bottom - box.bottom}px ${box.left - list.left}px)`;
+    };
+    const current = () => tabs.find((t) => t.getAttribute('aria-selected') === 'true') || tabs[0];
+    // First placement is instant; only later changes travel.
+    strike(current());
+    requestAnimationFrame(() => struck.classList.add('is-ready'));
+    new ResizeObserver(() => strike(current())).observe(tablist);
+
     const select = (tab, focus) => {
       tabs.forEach((t) => {
         const on = t === tab;
@@ -56,6 +93,9 @@
         document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
       });
       if (title) title.textContent = tab.hasAttribute('data-today') ? 'امروز در آموزشگاه' : `${tab.dataset.label} در آموزشگاه`;
+      // Arrow keys move the block at once; only a click or tap slides it.
+      struck.classList.toggle('is-ready', !focus);
+      strike(tab);
       if (focus) tab.focus();
     };
 
@@ -65,6 +105,17 @@
     tablist.addEventListener('click', (event) => {
       const tab = event.target.closest('[role="tab"]');
       if (tab) select(tab, false);
+    });
+
+    // A pressed tab shrinks; its ink twin shrinks with it, since that is the label the visitor sees.
+    const twins = [...struck.querySelectorAll('button')];
+    tablist.addEventListener('pointerdown', (event) => {
+      const twin = twins[tabs.indexOf(event.target.closest('[role="tab"]'))];
+      if (!twin) return;
+      twin.classList.add('is-pressed');
+      const release = () => twin.classList.remove('is-pressed');
+      addEventListener('pointerup', release, { once: true });
+      addEventListener('pointercancel', release, { once: true });
     });
 
     // Right to left: ArrowLeft moves to the next day, ArrowRight to the previous one.
@@ -138,12 +189,12 @@
   let group = [];
   let index = 0;
 
-  const show = (i) => {
+  const show = (i, fade = true) => {
     index = (i + group.length) % group.length;
     const link = group[index];
     const thumb = link.querySelector('img');
-    img.classList.add('is-loading');
-    img.onload = () => img.classList.remove('is-loading');
+    if (fade) img.classList.add('is-loading');
+    img.onload = img.onerror = () => img.classList.remove('is-loading');
     img.src = link.href;
     img.alt = thumb?.alt || '';
     caption.textContent = link.dataset.caption || '';
@@ -177,18 +228,75 @@
     if (event.target !== img) box.close();
   });
 
-  // Swipe: a horizontal drag of 50px or more changes the photo; in RTL a drag to the right brings the next one.
-  let startX = null;
-  let startY = 0;
-  img.addEventListener('pointerdown', (event) => { startX = event.clientX; startY = event.clientY; });
-  img.addEventListener('pointerup', (event) => {
-    if (startX === null || group.length < 2) return;
-    const dx = event.clientX - startX;
-    const dy = event.clientY - startY;
-    startX = null;
-    if (Math.abs(dx) >= 50 && Math.abs(dx) > Math.abs(dy)) show(index + (dx > 0 ? 1 : -1));
+  // Swipe: the photo follows the finger. A drag past 50px or a flick swaps it, otherwise it springs back.
+  // In RTL the next photo lies to the left, so a drag to the right brings it in.
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+  let drag = null;
+  let swapping = false;
+
+  const settle = (dx) => img.animate(
+    [{ transform: `translateX(${dx}px)` }, { transform: 'none' }],
+    { duration: motion.ms('--dur-spring'), easing: motion.ease('--ease-spring') },
+  );
+
+  const swap = async (dx) => {
+    swapping = true;
+    try {
+      const step = dx > 0 ? 1 : -1;
+      const next = group[(index + step + group.length) % group.length];
+      const preload = new Image();
+      preload.src = next.href;
+      const out = img.animate(
+        [{ transform: `translateX(${dx}px)` }, { transform: `translateX(${dx > 0 ? 60 : -60}%)`, opacity: 0 }],
+        { duration: motion.ms('--dur-swap'), easing: motion.ease('--ease-out'), fill: 'forwards' },
+      );
+      await Promise.all([out.finished, preload.decode().catch(() => {})]);
+      show(index + step, false);
+      out.cancel();
+      img.animate(
+        [{ transform: `translateX(${dx > 0 ? -30 : 30}%)`, opacity: 0 }, { transform: 'none', opacity: 1 }],
+        { duration: motion.ms('--dur-move'), easing: motion.ease('--ease-out') },
+      );
+    } finally {
+      swapping = false;
+    }
+  };
+
+  img.addEventListener('pointerdown', (event) => {
+    // One finger only: a second one (a pinch) or a swipe during a swap is left alone.
+    if (group.length < 2 || drag || swapping || !event.isPrimary) return;
+    drag = { id: event.pointerId, x: event.clientX, y: event.clientY, t: event.timeStamp, dx: 0, live: false };
   });
-  img.addEventListener('pointercancel', () => { startX = null; });
+  img.addEventListener('pointermove', (event) => {
+    if (drag?.id !== event.pointerId) return;
+    drag.dx = event.clientX - drag.x;
+    const dy = event.clientY - drag.y;
+    if (!drag.live && Math.abs(drag.dx) > 6 && Math.abs(drag.dx) > Math.abs(dy)) {
+      drag.live = true;
+      img.setPointerCapture(event.pointerId);
+    }
+    if (drag.live && !reduce.matches) img.style.transform = `translateX(${drag.dx}px)`;
+  });
+  img.addEventListener('pointerup', (event) => {
+    if (drag?.id !== event.pointerId) return;
+    const { dx, t, live } = drag;
+    drag = null;
+    img.style.transform = '';
+    if (!live) return;
+    const flick = Math.abs(dx) / Math.max(event.timeStamp - t, 1) > 0.11;
+    if (Math.abs(dx) >= 50 || flick) {
+      if (reduce.matches) show(index + (dx > 0 ? 1 : -1));
+      else swap(dx);
+    } else if (!reduce.matches) {
+      settle(dx);
+    }
+  });
+  img.addEventListener('pointercancel', (event) => {
+    if (drag?.id !== event.pointerId) return;
+    if (drag.live && !reduce.matches) settle(drag.dx);
+    drag = null;
+    img.style.transform = '';
+  });
   img.draggable = false;
 })();
 
@@ -207,6 +315,11 @@
     frame.title = poster.querySelector('.video-poster-title')?.textContent || '';
     frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     frame.referrerPolicy = 'strict-origin-when-cross-origin';
+    // The player paints a moment after it is inserted; it fades in from the paper instead of flashing.
+    frame.classList.add('is-loading');
+    const reveal = () => frame.classList.remove('is-loading');
+    frame.addEventListener('load', reveal, { once: true });
+    setTimeout(reveal, 1500);
     poster.replaceWith(frame);
     frame.focus();
   });
@@ -238,4 +351,17 @@
       }
     });
   });
+})();
+
+// Photos develop once: an image still loading when this runs comes up out of the paper tone as it arrives.
+// Images already decoded, and every image without JS, simply show.
+(() => {
+  document.querySelectorAll('.plates img, .home-rooms-plates img, img.album-cover, img.portrait, .home-plate img, .about-plate img')
+    .forEach((image) => {
+      if (image.complete) return;
+      image.classList.add('develops', 'is-developing');
+      const done = () => image.classList.remove('is-developing');
+      image.addEventListener('load', done, { once: true });
+      image.addEventListener('error', done, { once: true });
+    });
 })();

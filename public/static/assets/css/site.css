@@ -56,6 +56,9 @@
   img { block-size: auto; }
   input, button, textarea, select { font: inherit; color: inherit; }
   button { cursor: pointer; }
+  /* Taps fire at once (no double-tap-zoom wait), and a long press on a control doesn't select its label. */
+  a, button, summary { touch-action: manipulation; }
+  button, summary { -webkit-user-select: none; user-select: none; }
   ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
   table { border-collapse: collapse; }
   p, h1, h2, h3, h4, li, dd, figcaption, blockquote { overflow-wrap: break-word; }
@@ -125,8 +128,8 @@
     --dur-state: 160ms;
     --dur-move: 220ms;
     --dur-develop: 600ms;
-    --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
-    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);       /* strong ease-out: entrances, exits, presses */
+    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);   /* strong ease-in-out: things moving on screen */
     /* A damped spring (ratio 0.8, 1.5% overshoot) sampled into linear(); pair it with --dur-spring. */
     --ease-spring: linear(0, 0.034, 0.118, 0.227, 0.346, 0.464, 0.573, 0.669, 0.752, 0.82, 0.875, 0.918, 0.951, 0.975, 0.991, 1.003, 1.01, 1.013, 1.015, 1.015, 1.014, 1.013, 1.011, 1.009, 1.007, 1.006, 1.004, 1.003, 1.002, 1.002, 1);
     --dur-spring: 560ms;
@@ -199,7 +202,7 @@
     text-decoration-skip-ink: auto;
     transition: text-decoration-color var(--dur-state) var(--ease-out);
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     a:hover { text-decoration-thickness: 2px; }
   }
 
@@ -320,11 +323,11 @@
     transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
   }
   .btn:active { transform: scale(var(--press-scale)); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .btn:hover { background: color-mix(in oklab, var(--accent), black 14%); }
   }
   .btn-paper { background: var(--paper); color: var(--ink); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .btn-paper:hover { background: var(--paper-2); }
   }
 
@@ -373,7 +376,7 @@
     text-decoration-thickness: 2px;
     text-underline-offset: 0.35em;
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .site-nav a:hover, .site-nav summary:hover {
       text-decoration: underline;
       text-decoration-thickness: 1px;
@@ -401,6 +404,8 @@
     border: 0;
     font-size: var(--text-l);
   }
+  .menu-toggle, .menu-close, .gallery-menu summary { transition: transform var(--dur-press) var(--ease-out); }
+  .menu-toggle:active, .menu-close:active, .gallery-menu summary:active { transform: scale(var(--press-scale)); }
 
 
   /* The gallery disclosure: a sheet of categories, each with its albums. */
@@ -450,7 +455,7 @@
   .plates li { break-inside: avoid; margin-block-end: var(--space-5); }
   .plate-link { display: block; background: var(--paper-2); }
   .plate-link img { inline-size: 100%; transition: filter var(--dur-state) var(--ease-out); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .plate-link:hover img { filter: grayscale(1) contrast(1.06) brightness(1.08); }
   }
   @media (max-width: 56.25em) {
@@ -481,7 +486,7 @@
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
   }
-  .lightbox:not([open]) { opacity: 0; }
+  .lightbox:not([open]) { opacity: 0; transition-duration: var(--dur-state); }
   @starting-style {
     .lightbox[open] { opacity: 0; }
   }
@@ -512,6 +517,10 @@
     block-size: auto;
     max-block-size: 100%;
     transition: opacity var(--dur-swap) var(--ease-out);
+    /* It is the swipe surface: no selection or save-image callout under a held finger. */
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
   }
   .lightbox-stage img.is-loading { opacity: 0; }
 
@@ -546,7 +555,7 @@
   /* The chevron points down; turned, it points to the next photo, which sits to the left in RTL. */
   .lightbox-next .icon { transform: rotate(90deg); }
   .lightbox-prev .icon { transform: rotate(-90deg); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .lightbox button:hover { background: color-mix(in oklab, var(--on-ground), transparent 88%); }
   }
 
@@ -570,7 +579,7 @@
       overlay var(--dur-move) allow-discrete,
       display var(--dur-move) allow-discrete;
   }
-  .site-menu:not([open]) { opacity: 0; transform: translateY(0.75rem); }
+  .site-menu:not([open]) { opacity: 0; transform: translateY(0.75rem); transition-duration: var(--dur-state); }
   @starting-style {
     .site-menu[open] { opacity: 0; transform: translateY(0.75rem); }
   }
@@ -669,17 +678,34 @@
     border-radius: var(--radius);
     color: inherit;
     line-height: 1.25;
-    transition: background-color var(--dur-state) var(--ease-out), color var(--dur-state) var(--ease-out);
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out), color var(--dur-state) var(--ease-out);
   }
   .days small { min-block-size: 1.3em; font-size: 0.8em; color: var(--text-soft); transition: color var(--dur-state) var(--ease-out); }
   .days .day-short { display: none; }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .days [role="tab"]:hover { background: var(--paper-2); }
   }
   .days [aria-selected="true"],
   .days [aria-selected="true"]:hover { background: var(--ink); color: var(--paper); }
   .days [aria-selected="true"] small { color: var(--on-ground-soft); }
   .days [role="tab"]:focus-visible { outline-offset: 2px; }
+  .days [role="tab"]:active { transform: scale(var(--press-scale)); }
+
+  /* The struck day (site.js): an ink copy of the tabs, clipped to the selected one, so fill and label
+     travel together. The real tabs keep their place underneath and take the clicks and focus. */
+  .days.has-struck { position: relative; }
+  .days.has-struck [aria-selected="true"] { background: transparent; color: inherit; }
+  .days.has-struck [aria-selected="true"] small { color: var(--text-soft); }
+  .days-struck {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    pointer-events: none;
+  }
+  .days-struck button { background: var(--ink); color: var(--paper); transition: transform var(--dur-press) var(--ease-out); }
+  .days-struck .is-pressed { transform: scale(var(--press-scale)); }
+  .days-struck small { color: var(--on-ground-soft); }
+  .days-struck.is-ready { transition: clip-path var(--dur-move) var(--ease-in-out); }
 
   /* One measured grid every programme obeys: time, teacher, instruments. */
   .programme {
@@ -696,7 +722,7 @@
   }
   .programme-time { color: var(--text-soft); font-size: var(--text-s); }
   .programme-name { font-size: var(--text-l); font-weight: 700; text-decoration: none; }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .programme-name:hover { text-decoration: underline; text-decoration-thickness: 1px; }
   }
   .day-empty { font-size: var(--text-l); }
@@ -747,7 +773,7 @@
   }
   .footer-block li + li { margin-block-start: var(--space-1); }
   .footer-block a { text-decoration: none; }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .footer-block a:hover { text-decoration: underline; }
   }
   .footer-phones a {
@@ -778,7 +804,7 @@
     min-block-size: 2.75rem;
     text-decoration: none;
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .footer-social a:hover { color: var(--text); }
   }
 
@@ -1061,7 +1087,7 @@
   .performer-instruments { margin-block-start: var(--space-1); color: var(--text-soft); }
   .performer-days { font-size: var(--text-s); }
   .performer-portrait.portrait-initials { font-size: var(--text-xl); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .performer h2 a { transition: color var(--dur-state) var(--ease-out); }
     .performer:hover h2 a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   }
@@ -1168,7 +1194,7 @@
     font-weight: 400;
     color: var(--text-soft);
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .week-table tbody th a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
   }
   /* A start-first range reads left to right; in the RTL cell it sits at the start edge. */
@@ -1227,7 +1253,7 @@
   /* The whole album is the link's target; the title stays the only link in the tab order. */
   .album-title a::after { content: ""; position: absolute; inset: 0; }
   .album-text { margin-block-start: var(--space-1); color: var(--text-soft); font-size: var(--text-s); max-inline-size: 28em; }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .album-cover { transition: filter var(--dur-state) var(--ease-out); }
     .album:hover .album-cover { filter: grayscale(1) contrast(1.06) brightness(1.08); }
     .album:hover .album-plate { filter: none; background: var(--paper-2); }
@@ -1250,6 +1276,8 @@
     aspect-ratio: 16 / 9;
     border: 0;
   }
+  .video iframe { background: var(--paper); transition: opacity var(--dur-state) var(--ease-out); }
+  .video iframe.is-loading { opacity: 0; }
   .video-poster {
     display: grid;
     grid-template-rows: 1fr auto auto;
@@ -1285,7 +1313,7 @@
   }
   .video-poster-meta { font-size: var(--text-s); color: var(--text-soft); }
   .video-caption { margin-block-start: var(--space-3); font-size: var(--text-s); color: var(--text-soft); max-inline-size: var(--measure); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .video-poster:hover { background: var(--paper-2); }
   }
 
@@ -1362,7 +1390,7 @@
     transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
   }
   .captcha-refresh:active { transform: scale(var(--press-scale)); }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .captcha-refresh:hover { background: var(--paper-2); }
   }
   .field input[name="captcha_1"] { max-inline-size: 12.5rem; direction: ltr; text-align: center; letter-spacing: 0.15em; }
@@ -1371,7 +1399,7 @@
   .contact-block h2 { font-size: var(--text-s); color: var(--text-soft); font-weight: 400; margin-block-end: var(--space-2); }
   .contact-phones { display: grid; gap: var(--space-1); }
   .contact-phones a { display: inline-flex; align-items: center; min-block-size: 2.75rem; font-size: var(--text-l); text-decoration: none; }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .contact-phones a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
   }
   .contact-routes { --cluster: var(--space-1) var(--space-5); margin-block-start: var(--space-3); }
@@ -1426,7 +1454,7 @@
     font-weight: 700;
     text-decoration: none;
   }
-  @media (hover: hover) {
+  @media (hover: hover) and (pointer: fine) {
     .missing-links a:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   }
 
@@ -1453,6 +1481,11 @@
 
   /* The darkroom: every upload printed in the same monochrome, so mixed snapshots read as one set. */
   .mono { filter: grayscale(1) contrast(1.06); }
+
+  /* Photos develop once (site.js): an image still loading comes up out of the paper tone behind it.
+     In this last layer so it wins over each plate's own filter transition. */
+  .develops { transition: opacity var(--dur-develop) var(--ease-out), filter var(--dur-state) var(--ease-out); }
+  .develops.is-developing { opacity: 0; }
 
   .soft { color: var(--text-soft); }
   .text-s { font-size: var(--text-s); }

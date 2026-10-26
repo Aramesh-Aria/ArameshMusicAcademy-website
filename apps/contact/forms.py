@@ -43,7 +43,9 @@ class ContactForm(forms.ModelForm):
             field.help_text = ''
         self.fields['phone'].label = 'شماره تماس (اختیاری)'
         self.fields['phone'].widget.attrs.update({'inputmode': 'tel', 'dir': 'ltr'})
-        self.fields['email'].widget.attrs['dir'] = 'ltr'
+        self.fields['email'].widget.attrs.update({'dir': 'ltr', 'autocapitalize': 'none', 'spellcheck': 'false'})
+        # The phone keyboard: no capitals or corrections on the code, and Latin input on the left edge.
+        self.fields['captcha'].widget.attrs.update({'autocapitalize': 'none', 'autocorrect': 'off', 'spellcheck': 'false', 'dir': 'ltr'})
 
 
     def full_clean(self):
