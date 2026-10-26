@@ -1,5 +1,9 @@
 from django.views.generic import DetailView
 
+from apps.pages.models import FAQ
+from apps.schedules.week import active_sessions
+from apps.teachers.models import Instrument, Teacher
+
 from .models import Programme
 
 
@@ -12,5 +16,29 @@ class ProgrammeDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['meta_description'] = ' '.join(self.object.short_description.split())[:160]
+        programme = self.object
+        context['meta_description'] = ' '.join(programme.short_description.split())[:160]
+
+        shown = Programme.InstrumentsShown
+        context['programme_instruments'] = {
+            shown.ALL: Instrument.objects.main(),
+            shown.CHILDREN_ONLY: Instrument.objects.filter(children_only=True),
+        }.get(programme.instruments_shown, Instrument.objects.none())
+
+        # Who teaches it, and when: a reserved slot for a fixed-time Programme; the days its teachers are in
+        # for one "with the teacher". Private lessons are every teacher on every day, so the page links to the
+        # full schedule instead of listing it.
+        sessions = active_sessions().order_by('weekday_order', 'start_time')
+        teachers = Teacher.objects.filter(is_active=True).prefetch_related('instruments')
+        if programme.kind == Programme.Kind.FIXED_TIME:
+            sessions = sessions.filter(programme=programme)
+            teachers = teachers.filter(class_sessions__in=sessions).distinct()
+        elif programme.instruments_shown == shown.ALL:
+            sessions = sessions.none()
+        else:
+            teachers = teachers.filter(programmes=programme)
+            sessions = sessions.filter(teacher__in=teachers, programme__isnull=True)
+        context['programme_teachers'] = teachers
+        context['programme_sessions'] = sessions
+        context['faqs'] = FAQ.objects.active().filter(programmes=programme)
         return context

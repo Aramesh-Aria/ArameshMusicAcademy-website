@@ -1,12 +1,9 @@
 import json
 from datetime import time
-from io import BytesIO
 from pathlib import Path
 
 from django.core.files import File
-from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand
-from PIL import Image, ImageDraw
 
 from apps.gallery.models import GalleryImage, GalleryPage
 from apps.pages.models import SitePageContent
@@ -89,14 +86,9 @@ class Command(BaseCommand):
         if teacher.profile_image:
             return
 
-        # A few teachers have no photo on the live site; they get a plain initials tile instead.
+        # A few teachers have no photo on the live site. They keep none, so the site shows its designed
+        # fallback (initials on a stone plate) rather than a made-up picture.
         if image_path is None:
-            image = Image.new('RGB', (600, 600), '#3F5E5A')
-            draw = ImageDraw.Draw(image)
-            draw.text((285, 290), f'{teacher.first_name[0]}{teacher.last_name[0]}', fill='white')
-            image_buffer = BytesIO()
-            image.save(image_buffer, format='JPEG')
-            teacher.profile_image.save(f'teacher-{teacher.pk}.jpg', ContentFile(image_buffer.getvalue()), save=True)
             return
 
         self.save_seed_file(teacher.profile_image, image_path)

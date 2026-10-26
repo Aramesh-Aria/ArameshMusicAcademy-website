@@ -838,6 +838,33 @@
     .portrait-row > li { scroll-snap-align: start; }
   }
 
+  /* ── Class times: day, hours, teacher, as rows on the ground ── */
+  .times { display: grid; max-inline-size: 52rem; }
+  .times li {
+    display: grid;
+    grid-template-columns: 7rem 8rem minmax(0, 1fr);
+    gap: var(--space-1) var(--space-5);
+    align-items: baseline;
+    padding-block: var(--space-4);
+    padding-inline: calc(var(--panel-pad) - var(--space-3));
+  }
+  .times li + li { border-block-start: 1px solid color-mix(in oklab, var(--stone) 14%, var(--ground)); }
+  .times__day { font-weight: 700; }
+  .times__hours { color: var(--text-soft); }
+  .times__teacher { text-decoration: none; }
+  .times__what { grid-column: 2 / -1; color: var(--text-soft); font-size: var(--text-s); }
+  @media (hover: hover) and (pointer: fine) {
+    .times__teacher:hover { text-decoration: underline; text-decoration-color: var(--saffron); }
+  }
+  @media (max-width: 37.5em) {
+    .times li { grid-template-columns: 6rem minmax(0, 1fr); }
+    .times__teacher { grid-column: 2; }
+    .times__what { grid-column: 2; }
+  }
+  .section__note { padding-inline: calc(var(--panel-pad) - var(--space-3)); }
+  /* A page's opening panel sits just under the navbar. */
+  .page-head { margin-block-start: var(--space-3); }
+
   /* ── Contact band: the page's one saffron field ── */
   .band {
     --surface: var(--saffron);
@@ -1179,18 +1206,21 @@
   }
 
 
-  /* Portrait plates: 1:1, printed in the darkroom. A missing upload shows initials on paper. */
+  /* Portraits: 1:1. A missing upload shows the initials instead. */
   .portrait {
     inline-size: 100%;
     aspect-ratio: 1;
     object-fit: cover;
-    background: var(--paper-2);
+    background: var(--ground-2);
   }
+  /* No photo: the initials in Amiri on the same saffron-tinted stone as the other no-photo frames. */
   .portrait-initials {
     display: grid;
     place-items: center;
+    background: color-mix(in oklab, var(--saffron) 14%, var(--stone));
     color: var(--ink-soft);
-    font-size: clamp(2rem, 1rem + 4vw, 4.5rem);
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 1rem + 5vw, 5rem);
     font-weight: 700;
     line-height: 1;
   }
@@ -1363,7 +1393,7 @@
   }
 
   /* About: a split reading panel, the text and the rooms side by side. */
-  .about-split {
+  .split {
     display: grid;
     grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
     gap: var(--panel-pad);
@@ -1372,9 +1402,9 @@
     padding: var(--space-3);
     padding-inline-start: var(--panel-pad);
   }
-  .about-split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
-  .about-split__text p { max-inline-size: var(--measure); }
-  .about-split__media { align-self: stretch; min-block-size: 26rem; }
+  .split__text { display: grid; gap: var(--space-5); justify-items: start; padding-block: var(--panel-pad); }
+  .split__text p { max-inline-size: var(--measure); }
+  .split__media { align-self: stretch; min-block-size: 26rem; }
 
   .programme-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--frame); }
   .programme-row > li, .programme-row .programme-card { block-size: 100%; }
@@ -1424,9 +1454,9 @@
       border-radius: var(--radius-panel);
       background: var(--ground-2);
     }
-    .about-split { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
-    .about-split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
-    .about-split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
+    .split { grid-template-columns: minmax(0, 1fr); padding: var(--space-3); }
+    .split__text { padding: var(--space-5) var(--space-3) var(--space-2); }
+    .split__media { min-block-size: 0; aspect-ratio: 3 / 2; order: -1; }
     @media (max-width: 37.5em) {
       /* The Programme cards scroll sideways like the teachers. */
       .programme-row {

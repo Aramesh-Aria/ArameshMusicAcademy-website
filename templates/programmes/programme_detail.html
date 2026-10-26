@@ -1,14 +1,62 @@
 {% extends 'base.html' %}
-{# Step 10 routes this page so the navbar can link it; step 11 lays it out. #}
 
 {% block title %}{{ programme.name }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-programme{% endblock %}
+{% block og_image %}{% if programme.photos %}{% include 'partials/og_image.html' with url=programme.photos.0.url alt=programme.name %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
-<article class="panel" aria-labelledby="programme-title">
-  <h1 id="programme-title">{{ programme.name }}</h1>
-  {% if programme.age_label %}<p><span class="chip">{{ programme.age_label }}</span></p>{% endif %}
-  {{ programme.long_description|linebreaks }}
+{# ── The Programme: what it is, who it is for, beside its photos. ── #}
+<article class="split panel on-stone page-head" aria-labelledby="programme-title">
+  <div class="split__text">
+    <h1 id="programme-title">{{ programme.name }}</h1>
+    {% if programme.age_label %}<p><span class="chip">{{ programme.age_label }}</span></p>{% endif %}
+    <div class="prose">{{ programme.long_description|linebreaks }}</div>
+  </div>
+  {% with photos=programme.photos %}
+  <div class="split__media frame{% if photos %} crossfade{% else %} frame--shape{% endif %}">
+    {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% empty %}{% include 'components/santur.html' %}{% endfor %}
+  </div>
+  {% endwith %}
 </article>
-{% include 'partials/page_call.html' %}
+
+{% if programme_instruments %}
+<section class="section" aria-labelledby="instruments-title">
+  <header class="section__head">
+    <h2 id="instruments-title">{% if programme.instruments_shown == 'children_only' %}سازهای این دوره{% else %}سازهایی که آموزش می‌دهیم{% endif %}</h2>
+  </header>
+  <ul class="tile-grid" role="list">
+    {% for instrument in programme_instruments %}<li>{% include 'teachers/_instrument_tile.html' %}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+{% if programme_teachers %}
+<section class="section" aria-labelledby="teachers-title">
+  <header class="section__head"><h2 id="teachers-title">{% if programme.instruments_shown == 'all' %}استادان آرامش{% else %}استادان این دوره{% endif %}</h2></header>
+  <ul class="portrait-row" role="list">
+    {% for teacher in programme_teachers %}<li>{% include 'teachers/_teacher_card.html' %}</li>{% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="section" aria-labelledby="times-title">
+  <header class="section__head section__head--row">
+    <h2 id="times-title">زمان کلاس‌ها</h2>
+    {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
+  </header>
+  {% if programme_sessions %}
+  {% include 'partials/sessions.html' with sessions=programme_sessions %}
+  {% else %}
+  <p class="section__intro section__note">روز و ساعت هر کلاس را با استاد و آموزشگاه هماهنگ می‌کنید؛ روزهای حضور هر استاد در برنامهٔ هفته آمده است.</p>
+  {% endif %}
+</section>
+
+{% if faqs %}
+<section class="panel on-stone faq" aria-labelledby="faq-title">
+  <h2 id="faq-title">پرسش‌های متداول</h2>
+  {% include 'partials/faq.html' %}
+</section>
+{% endif %}
+
+{% include 'partials/contact_band.html' %}
 {% endblock %}

@@ -168,3 +168,61 @@ class ProgrammePageTests(TestCase):
 
         self.assertContains(self.client.get('/programmes/ensemble/'), 'پنجشنبه‌ها')
         self.assertEqual(self.client.get('/programmes/hidden/').status_code, 404)
+
+
+class ProgrammePageContentTests(TestCase):
+    def setUp(self):
+        from datetime import time
+
+        from apps.schedules.models import ClassSession, Weekday
+        from apps.teachers.models import Instrument, Teacher
+
+        self.piano = Instrument.objects.create(name='پیانو', slug='piano')
+        self.bells = Instrument.objects.create(name='بلز', slug='bells', children_only=True)
+        self.private = Programme.objects.create(
+            name='کلاس خصوصی', slug='private', short_description='.', long_description='.',
+            instruments_shown=Programme.InstrumentsShown.ALL,
+        )
+        self.children = Programme.objects.create(
+            name='موسیقی کودک', slug='children', short_description='.', long_description='.',
+            instruments_shown=Programme.InstrumentsShown.CHILDREN_ONLY,
+        )
+        self.ensemble = Programme.objects.create(
+            name='گروه نوازی', slug='ensemble', short_description='.', long_description='.',
+            kind=Programme.Kind.FIXED_TIME,
+        )
+        self.nasim = Teacher.objects.create(first_name='نسیم', last_name='حقی', biography='.')
+        self.nasim.programmes.add(self.children)
+        self.masoud = Teacher.objects.create(first_name='مسعود', last_name='آرامش', biography='.')
+        session = ClassSession.objects.create(
+            teacher=self.nasim, weekday=Weekday.SATURDAY, start_time=time(14), end_time=time(21),
+        )
+        session.instruments.add(self.bells)
+        self.reserved = ClassSession.objects.create(
+            teacher=self.masoud, weekday=Weekday.THURSDAY, start_time=time(10), end_time=time(19),
+            programme=self.ensemble,
+        )
+
+    def get(self, programme):
+        return self.client.get(programme.get_absolute_url()).context
+
+    def test_a_with_teacher_programme_lists_its_teachers_and_their_days(self):
+        context = self.get(self.children)
+
+        self.assertEqual(list(context['programme_teachers']), [self.nasim])
+        self.assertEqual([s.teacher for s in context['programme_sessions']], [self.nasim])
+        self.assertEqual(list(context['programme_instruments']), [self.bells])
+
+    def test_a_fixed_time_programme_lists_only_its_reserved_slot(self):
+        context = self.get(self.ensemble)
+
+        self.assertEqual(list(context['programme_sessions']), [self.reserved])
+        self.assertEqual(list(context['programme_teachers']), [self.masoud])
+        self.assertFalse(context['programme_instruments'])
+
+    def test_private_lessons_show_every_main_instrument_and_teacher_but_no_slot_list(self):
+        context = self.get(self.private)
+
+        self.assertEqual(list(context['programme_instruments']), [self.piano])
+        self.assertEqual(set(context['programme_teachers']), {self.nasim, self.masoud})
+        self.assertFalse(context['programme_sessions'])

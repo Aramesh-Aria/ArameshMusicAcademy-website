@@ -59,13 +59,13 @@
 
 
 {# ── 2. About: a working musician leads the place. Text on stone, the rooms beside it. ── #}
-<section class="about-split panel on-stone" aria-labelledby="about-title">
-  <div class="about-split__text">
+<section class="split panel on-stone" aria-labelledby="about-title">
+  <div class="split__text">
     <h2 id="about-title">با مدیریت مسعود آرامش</h2>
     <p>مسعود آرامش، آهنگساز و نوازندهٔ سنتور با بیش از چهل سال فعالیت در موسیقی، این آموزشگاه را در سال ۱۳۹۵ در تهران بنیان گذاشت. اینجا کودکان، نوجوانان و بزرگسالان در فضایی آرام، نزد استادانی ساز و آواز می‌آموزند که بیشترشان سابقهٔ اجرا در کنسرت‌ها و جشنواره‌ها دارند.</p>
     {% url 'pages:about' as about_url %}{% include "components/button.html" with label="دربارهٔ آموزشگاه" href=about_url variant="quiet" %}
   </div>
-  <div class="about-split__media frame{% if not about_photo %} frame--shape{% endif %}">
+  <div class="split__media frame{% if not about_photo %} frame--shape{% endif %}">
     {% if about_photo %}
     <img src="{{ about_photo.image.url }}" alt="{{ about_photo.title|default:about_photo.gallery_page.title }}" loading="lazy" decoding="async">
     {% else %}

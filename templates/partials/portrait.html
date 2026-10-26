@@ -1,4 +1,4 @@
-{# A teacher's 1:1 portrait plate. A missing or broken upload becomes a paper plate with initials (see base.html). #}
+{# A teacher's 1:1 portrait. A missing or broken upload becomes the initials on a stone plate (see base.html). #}
 {% if teacher.profile_image %}
 <img class="portrait{% if class %} {{ class }}{% endif %}" src="{{ teacher.profile_image.url }}" width="600" height="600" alt="{{ teacher.full_name }}" decoding="async"{% if lazy %} loading="lazy"{% endif %} data-initials="{{ teacher.first_name|slice:':1' }} {{ teacher.last_name|slice:':1' }}">
 {% else %}
