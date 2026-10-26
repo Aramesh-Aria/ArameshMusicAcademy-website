@@ -66,6 +66,22 @@ class ContactViewTests(TestCase):
         self.assertIn('ali@example.com', mail.outbox[0].reply_to)
         self.assertIn('Question', mail.outbox[0].subject)
 
+    def test_message_without_email_still_notifies_with_no_reply_to(self):
+        captcha_key, captcha_response = self._solved_captcha()
+        self.client.post(reverse('contact:contact'), {
+            'full_name': 'Ali Ahmadi',
+            'phone': '09120000000',
+            'subject': 'Question',
+            'message': 'Please call me.',
+            'captcha_0': captcha_key,
+            'captcha_1': captcha_response,
+        })
+
+        self.assertEqual(ContactMessage.objects.get().email, '')
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].reply_to, [])
+        self.assertIn('09120000000', mail.outbox[0].body)
+
     def test_invalid_submission_ties_each_error_to_its_field(self):
         response = self.client.post(reverse('contact:contact'), {
             'full_name': '',
@@ -124,5 +140,19 @@ class ContactFormTests(TestCase):
 
         self.assertFalse(form.is_valid())
         self.assertIn('ایمیل وارد شده معتبر نیست.', form.errors['email'])
+
+    def test_phone_is_required_and_email_is_optional(self):
+        # The Academy answers by calling the Visitor back.
+        data = {'full_name': 'Ali Ahmadi', 'subject': 'Question', 'message': 'Hi'}
+
+        form = ContactForm(data=data)
+        form.is_valid()
+        self.assertIn('phone', form.errors)
+        self.assertNotIn('email', form.errors)
+
+        form = ContactForm(data={**data, 'phone': '09120000000'})
+        form.is_valid()
+        self.assertNotIn('phone', form.errors)
+        self.assertNotIn('email', form.errors)
 
 # Create your tests here.

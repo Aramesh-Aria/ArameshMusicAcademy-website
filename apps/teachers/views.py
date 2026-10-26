@@ -51,7 +51,8 @@ class TeacherDetailView(DetailView):
             )
         context['teacher_sessions'] = (
             teacher.class_sessions.active()
-            .prefetch_related('instruments')
+            .select_related('teacher', 'programme')
+            .prefetch_related('instruments', 'teacher__programmes')
             .order_by('weekday_order', 'start_time')
         )
         return context

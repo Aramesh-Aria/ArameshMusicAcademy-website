@@ -32,7 +32,7 @@
           {% for session in day.list %}
           <dd>
             <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
-            <span class="soft">{{ session.instruments.all|join:"، " }}</span>
+            <span class="soft">{{ session.offerings }}</span>
           </dd>
           {% endfor %}
         </div>

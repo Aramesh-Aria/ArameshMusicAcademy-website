@@ -1,5 +1,5 @@
 from django.core.exceptions import ValidationError
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from .models import GalleryImage, GalleryPage, Video
@@ -180,3 +180,28 @@ class GalleryViewTests(TestCase):
         self.assertNotContains(response, '<iframe')
 
 # Create your tests here.
+
+
+@override_settings(HERO_GALLERY_SLUG='home-hero')
+class HeroGalleryPageTests(TestCase):
+    def setUp(self):
+        self.concerts = GalleryPage.objects.create(title='کنسرت‌ها', slug='concerts')
+        self.hero = GalleryPage.objects.create(title='صفحهٔ اصلی', slug='home-hero')
+
+    def test_the_hero_page_is_left_out_of_the_listed_pages(self):
+        self.assertEqual(list(GalleryPage.objects.listed()), [self.concerts])
+
+    def test_the_hero_page_is_hidden_from_the_menu_index_and_sitemap(self):
+        index = self.client.get(reverse('gallery:gallery_root'))
+        sitemap = self.client.get('/sitemap.xml')
+
+        self.assertEqual(list(index.context['child_pages']), [self.concerts])
+        self.assertEqual([item['page'] for item in index.context['gallery_nav_tree']], [self.concerts])
+        self.assertContains(sitemap, '/gallery/concerts/')
+        self.assertNotContains(sitemap, 'home-hero')
+
+    def test_a_child_page_with_the_same_slug_is_still_listed(self):
+        child = GalleryPage.objects.create(title='Hero concert', slug='home-hero', parent=self.concerts)
+
+        self.assertIn(child, GalleryPage.objects.listed())
+

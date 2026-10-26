@@ -5,9 +5,12 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
+from apps.programmes.models import Programme
 from apps.teachers.models import Instrument, Teacher
 
+from .admin import ClassSessionForm
 from .models import ClassSession, Weekday
+from .week import active_sessions
 
 
 class ClassSessionModelTests(TestCase):
@@ -155,7 +158,7 @@ class ScheduleViewTests(TestCase):
 
         self.assertEqual(len(rows), 1)
         self.assertEqual(rows[0]['teacher'], self.teacher)
-        self.assertEqual(rows[0]['instruments'], [self.instrument])
+        self.assertEqual(rows[0]['offerings'].instruments, [self.instrument])
         self.assertEqual(rows[0]['cells'][0].weekday, Weekday.SATURDAY)
         self.assertEqual(len(rows[0]['cells'][0].sessions), 1)
 
@@ -176,3 +179,132 @@ class ScheduleViewTests(TestCase):
         self.assertEqual([cell.weekday for cell in row['cells'] if cell.is_today], [Weekday.MONDAY])
         self.assertEqual(len(week[2].sessions), 1)
         self.assertContains(response, '<td class="is-today">', html=False)
+
+
+class ScheduleDisplayRuleTests(TestCase):
+    """ClassSession.offerings(): what the schedule shows for each session (ADR-0002)."""
+
+    def setUp(self):
+        self.piano = Instrument.objects.create(name='پیانو', slug='piano', display_order=1)
+        self.guitar = Instrument.objects.create(name='گیتار پاپ', slug='pop-guitar', display_order=2)
+        self.bells = Instrument.objects.create(name='بلز', slug='glockenspiel', display_order=3, children_only=True)
+        self.theory = Programme.objects.create(
+            name='تئوری و سلفژ', slug='theory', kind=Programme.Kind.WITH_TEACHER,
+            short_description='-', long_description='-',
+        )
+        self.ensemble = Programme.objects.create(
+            name='گروه نوازی', slug='ensemble', kind=Programme.Kind.FIXED_TIME,
+            short_description='-', long_description='-',
+        )
+        self.teacher = Teacher.objects.create(
+            first_name='علی', last_name='شمس', biography='.', profile_image='teachers/ali.jpg',
+        )
+        self.teacher.programmes.add(self.theory)
+
+    def _session(self, weekday, *instruments, programme=None):
+        session = ClassSession.objects.create(
+            teacher=self.teacher, weekday=weekday, start_time=time(14, 0), end_time=time(21, 0), programme=programme,
+        )
+        session.instruments.add(*instruments)
+        return session
+
+    def test_a_session_shows_its_instruments_then_the_teachers_programmes(self):
+        session = self._session(Weekday.WEDNESDAY, self.guitar, self.piano)
+
+        self.assertEqual(str(session.offerings()), 'پیانو، گیتار پاپ · تئوری و سلفژ')
+
+    def test_a_reserved_session_shows_only_its_programme(self):
+        session = self._session(Weekday.THURSDAY, programme=self.ensemble)
+
+        offerings = session.offerings()
+        self.assertEqual(offerings.instruments, [])
+        self.assertEqual(offerings.programmes, [self.ensemble])
+        self.assertEqual(str(offerings), 'گروه نوازی')
+
+    def test_children_only_instruments_never_show_on_the_schedule(self):
+        session = self._session(Weekday.SATURDAY, self.bells, self.piano)
+
+        self.assertEqual(str(session.offerings()), 'پیانو · تئوری و سلفژ')
+
+    def test_a_session_of_only_childrens_instruments_shows_the_teachers_programme(self):
+        children = Programme.objects.create(
+            name='موسیقی کودک', slug='children', kind=Programme.Kind.WITH_TEACHER,
+            instruments_shown=Programme.InstrumentsShown.CHILDREN_ONLY,
+            short_description='-', long_description='-',
+        )
+        self.teacher.programmes.set([children])
+        session = self._session(Weekday.SATURDAY, self.bells)
+
+        self.assertEqual(str(session.offerings()), 'موسیقی کودک')
+
+    def test_an_inactive_programme_is_left_out(self):
+        self.theory.is_active = False
+        self.theory.save()
+        session = self._session(Weekday.WEDNESDAY, self.piano)
+
+        self.assertEqual(str(session.offerings()), 'پیانو')
+
+    def test_offerings_read_from_the_prefetch_without_more_queries(self):
+        self._session(Weekday.WEDNESDAY, self.piano)
+        self._session(Weekday.THURSDAY, programme=self.ensemble)
+        sessions = list(active_sessions())
+
+        with self.assertNumQueries(0):
+            [str(session.offerings()) for session in sessions]
+
+    def test_the_schedule_page_shows_the_reserved_session_and_the_teachers_full_list(self):
+        self._session(Weekday.WEDNESDAY, self.piano, self.guitar)
+        self._session(Weekday.THURSDAY, programme=self.ensemble)
+
+        response = self.client.get(reverse('schedules:schedule'))
+
+        row = response.context['schedule_rows'][0]
+        self.assertEqual(str(row['offerings']), 'پیانو، گیتار پاپ · تئوری و سلفژ، گروه نوازی')
+        # Each session offers less than the row's full list, so each cell names its own.
+        self.assertContains(response, '<small class="week-instruments">گروه نوازی</small>', html=True)
+        self.assertContains(
+            response, '<small class="week-instruments">پیانو، گیتار پاپ · تئوری و سلفژ</small>', html=True,
+        )
+
+
+class ClassSessionAdminFormTests(TestCase):
+    def setUp(self):
+        self.piano = Instrument.objects.create(name='پیانو', slug='piano')
+        self.ensemble = Programme.objects.create(
+            name='گروه نوازی', slug='ensemble', kind=Programme.Kind.FIXED_TIME,
+            short_description='-', long_description='-',
+        )
+        self.theory = Programme.objects.create(
+            name='تئوری و سلفژ', slug='theory', kind=Programme.Kind.WITH_TEACHER,
+            short_description='-', long_description='-',
+        )
+        self.teacher = Teacher.objects.create(
+            first_name='مسعود', last_name='آرامش', biography='.', profile_image='teachers/m.jpg',
+        )
+
+    def _form(self, **data):
+        return ClassSessionForm(data={
+            'teacher': self.teacher.pk, 'weekday': Weekday.THURSDAY,
+            'start_time': '10:00', 'end_time': '19:00', 'is_active': True, **data,
+        })
+
+    def test_a_session_needs_instruments_or_a_reserved_programme(self):
+        form = self._form()
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('instruments', form.errors)
+
+    def test_a_reserved_session_with_no_instruments_is_valid(self):
+        self.assertTrue(self._form(programme=self.ensemble.pk).is_valid())
+
+    def test_a_session_cannot_have_both_instruments_and_a_reserved_programme(self):
+        form = self._form(programme=self.ensemble.pk, instruments=[self.piano.pk])
+
+        self.assertFalse(form.is_valid())
+        self.assertTrue(form.non_field_errors())
+
+    def test_only_fixed_time_programmes_can_be_reserved(self):
+        form = self._form(programme=self.theory.pk)
+
+        self.assertFalse(form.is_valid())
+        self.assertIn('programme', form.errors)

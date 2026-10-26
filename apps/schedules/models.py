@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -28,6 +30,18 @@ WEEKDAY_SORT_VALUES = {
 }
 
 
+@dataclass(frozen=True)
+class Offerings:
+    """A session's Instruments and Programmes, in the order the schedule lists them."""
+    instruments: list
+    programmes: list
+
+    def __str__(self):
+        # «پیانو، گیتار پاپ · تئوری و سلفژ»
+        parts = ['، '.join(item.name for item in group) for group in (self.instruments, self.programmes) if group]
+        return ' · '.join(parts)
+
+
 class ClassSessionQuerySet(models.QuerySet):
     def active(self):
         """The sessions the site shows: active, and taught by an active teacher."""
@@ -46,7 +60,19 @@ class ClassSession(models.Model):
         'teachers.Instrument',
         related_name='class_sessions',
         verbose_name='سازها',
+        blank=True,
         help_text='یک یا چند سازی که استاد در این جلسه تدریس می‌کند را انتخاب کنید.',
+    )
+    programme = models.ForeignKey(
+        'programmes.Programme',
+        on_delete=models.PROTECT,
+        related_name='reserved_sessions',
+        null=True,
+        blank=True,
+        limit_choices_to={'kind': 'fixed_time'},
+        verbose_name='دورهٔ رزروشده',
+        help_text='فقط برای جلسه‌ای که برای یک دورهٔ زمان‌دار (مثل گروه نوازی) رزرو شده است. '
+                  'در این جلسه چیز دیگری تدریس نمی‌شود.',
     )
     weekday = models.CharField('روز هفته', max_length=3, choices=Weekday.choices, help_text='روز برگزاری این جلسه را انتخاب کنید.')
     weekday_order = models.PositiveSmallIntegerField('ترتیب روز هفته', default=0, editable=False)
@@ -90,6 +116,23 @@ class ClassSession(models.Model):
             raise ValidationError(
                 'این استاد در همین روز و بازه زمانی، یک جلسه فعال دیگر دارد.'
             )
+
+    def offerings(self):
+        """What the schedule shows for this session (ADR-0002).
+
+        A session reserved for a fixed-time Programme shows only that Programme. Any other shows its
+        Instruments (children-only ones excluded), then the teacher's "with the teacher" Programmes.
+        Reads `instruments` and `teacher.programmes` through `.all()`, so a prefetch serves it.
+        """
+        if self.programme_id:
+            return Offerings(instruments=[], programmes=[self.programme])
+        return Offerings(
+            instruments=[i for i in self.instruments.all() if not i.children_only],
+            programmes=[
+                p for p in self.teacher.programmes.all()
+                if p.is_active and p.kind == p.Kind.WITH_TEACHER
+            ],
+        )
 
     def save(self, *args, **kwargs):
         self.weekday_order = WEEKDAY_SORT_VALUES[self.weekday]

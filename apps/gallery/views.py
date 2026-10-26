@@ -11,10 +11,7 @@ class GalleryRootView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['current_page'] = None
         context['breadcrumbs'] = []
-        context['child_pages'] = GalleryPage.objects.filter(
-            parent__isnull=True,
-            is_active=True,
-        )
+        context['child_pages'] = GalleryPage.objects.listed().filter(parent__isnull=True)
         context['images'] = []
         return context
 

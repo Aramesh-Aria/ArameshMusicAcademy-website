@@ -6,7 +6,7 @@ from .models import GalleryPage
 def gallery_nav_tree(request):
     pages = list(
         GalleryPage.objects
-        .filter(is_active=True)
+        .listed()
         .order_by('display_order', 'title')
         .only('id', 'title', 'slug', 'parent_id')
     )

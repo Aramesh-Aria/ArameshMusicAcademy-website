@@ -48,7 +48,7 @@ class GalleryPageSitemap(PublicSitemap):
     changefreq = 'weekly'
 
     def items(self):
-        return GalleryPage.objects.filter(is_active=True)
+        return GalleryPage.objects.listed()
 
     def lastmod(self, obj):
         return obj.updated_at

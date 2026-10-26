@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw
 
 from apps.gallery.models import GalleryImage, GalleryPage
 from apps.pages.models import SitePageContent
+from apps.programmes.models import Programme
 from apps.schedules.models import ClassSession
 from apps.teachers.models import Instrument, Teacher
 
@@ -18,39 +19,55 @@ DATA_DIR = Path(__file__).resolve().parent / 'seed_data'
 
 
 class Command(BaseCommand):
-    help = 'Fill the database with the academy\'s real content (teachers, sessions, gallery, About text) for local development.'
+    help = (
+        'Fill the database with the academy\'s real content (Programmes, Instruments, teachers, sessions, gallery, '
+        'About text and the home page\'s teaching sections) for local development.'
+    )
 
     def handle(self, *args, **options):
         with open(DATA_DIR / 'academy.json', encoding='utf-8') as f:
             data = json.load(f)
 
-        instruments = self.create_instruments(data['teachers'])
-        self.create_teachers(data['teachers'], instruments)
+        programmes = self.create_programmes(data['programmes'])
+        instruments = self.create_instruments(data['instruments'])
+        self.create_teachers(data['teachers'], instruments, programmes)
         self.create_gallery(data['gallery_pages'])
         self.create_about_page(data['about'])
+        self.create_sections(data['sections'])
 
         self.stdout.write(self.style.SUCCESS('Academy data is ready.'))
 
-    def create_instruments(self, teacher_data):
-        names = set()
-        for teacher in teacher_data:
-            names.update(teacher['instruments'])
-            for session in teacher['sessions']:
-                names.update(session['instruments'])
-        return {name: Instrument.objects.get_or_create(name=name)[0] for name in sorted(names)}
+    def create_programmes(self, programme_data):
+        # get_or_create, so copy edited in the admin survives a re-run.
+        programmes = {}
+        for data in programme_data:
+            fields = dict(data)
+            name = fields.pop('name')
+            programmes[name] = Programme.objects.get_or_create(name=name, defaults=fields)[0]
+        return programmes
 
-    def create_teachers(self, teacher_data, instruments):
+    def create_instruments(self, instrument_data):
+        instruments = {}
+        for data in instrument_data:
+            fields = dict(data)
+            name = fields.pop('name')
+            instruments[name] = Instrument.objects.update_or_create(name=name, defaults=fields)[0]
+        return instruments
+
+    def create_teachers(self, teacher_data, instruments, programmes):
         for data in teacher_data:
             teacher, _ = Teacher.objects.update_or_create(
                 first_name=data['first_name'],
                 last_name=data['last_name'],
                 defaults={
                     'biography': data['biography'],
+                    'lineage': data['lineage'],
                     'display_order': data['display_order'],
                     'is_active': True,
                 },
             )
             teacher.instruments.set(instruments[name] for name in data['instruments'])
+            teacher.programmes.set(programmes[name] for name in data['programmes'])
             self.ensure_teacher_image(teacher, data['image'])
 
             for session_data in data['sessions']:
@@ -60,6 +77,8 @@ class Command(BaseCommand):
                     start_time=time.fromisoformat(session_data['start']),
                     defaults={
                         'end_time': time.fromisoformat(session_data['end']),
+                        # A session reserved for a fixed-time Programme, such as Thursday's ensemble playing.
+                        'programme': programmes.get(session_data.get('programme')),
                         'is_active': True,
                         'notes': '',
                     },
@@ -113,6 +132,14 @@ class Command(BaseCommand):
             page_key=SitePageContent.ABOUT,
             defaults={'title': about['title'], 'body': about['body'], 'is_active': True},
         )
+
+    def create_sections(self, sections):
+        # The home page's «how we teach» and «three steps» sections, also editable in the admin.
+        for page_key, content in sections.items():
+            SitePageContent.objects.get_or_create(
+                page_key=page_key,
+                defaults={'title': content['title'], 'body': content['body'], 'is_active': True},
+            )
 
     def save_seed_file(self, field_file, relative_path):
         # Saving through the field runs the model's save(), which resizes and crops the upload.

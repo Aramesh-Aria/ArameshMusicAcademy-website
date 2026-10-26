@@ -85,6 +85,7 @@ INSTALLED_APPS = [
     'django_jalali',
     'apps.core',
     'apps.pages',
+    'apps.programmes',
     'apps.teachers',
     'apps.schedules',
     'apps.contact',
@@ -258,6 +259,8 @@ CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', SITE_E
 
 # Slug of the GalleryPage whose images are shown on the About page (academy's physical space).
 ABOUT_GALLERY_SLUG = os.environ.get('ABOUT_GALLERY_SLUG', 'academy-space')
+# The gallery page whose photos rotate in the home hero. It is hidden from the gallery menu, index and sitemap.
+HERO_GALLERY_SLUG = os.environ.get('HERO_GALLERY_SLUG', 'home-hero')
 
 # Google Analytics 4 measurement ID (e.g. G-XXXXXXXXXX). Empty = analytics disabled.
 GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID', '')

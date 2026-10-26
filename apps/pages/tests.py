@@ -185,3 +185,19 @@ class PageViewTests(TestCase):
         self.assertContains(response, 'متن صفحه خانه از پنل مدیریت.')
 
 # Create your tests here.
+
+
+class SitePageContentPointsTests(TestCase):
+    def test_points_split_the_body_into_titles_and_texts(self):
+        content = SitePageContent(
+            page_key=SitePageContent.TEACHING,
+            title='شیوهٔ آموزش',
+            body='یک استاد، یک هنرجو\r\nهمهٔ کلاس‌ها خصوصی است.\r\nخط دوم.\r\n\r\n\r\nاز کلاس تا صحنه\nکنسرت‌های داخلی\n\nفقط عنوان',
+        )
+
+        self.assertEqual(content.points(), [
+            ('یک استاد، یک هنرجو', 'همهٔ کلاس‌ها خصوصی است. خط دوم.'),
+            ('از کلاس تا صحنه', 'کنسرت‌های داخلی'),
+            ('فقط عنوان', ''),
+        ])
+

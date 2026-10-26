@@ -1,5 +1,14 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.text import slugify
+
+from apps.programmes.models import Programme
+
+
+class InstrumentQuerySet(models.QuerySet):
+    def main(self):
+        """The Instruments of the main grid: children-only ones belong to children's music alone."""
+        return self.filter(children_only=False)
 
 
 class Instrument(models.Model):
@@ -12,16 +21,66 @@ class Instrument(models.Model):
             'unique': 'این ساز قبلا ثبت شده است.',
         },
     )
+    slug = models.SlugField(
+        'نام در آدرس',
+        max_length=100,
+        unique=True,
+        help_text='با حروف لاتین، مثل santur. در آدرس صفحهٔ ساز می‌آید.',
+        error_messages={'unique': 'ساز دیگری همین نام در آدرس را دارد.'},
+    )
+    overview = models.TextField(
+        'معرفی کوتاه',
+        blank=True,
+        help_text='چند جمله دربارهٔ این ساز برای صفحهٔ ساز. یک خط خالی بین پاراگراف‌ها بگذارید.',
+    )
+    photo = models.ImageField(
+        'تصویر',
+        upload_to='instruments/',
+        blank=True,
+        help_text='اختیاری. بدون تصویر، نام ساز با حروف درشت به جای تصویر نمایش داده می‌شود.',
+    )
+    children_only = models.BooleanField(
+        'ساز کودک',
+        default=False,
+        help_text='سازهای کودک (مثل بلز و فلوت) فقط در صفحهٔ موسیقی کودک و صفحهٔ استاد دیده می‌شوند، نه در فهرست اصلی سازها.',
+    )
+    display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در فهرست سازها.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
 
+    objects = InstrumentQuerySet.as_manager()
+
     class Meta:
-        ordering = ['name']
+        ordering = ['display_order', 'name']
         verbose_name = 'ساز'
         verbose_name_plural = 'سازها'
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        try:
+            old_name = Instrument.objects.get(pk=self.pk).photo.name or None
+        except Instrument.DoesNotExist:
+            old_name = None
+
+        new_name = self.photo.name if self.photo else None
+        photo_changed = old_name != new_name
+
+        # The admin asks for a slug; rows made in code without one get the name's, or the pk's for a Persian name.
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+        if not self.slug:
+            self.slug = f'instrument-{self.pk}'
+            Instrument.objects.filter(pk=self.pk).update(slug=self.slug)
+
+        if photo_changed and self.photo:
+            from apps.core.image_utils import process_image
+            result_name = process_image(self.photo, width=1200, height=800, crop=True)
+            if result_name != self.photo.name:
+                Instrument.objects.filter(pk=self.pk).update(photo=result_name)
+                self.photo.name = result_name
 
 
 class Teacher(models.Model):
@@ -32,6 +91,21 @@ class Teacher(models.Model):
         related_name='teachers',
         verbose_name='سازها',
         help_text='یک یا چند ساز که این استاد تدریس می‌کند را انتخاب کنید.',
+    )
+    programmes = models.ManyToManyField(
+        'programmes.Programme',
+        related_name='teachers',
+        blank=True,
+        limit_choices_to=Programme.TEACHER_CHOICES,
+        verbose_name='دوره‌ها',
+        help_text='دوره‌هایی که این استاد در همان روزهای حضورش درس می‌دهد (مثل تئوری و سلفژ). '
+                  'کلاس خصوصی را انتخاب نکنید؛ همهٔ کلاس‌ها خصوصی است.',
+    )
+    lineage = models.CharField(
+        'استادان و دوره‌ها',
+        max_length=120,
+        blank=True,
+        help_text='یک خط کوتاه زیر نام استاد، مثل «آموخته نزد هوشنگ ظریف». اگر خالی بماند نمایش داده نمی‌شود.',
     )
     biography = models.TextField('بیوگرافی', help_text='توضیح کوتاه یا کامل درباره سابقه و فعالیت‌های استاد.')
     home_intro = models.TextField(

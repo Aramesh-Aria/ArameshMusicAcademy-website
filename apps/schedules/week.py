@@ -25,11 +25,11 @@ def today_weekday():
 
 
 def active_sessions():
-    """Every active session of an active teacher, with its teacher and instruments loaded."""
+    """Every active session of an active teacher, with what `ClassSession.offerings()` reads loaded."""
     return (
         ClassSession.objects.active()
-        .select_related('teacher')
-        .prefetch_related('instruments')
+        .select_related('teacher', 'programme')
+        .prefetch_related('instruments', 'teacher__programmes')
     )
 
 

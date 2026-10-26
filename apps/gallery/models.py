@@ -1,6 +1,7 @@
 import re
 from urllib.parse import parse_qs, urlparse
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -26,6 +27,12 @@ def aparat_video_hash(url):
     """Extract the video hash from an Aparat URL (aparat.com/v/HASH or embed form)."""
     match = re.search(r'/v/([A-Za-z0-9]+)', url) or re.search(r'/videohash/([A-Za-z0-9]+)', url)
     return match.group(1) if match else None
+
+
+class GalleryPageQuerySet(models.QuerySet):
+    def listed(self):
+        """Active pages a Visitor can browse to: the home hero's photo page stays out of the menu, index and sitemap."""
+        return self.filter(is_active=True).exclude(parent__isnull=True, slug=settings.HERO_GALLERY_SLUG)
 
 
 class GalleryPage(models.Model):
@@ -55,6 +62,8 @@ class GalleryPage(models.Model):
     display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در لیست گالری‌ها.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
     updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    objects = GalleryPageQuerySet.as_manager()
 
     class Meta:
         ordering = ['display_order', 'title']

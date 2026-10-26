@@ -25,8 +25,8 @@ class ContactView(FormView):
         subject = f'پیام جدید از سایت: {message.subject}'
         body = (
             f'نام: {message.full_name}\n'
-            f'ایمیل: {message.email}\n'
-            f'تلفن: {message.phone or "—"}\n'
+            f'تلفن: {message.phone}\n'
+            f'ایمیل: {message.email or "—"}\n'
             f'موضوع: {message.subject}\n\n'
             f'{message.message}'
         )
@@ -36,7 +36,7 @@ class ContactView(FormView):
                 body=body,
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 to=[settings.CONTACT_NOTIFICATION_EMAIL],
-                reply_to=[message.email],
+                reply_to=[message.email] if message.email else None,
             ).send(fail_silently=False)
         except Exception:
             # A mail failure must never block the visitor's submission — it's already saved.

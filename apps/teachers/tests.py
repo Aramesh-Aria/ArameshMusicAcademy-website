@@ -100,3 +100,19 @@ class TeacherViewTests(TestCase):
 
         self.assertEqual(sessions, [saturday, monday])
         self.assertContains(response, 'شنبه، دوشنبه')
+
+
+class InstrumentModelTests(TestCase):
+    def test_the_main_grid_leaves_out_childrens_instruments(self):
+        santur = Instrument.objects.create(name='سنتور', slug='santur')
+        Instrument.objects.create(name='بلز', slug='glockenspiel', children_only=True)
+
+        self.assertEqual(list(Instrument.objects.main()), [santur])
+
+    def test_an_instrument_made_without_a_slug_gets_one(self):
+        latin = Instrument.objects.create(name='Piano')
+        persian = Instrument.objects.create(name='سنتور')
+
+        self.assertEqual(latin.slug, 'piano')
+        self.assertEqual(persian.slug, f'instrument-{persian.pk}')
+        self.assertEqual(Instrument.objects.get(pk=persian.pk).slug, persian.slug)
