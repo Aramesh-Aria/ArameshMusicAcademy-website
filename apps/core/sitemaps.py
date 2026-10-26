@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
@@ -5,7 +6,15 @@ from apps.gallery.models import GalleryPage
 from apps.teachers.models import Teacher
 
 
-class StaticViewSitemap(Sitemap):
+class PublicSitemap(Sitemap):
+    """Lists URLs on the public domain over https, whichever host served sitemap.xml."""
+    protocol = 'https'
+
+    def get_domain(self, site=None):
+        return settings.SITE_DOMAIN
+
+
+class StaticViewSitemap(PublicSitemap):
     priority = 0.7
     changefreq = 'monthly'
 
@@ -23,7 +32,7 @@ class StaticViewSitemap(Sitemap):
         return reverse(item)
 
 
-class TeacherSitemap(Sitemap):
+class TeacherSitemap(PublicSitemap):
     priority = 0.6
     changefreq = 'monthly'
 
@@ -34,7 +43,7 @@ class TeacherSitemap(Sitemap):
         return obj.updated_at
 
 
-class GalleryPageSitemap(Sitemap):
+class GalleryPageSitemap(PublicSitemap):
     priority = 0.5
     changefreq = 'weekly'
 

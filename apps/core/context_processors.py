@@ -7,6 +7,7 @@ def site_info(request):
     """
     phones = getattr(settings, 'SITE_PHONES', [])
     return {
+        'site_url': 'https://' + getattr(settings, 'SITE_DOMAIN', 'aramesh-academy.ir'),
         'site_email': getattr(settings, 'SITE_EMAIL', 'info@arameshmusicacademy.com'),
         'site_phones': phones,
         'site_phone_primary': phones[0] if len(phones) > 0 else '',

@@ -3,7 +3,7 @@
 {% block title %}{% if current_page %}{{ current_page.title }} | گالری{% else %}گالری{% endif %} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block meta_description %}{{ meta_description|default:'تصاویر و ویدیوهای آموزشگاه موسیقی آرامش: فضای آموزشگاه، کلاس‌ها و کنسرت‌ها.' }}{% endblock %}
 {% block body_class %}page-gallery{% endblock %}
-{% block og_image %}{% if current_page.cover_image %}{% include 'partials/og_image.html' with url=current_page.cover_image.url width=900 height=600 alt=current_page.title %}{% elif images %}{% include 'partials/og_image.html' with url=images.0.image.url alt=current_page.title|default:'گالری' %}{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block og_image %}{% with cover=current_page.display_cover %}{% if current_page.cover_image %}{% include 'partials/og_image.html' with url=cover.url width=900 height=600 alt=current_page.title %}{% elif cover %}{% include 'partials/og_image.html' with url=cover.url alt=current_page.title %}{% else %}{{ block.super }}{% endif %}{% endwith %}{% endblock %}
 
 {% block content %}
 <section class="gallery grid" aria-labelledby="gallery-title">

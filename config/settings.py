@@ -32,7 +32,15 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-w(p+t0x6&*4295%5nedht
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['aramesh-academy.runflare.run', 'api.runflare.com', 'localhost', '127.0.0.1','aramesh-academy.ir']
+# Comma-separated in .env or Runflare's variables; without it, the hosts the site has always answered on.
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        'ALLOWED_HOSTS',
+        'aramesh-academy.ir,aramesh-academy.runflare.run,api.runflare.com,localhost,127.0.0.1',
+    ).split(',')
+    if host.strip()
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://aramesh-academy.ir',
@@ -171,6 +179,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "public", "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Site Information
+# The one public domain: canonical, og:url and og:image name it, whichever host served the page.
+SITE_DOMAIN = 'aramesh-academy.ir'
 SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7748', '+98 990 233 8431', '+98 21 4445 7746', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '

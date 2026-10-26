@@ -1,8 +1,8 @@
 {# The link-preview image. Expects `url` (site-relative) and `alt`; `width` and `height` only when known. #}
-<meta property="og:image" content="https://{{ request.get_host }}{{ url }}">
-<meta property="og:image:secure_url" content="https://{{ request.get_host }}{{ url }}">
+<meta property="og:image" content="{{ site_url }}{{ url }}">
+<meta property="og:image:secure_url" content="{{ site_url }}{{ url }}">
 {% if width %}<meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="{{ width }}">
 <meta property="og:image:height" content="{{ height }}">
 {% endif %}<meta property="og:image:alt" content="{{ alt }}">
-<meta name="twitter:image" content="https://{{ request.get_host }}{{ url }}">
+<meta name="twitter:image" content="{{ site_url }}{{ url }}">

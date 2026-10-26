@@ -40,9 +40,9 @@ There is no linter or frontend build step configured.
 
 ## Configuration
 
-- `config/settings.py` is the only settings file. It loads a gitignored `.env` via python-dotenv. On Runflare, real environment variables are used instead. See `.env.example` for the keys: `SECRET_KEY`, `DEBUG`, email/SMTP settings, `CONTACT_NOTIFICATION_EMAIL`, `ABOUT_GALLERY_SLUG`, `SITE_INSTAGRAM`/`SITE_TELEGRAM`, `GOOGLE_ANALYTICS_ID`.
+- `config/settings.py` is the only settings file. It loads a gitignored `.env` via python-dotenv. On Runflare, real environment variables are used instead. See `.env.example` for the keys: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` (comma-separated; defaults to the production and local hosts when unset), email/SMTP settings, `CONTACT_NOTIFICATION_EMAIL`, `ABOUT_GALLERY_SLUG`, `SITE_INSTAGRAM`/`SITE_TELEGRAM`, `GOOGLE_ANALYTICS_ID`.
 - When no email env vars are set, the console email backend is used, so local dev and tests need no credentials.
-- `ALLOWED_HOSTS`, `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS` and `SITE_HOURS` are hardcoded in `settings.py`.
+- `SITE_DOMAIN` (the public domain used by canonical, og: tags and the sitemap), `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS` and `SITE_HOURS` are hardcoded in `settings.py`.
 - Locale: `LANGUAGE_CODE = 'fa-ir'`, `TIME_ZONE = 'Asia/Tehran'`, and `django_jalali` for Persian dates.
 - The database is SQLite at `database/db.sqlite3` (gitignored), in production too.
 

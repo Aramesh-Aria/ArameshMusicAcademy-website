@@ -53,7 +53,7 @@ class TeacherViewTests(TestCase):
 
         response = self.client.get(teacher.get_absolute_url())
 
-        self.assertContains(response, f'<meta property="og:image" content="https://testserver{teacher.profile_image.url}">', html=True)
+        self.assertContains(response, f'<meta property="og:image" content="https://aramesh-academy.ir{teacher.profile_image.url}">', html=True)
 
     def test_inactive_teacher_detail_returns_404(self):
         inactive_teacher = self.make_teacher('Hidden', 'Teacher', is_active=False)

@@ -1,8 +1,9 @@
 {# One child gallery page in an index: its cover (or first photo) cropped to 3:2 and its title, or with no photo at all a paper plate set with the title. #}
+{# The first row's covers are the page's largest paint, so they load at once; the rest wait until they're near. #}
 <li class="subpage">
   {% with cover=page.display_cover %}
   {% if cover %}
-  <img class="subpage-cover mono" src="{{ cover.url }}" width="900" height="600" alt="" loading="lazy" decoding="async">
+  <img class="subpage-cover mono" src="{{ cover.url }}" width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async">
   <h2 class="subpage-title"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></h2>
   {% else %}
   <div class="subpage-cover subpage-plate">

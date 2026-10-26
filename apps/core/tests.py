@@ -32,6 +32,23 @@ class BaseLayoutTests(TestCase):
         self.assertContains(response, 'aria-current="page"', count=2)  # header and menu
 
 
+class PublicDomainTests(TestCase):
+    def test_canonical_og_url_and_og_image_name_the_public_domain_whichever_host_served_the_page(self):
+        response = self.client.get(reverse('contact:contact'), HTTP_HOST='aramesh-academy.runflare.run')
+
+        self.assertContains(response, '<link rel="canonical" href="https://aramesh-academy.ir/contact/">', html=True)
+        self.assertContains(response, '<meta property="og:url" content="https://aramesh-academy.ir/contact/">', html=True)
+        self.assertContains(response, 'property="og:image" content="https://aramesh-academy.ir/public/static/')
+        self.assertNotContains(response, 'runflare.run')
+
+    def test_the_sitemap_lists_the_public_domain_over_https_whichever_host_served_it(self):
+        response = self.client.get('/sitemap.xml', HTTP_HOST='aramesh-academy.runflare.run')
+
+        self.assertContains(response, '<loc>https://aramesh-academy.ir/</loc>')
+        self.assertContains(response, '<loc>https://aramesh-academy.ir/contact/</loc>')
+        self.assertNotContains(response, 'runflare.run')
+
+
 class NotFoundPageTests(TestCase):
     def test_missing_page_uses_the_site_404_with_ways_back(self):
         response = self.client.get('/no-such-page/')
