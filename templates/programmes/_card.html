@@ -2,7 +2,7 @@
 <article class="programme-card on-stone">
   {% if programme.age_label %}<span class="chip chip--on-photo">{{ programme.age_label }}</span>{% endif %}
   {% with photos=programme.photos %}
-  <div class="frame{% if photos %} crossfade{% else %} frame--shape{% endif %}">
+  <div class="frame vt{% if photos %} crossfade{% else %} frame--shape{% endif %}" style="--vt: programme-{{ programme.pk }}">
     {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600" loading="lazy" decoding="async">{% empty %}{% include 'components/santur.html' %}{% endfor %}
   </div>
   {% endwith %}

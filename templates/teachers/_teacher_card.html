@@ -1,6 +1,6 @@
 {# A teacher in a row: the portrait, the name (the link), what they teach, and whom they learned from. #}
 <article class="teacher-card">
-  <div class="frame frame--portrait">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</div>
+  <div class="frame frame--portrait vt" style="--vt: teacher-{{ teacher.pk }}">{% include 'partials/portrait.html' with teacher=teacher lazy=True %}</div>
   <h3 class="teacher-card__name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h3>
   {% with offered=teacher.instruments.all %}{% if offered %}<p class="teacher-card__teaches">{{ offered|join:"، " }}</p>{% endif %}{% endwith %}
   {% if teacher.lineage %}<p class="teacher-card__lineage">{{ teacher.lineage }}</p>{% endif %}

@@ -398,6 +398,90 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   });
 })();
 
+// Crossfade (`.crossfade`): show photo `index` of a stack. The outgoing photo is held opaque under the incoming
+// one until the fade has covered it (see site.css), then let go.
+const crossfadeTo = (stack, index) => {
+  const photos = [...stack.children];
+  // Before the first turn the first photo shows by default, so it is the one leaving.
+  const leaving = photos.find((photo) => photo.classList.contains('is-active')) || photos[0];
+  const next = photos[index % photos.length];
+  stack.setAttribute('data-cycling', '');
+  if (leaving === next) { next.classList.add('is-active'); return; }
+  photos.forEach((photo) => photo.classList.remove('is-leaving'));
+  if (leaving) {
+    leaving.classList.remove('is-active');
+    leaving.classList.add('is-leaving');
+    setTimeout(() => leaving.classList.remove('is-leaving'), motion.ms('--dur-fade'));
+  }
+  next.classList.add('is-active');
+  // Fetch the photo after this one now, so it has arrived before its turn.
+  photos[(index + 1) % photos.length].loading = 'eager';
+};
+
+// Home hero (`[data-hero]`): the rooms' photos take turns. The active bar's fill animation is the clock, so
+// hover, focus inside the hero, the hero leaving the screen or the tab hiding all pause it where it is.
+// Reduced motion keeps the first photo and shows no bars.
+(() => {
+  const hero = document.querySelector('[data-hero]');
+  const stack = hero?.querySelector('.hero__slides');
+  if (!stack || stack.children.length < 2 || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const titles = [...hero.querySelectorAll('.hero__titles > span')];
+  const bars = [...hero.querySelectorAll('.hero__bar')];
+  let current = 0;
+
+  const show = (index) => {
+    current = index % bars.length;
+    crossfadeTo(stack, current);
+    titles.forEach((title, k) => title.classList.toggle('is-active', k === current));
+    bars.forEach((bar, k) => {
+      bar.classList.remove('is-active');
+      bar.classList.toggle('is-done', k < current);
+    });
+    void bars[current].offsetWidth;   // restart the fill on the new active bar
+    bars[current].classList.add('is-active');
+  };
+
+  const holds = new Set();
+  const hold = (reason, on) => {
+    if (on) holds.add(reason); else holds.delete(reason);
+    hero.toggleAttribute('data-paused', holds.size > 0);
+  };
+
+  hero.addEventListener('animationend', (event) => {
+    if (event.animationName === 'hero-fill') show(current + 1);
+  });
+  hero.addEventListener('pointerenter', (event) => { if (event.pointerType === 'mouse') hold('hover', true); });
+  hero.addEventListener('pointerleave', () => hold('hover', false));
+  hero.addEventListener('focusin', () => hold('focus', true));
+  hero.addEventListener('focusout', (event) => { if (!hero.contains(event.relatedTarget)) hold('focus', false); });
+  new IntersectionObserver(([entry]) => hold('offscreen', !entry.isIntersecting), { threshold: 0.25 }).observe(hero);
+  document.addEventListener('visibilitychange', () => hold('hidden', document.hidden));
+
+  hero.setAttribute('data-cycling', '');
+  show(0);
+})();
+
+// Programme cards: a card with more than one photo shows the next ones while a mouse rests on it, and goes back
+// to its first photo when the mouse leaves. Touch and reduced motion keep the first photo.
+(() => {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.programme-card .crossfade').forEach((stack) => {
+    if (stack.children.length < 2) return;
+    const card = stack.closest('.programme-card');
+    let current = 0;
+    let timer;
+    card.addEventListener('pointerenter', () => {
+      crossfadeTo(stack, current = 1);
+      timer = setInterval(() => crossfadeTo(stack, current = (current + 1) % stack.children.length), motion.ms('--dur-fade') + 900);
+    });
+    card.addEventListener('pointerleave', () => {
+      clearInterval(timer);
+      crossfadeTo(stack, current = 0);
+    });
+  });
+})();
+
 // Photos develop once: an image still loading when this runs comes up out of the paper tone as it arrives.
 // Images already decoded, and every image without JS, simply show.
 (() => {

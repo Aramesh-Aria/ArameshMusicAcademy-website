@@ -22,7 +22,7 @@
     </dl>
     {% if teacher.public_biography %}<div class="prose">{{ teacher.public_biography|linebreaks }}</div>{% endif %}
   </div>
-  <div class="split__media frame frame--portrait">{% include 'partials/portrait.html' with teacher=teacher %}</div>
+  <div class="split__media frame frame--portrait vt" style="--vt: teacher-{{ teacher.pk }}">{% include 'partials/portrait.html' with teacher=teacher %}</div>
 </article>
 
 <section class="section" aria-labelledby="week-title">

@@ -13,7 +13,7 @@
     <div class="prose">{{ programme.long_description|linebreaks }}</div>
   </div>
   {% with photos=programme.photos %}
-  <div class="split__media frame{% if photos %} crossfade{% else %} frame--shape{% endif %}">
+  <div class="split__media frame vt{% if photos %} crossfade{% else %} frame--shape{% endif %}" style="--vt: programme-{{ programme.pk }}">
     {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% empty %}{% include 'components/santur.html' %}{% endfor %}
   </div>
   {% endwith %}
