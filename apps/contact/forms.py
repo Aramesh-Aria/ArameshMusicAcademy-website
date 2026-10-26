@@ -9,7 +9,7 @@ class ContactForm(forms.ModelForm):
     captcha = CaptchaField(
         label='کد امنیتی',
         error_messages={'invalid': 'کد امنیتی وارد شده صحیح نیست.'},
-        widget=CaptchaTextInput(attrs={'autocapitalize': 'none', 'autocorrect': 'off', 'spellcheck': 'false', 'dir': 'ltr'}),
+        widget=CaptchaTextInput(attrs={'autocapitalize': 'none', 'autocorrect': 'off', 'spellcheck': 'false', 'dir': 'ltr', 'enterkeyhint': 'send'}),
     )
 
     class Meta:

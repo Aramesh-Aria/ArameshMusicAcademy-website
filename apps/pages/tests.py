@@ -97,7 +97,7 @@ class TodayStatusTests(TestCase):
         with patch('apps.schedules.week.timezone.localtime', return_value=self.at(12)):
             response = self.client.get(reverse('pages:home'))
 
-        self.assertContains(response, '<b>امروز، دوشنبه:</b> سنتور، پیانو، موسیقی کودک · تا ساعت 19:30', html=False)
+        self.assertContains(response, '<b>امروز، دوشنبه:</b> سنتور، پیانو، موسیقی کودک، تا ساعت 19:30', html=False)
 
 
 class HomePageTests(TestCase):

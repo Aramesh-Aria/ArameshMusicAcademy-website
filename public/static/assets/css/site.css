@@ -63,7 +63,8 @@
   button { cursor: pointer; }
   /* Taps fire at once (no double-tap-zoom wait), and a long press on a control doesn't select its label. */
   a, button, summary { touch-action: manipulation; }
-  button, summary { -webkit-user-select: none; user-select: none; }
+  /* Controls, not content: a long press shouldn't select their labels. Links in text stay selectable. */
+  button, summary, .btn { -webkit-user-select: none; user-select: none; }
   ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
   table { border-collapse: collapse; }
   p, h1, h2, h3, h4, li, dd, figcaption, blockquote { overflow-wrap: break-word; }
@@ -199,11 +200,18 @@
 
 /* ── base ──────────────────────────────────────────────────────────── */
 @layer base {
+  /* The ground is dark, so the browser's own parts (scrollbars, autofill, the page before CSS) are too; stone
+     panels flip them back to light. */
   html {
+    color-scheme: dark;
     background: var(--ground);
     scrollbar-color: var(--stone-soft) var(--ground);
     -webkit-tap-highlight-color: transparent;
   }
+  .on-stone { color-scheme: light; }
+  /* A phone on its side puts the notch at one edge: pad the page clear of it. Physical sides, since the
+     notch is on the device, not at the start or end of the text. Zero everywhere else. */
+  body { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 
   body {
     background: var(--surface);
@@ -669,7 +677,8 @@
     border-radius: var(--radius-pill);
     background: var(--ground);
   }
-  .navbar__logo { display: block; flex: none; }
+  /* At least a 44px tap area even where the logo itself is drawn smaller (phones). */
+  .navbar__logo { display: flex; align-items: center; flex: none; min-block-size: 2.75rem; }
   .navbar__logo img { inline-size: auto; block-size: 2.75rem; }
   .navbar__links {
     display: flex;
@@ -806,7 +815,8 @@
   /* ── Teacher card: portrait, name, what they teach, from whom they learned ── */
   .portrait-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-7) var(--space-5); }
   .teacher-card { position: relative; display: grid; gap: var(--space-1); align-content: start; }
-  .teacher-card .frame { margin-block-end: var(--space-3); }
+  .teacher-card .frame { margin-block-end: var(--space-3); transition: transform var(--dur-press) var(--ease-out); }
+  .teacher-card:active .frame { transform: scale(var(--press-scale)); }
   .teacher-card .frame > .portrait { inline-size: 100%; block-size: 100%; }
   .teacher-card__name { font-size: var(--display-s); }
   .teacher-card__name a { text-decoration: none; }
@@ -1012,7 +1022,11 @@
     animation: marquee var(--marquee-duration, 70s) linear infinite;
   }
   .marquee__list { display: flex; gap: var(--space-4); padding-inline-end: var(--space-4); }
-  .marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
+  .marquee:focus-within .marquee__track { animation-play-state: paused; }
+  /* Only a real hover holds it: a tap would leave touch's fake hover on, and the quotes stopped for good. */
+  @media (hover: hover) and (pointer: fine) {
+    .marquee:hover .marquee__track { animation-play-state: paused; }
+  }
   /* Right to left, the next card arrives from the reading end (the left): the track drifts rightwards. */
   @keyframes marquee { to { transform: translateX(50%); } }
   @media (prefers-reduced-motion: reduce) {
@@ -1465,7 +1479,7 @@
   .faq h2 { margin-block-end: var(--space-6); }
 
   @media (max-width: 56.25em) {
-    .hero__frame { min-block-size: 0; aspect-ratio: auto; block-size: min(43.75rem, calc(100svh - 7rem)); }
+    .hero__frame { aspect-ratio: auto; min-block-size: min(43.75rem, calc(100svh - 7rem)); }   /* a floor, so a phone on its side grows it rather than clipping the call */
     .hero__frame:not(.frame--shape)::before {
       background: linear-gradient(to top, rgb(23 19 15 / 0.94) 0%, rgb(23 19 15 / 0.82) 55%, rgb(23 19 15 / 0) 85%);
     }
