@@ -1,0 +1,9 @@
+span.ui-datepicker-trigger {
+    width: 16px;
+    height: 16px;
+    background: url("../jquery.ui.datepicker.jalali/themes/base/images/icon-calendar.1d459099e0a1.svg") 0 0 no-repeat;
+    margin-top: auto;
+    margin-bottom: auto;
+    display: inline-block;
+    padding: 0 0 0 5px;
+}

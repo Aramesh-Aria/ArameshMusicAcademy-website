@@ -52,7 +52,8 @@ There is no linter or frontend build step configured.
 ## Static and media files
 
 - Edit sources in `static_dev/`. It is **gitignored and dev-only** (`STATICFILES_DIRS`). All styling is in `static_dev/assets/css/site.css` (plain CSS in cascade layers) and all behaviour in `static_dev/assets/js/site.js` (small vanilla modules, loaded with defer). There are no vendor libraries.
-- After editing, run `collectstatic` and **commit `public/static/`** (`STATIC_ROOT`). Production serves that directory through WhiteNoise.
+- After editing, run `collectstatic` and **commit `public/static/`** (`STATIC_ROOT`), including `staticfiles.json` and the hashed copies (`site.<hash>.css`). Production serves that directory through WhiteNoise.
+- Storage is `apps.core.storage.StaticFilesStorage` (WhiteNoise's compressed manifest storage): with `DEBUG` off `{% static %}` links the hashed names, which are cached for a year, and a path missing from the manifest is an error. Only vendor paths under `admin/` and `vendor/` are let through. With `DEBUG` on, plain names are linked. To try production serving locally, run `runserver --nostatic` with `DEBUG=False`; without `--nostatic`, Django serves `static_dev/` first and every hashed URL 404s.
 - Static URL is `/public/static/` and media URL is `/public/media/` (not the Django defaults). Uploads go to `public/media/`, which `config/urls.py` serves explicitly.
 
 ## Deployment
