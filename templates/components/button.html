@@ -1,0 +1,13 @@
+{% comment %}
+  The Disc button (Gate 2). Include with:
+    label     the words on it (required)
+    href      makes it a link; without it, a <button> of `type` (default "button")
+    variant   primary (default) | secondary | quiet
+    icon      arrow (default) | phone | route | none. The arrow slides on hover; other icons tilt.
+    number    a phone or other number shown after the label, kept left-to-right
+    size      "sm" for the smaller pill; block=True to fill the row
+    aria_label, rel, extra_class, busy_label (shown while a form submits)
+{% endcomment %}{% with variant=variant|default:"primary" icon=icon|default:"arrow" %}<{% if href %}a href="{{ href }}"{% else %}button type="{{ type|default:'button' }}"{% endif %} class="btn btn--{{ variant }}{% if size %} btn--{{ size }}{% endif %}{% if block %} btn--block{% endif %}{% if extra_class %} {{ extra_class }}{% endif %}"{% if icon != "none" %} data-motion="{% if icon == 'arrow' %}slide{% else %}ring{% endif %}"{% endif %}{% if aria_label %} aria-label="{{ aria_label }}"{% endif %}{% if rel %} rel="{{ rel }}"{% endif %}{% if busy_label %} data-busy-label="{{ busy_label }}"{% endif %}>
+  <span class="btn__label">{{ label }}{% if number %} <span class="num ltr">{{ number }}</span>{% endif %}</span>
+  {% if icon != "none" %}{% if variant == "quiet" %}<svg class="btn__glyph" aria-hidden="true"><use href="#i-{{ icon }}"/></svg>{% else %}<span class="btn__disc" aria-hidden="true"><svg class="btn__glyph"><use href="#i-{{ icon }}"/></svg>{% if icon == "arrow" %}<svg class="btn__glyph btn__glyph--next"><use href="#i-arrow"/></svg>{% endif %}</span>{% endif %}{% endif %}
+</{% if href %}a{% else %}button{% endif %}>{% endwith %}

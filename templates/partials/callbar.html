@@ -2,7 +2,7 @@
 {# Phones only: call and directions, always under the thumb. #}
 {% if site_phone_primary %}
 <nav class="callbar" aria-label="تماس سریع">
-  <a class="btn" href="{{ site_phone_primary|tel_href }}"><svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>تماس</a>
-  <a class="btn btn-paper" href="{{ site_map_neshan }}" rel="noopener"><svg class="icon" aria-hidden="true"><use href="#i-route"/></svg>مسیر</a>
+  {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href icon="phone" size="sm" %}
+  {% include "components/button.html" with label="مسیر" href=site_map_neshan rel="noopener" icon="route" variant="secondary" size="sm" %}
 </nav>
 {% endif %}

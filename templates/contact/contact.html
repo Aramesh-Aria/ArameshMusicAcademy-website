@@ -35,7 +35,7 @@
       {% include 'contact/_field.html' with field=form.message wide=True %}
       {% include 'contact/_field.html' with field=form.captcha wide=True %}
       <div class="field-wide">
-        <button type="submit" class="btn">ارسال پیام</button>
+        {% include "components/button.html" with label="ارسال پیام" type="submit" busy_label="در حال ارسال…" %}
       </div>
     </form>
   </div>

@@ -286,7 +286,8 @@
     --surface: var(--stone);
     --text: var(--ink);
     --text-soft: var(--ink-soft);
-    --mark: var(--saffron-deep);
+    --mark: var(--saffron-deep);   /* lines and dots only: as text it is 3.7:1 */
+    --label: var(--ink-soft);
     --focus: var(--ink);
     background: var(--surface);
     color: var(--text);
@@ -352,32 +353,555 @@
     flex: none;
   }
 
-  /* The one action: jade, square, pressed like a key. */
+  /* ── Buttons: the Disc system (Gate 2). Label first, its icon in a disc at the end. ──
+     Primary: a saffron pill with a ground disc. Secondary: a stone pill on the ground, an ink-tint pill on
+     stone, each with a dark disc. Quiet: text over a 2px mark, with a bare arrow. Markup comes from
+     templates/components/button.html. */
   .btn {
+    --btn-h: 3.125rem;          /* 50 */
+    --disc: 2.5rem;             /* 40 */
+    --btn-bg: var(--saffron);
+    --btn-fg: var(--ink);
+    --disc-bg: var(--ground);
+    --disc-fg: var(--saffron);
+    position: relative;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-2);
-    min-block-size: 3rem;
-    padding: 0.55em 1.3em 0.65em;
-    background: var(--accent);
-    color: var(--on-accent);
+    gap: 0.875rem;
+    min-block-size: var(--btn-h);
+    padding-block: 0;
+    padding-inline: 1.5rem;
+    background: var(--btn-bg);
+    color: var(--btn-fg);
     border: 0;
-    border-radius: var(--radius);
-    font-size: var(--text-l);
+    border-radius: var(--radius-pill);
+    font-family: var(--font-text);
+    font-size: 1.0625rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: var(--leading-ui);
     text-decoration: none;
+    white-space: nowrap;
     transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
   }
+  /* A disc sits 5px inside the pill's end, so the pill's curve and the disc's share a centre. */
+  .btn:has(.btn__disc) { padding-inline-end: calc((var(--btn-h) - var(--disc)) / 2); }
   .btn:active { transform: scale(var(--press-scale)); }
-  @media (hover: hover) and (pointer: fine) {
-    .btn:hover { background: color-mix(in oklab, var(--accent), black 14%); }
+
+  .btn--secondary {
+    --btn-bg: var(--stone);
+    --btn-fg: var(--ink);
+    --disc-bg: var(--ground);
+    --disc-fg: var(--stone);
   }
-  .btn-paper { background: var(--paper); color: var(--ink); }
-  @media (hover: hover) and (pointer: fine) {
-    .btn-paper:hover { background: var(--paper-2); }
+  .on-stone .btn--secondary, .sheet .btn--secondary {
+    --btn-bg: color-mix(in oklab, var(--ink) 9%, var(--stone));
+    --disc-bg: var(--ink);
   }
+  .btn--sm { --btn-h: 2.875rem; --disc: 2.25rem; padding-inline: 1.25rem; font-size: var(--text-s); }
+  .btn--block { inline-size: 100%; justify-content: space-between; }
+
+  /* An icon-only call: a saffron disc, the phone inside (the phone navbar). It keeps a name for readers. */
+  .btn--icon { inline-size: var(--btn-h); padding: 0; gap: 0; }
+  .btn--icon .btn__glyph { inline-size: 1.375rem; block-size: 1.375rem; }
+
+  .btn__label { display: inline-flex; align-items: baseline; gap: 0.4em; }
+
+  .btn__disc {
+    position: relative;
+    display: grid;
+    place-items: center;
+    inline-size: var(--disc);
+    block-size: var(--disc);
+    flex: none;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--disc-bg);
+    color: var(--disc-fg);
+  }
+  .btn__glyph {
+    grid-area: 1 / 1;
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+    flex: none;
+    transition: transform var(--dur-move) var(--ease-out);
+  }
+  /* Forward in RTL is leftwards: on hover the arrow leaves to the left and its twin comes in from the right. */
+  .btn__glyph--next { transform: translateX(150%); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn[data-motion="slide"]:hover .btn__disc .btn__glyph:not(.btn__glyph--next) { transform: translateX(-150%); }
+    .btn[data-motion="slide"]:hover .btn__glyph--next { transform: translateX(0); }
+    .btn[data-motion="ring"]:hover .btn__glyph { transform: rotate(-14deg); }
+    /* A button with no icon has no motion to show it heard the pointer, so its fill lifts instead. */
+    .btn:not([data-motion]):hover { background: color-mix(in oklab, var(--btn-bg), white 12%); }
+  }
+
+  .btn--quiet {
+    --btn-bg: transparent;
+    --btn-fg: var(--text);
+    gap: var(--space-2);
+    min-block-size: 2.75rem;
+    padding-inline: 0.125rem;
+  }
+  .btn--quiet .btn__label {
+    padding-block-end: 0.3em;
+    background: linear-gradient(var(--mark), var(--mark)) no-repeat 0 100% / 100% 2px;
+  }
+  .btn--quiet .btn__glyph { transition-duration: var(--dur-state); }
+  @media (hover: hover) and (pointer: fine) {
+    .btn--quiet:hover .btn__glyph { transform: translateX(-4px); }
+  }
+
+  .btn:disabled, .btn[aria-disabled="true"] {
+    --btn-bg: color-mix(in oklab, var(--text) 14%, var(--surface));
+    --btn-fg: var(--text-soft);
+    --disc-bg: color-mix(in oklab, var(--text) 22%, var(--surface));
+    --disc-fg: var(--text-soft);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn--quiet:is(:disabled, [aria-disabled="true"]) { --btn-bg: transparent; }
+  .btn:is(:disabled, [aria-disabled="true"]) .btn__glyph { transform: none !important; }
+
+  /* Sending: the glyph gives way to a turning ring until the next page arrives. */
+  .btn[aria-busy="true"] { cursor: progress; }
+  .btn[aria-busy="true"] .btn__glyph { opacity: 0; }
+  .btn[aria-busy="true"] .btn__disc::after {
+    content: "";
+    grid-area: 1 / 1;
+    inline-size: 1.125rem;
+    block-size: 1.125rem;
+    border: 2px solid currentColor;
+    border-inline-end-color: transparent;
+    border-radius: 50%;
+    animation: spin 700ms linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+
+  /* ── Panels and frames ──
+     A panel is a large-radius plate inset on the ground; `.on-stone` makes it a reading panel. A frame holds
+     a photo inside a panel; its corner nests (the panel radius minus the inset). */
+  .panel {
+    margin-inline: var(--frame);
+    padding: var(--panel-pad);
+    border-radius: var(--radius-panel);
+    background: var(--surface);
+  }
+  .panel + .panel { margin-block-start: var(--frame); }
+  .panel--flush { padding: 0; overflow: hidden; }
+
+  .frame {
+    --inset: var(--space-3);
+    position: relative;
+    overflow: hidden;
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--inset)));
+    background: var(--ground-2);
+  }
+  .frame > img, .frame > picture > img {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+  /* One grade for every photo: a whisper of the ground multiplied over it, never a filter on faces. */
+  .frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--ground);
+    mix-blend-mode: multiply;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+  /* No photo yet: the frame holds the santur shape on a saffron-tinted stone, never a grey box or a repeat
+     of the name beside it. */
+  .frame--shape { background: color-mix(in oklab, var(--saffron) 14%, var(--stone)); }
+  .frame--shape::after { content: none; }
+  .frame--shape .shape { position: absolute; inset-block-end: -20%; inset-inline-start: -10%; inline-size: 85%; color: color-mix(in oklab, var(--saffron) 38%, var(--stone)); }
+  .frame--portrait { aspect-ratio: 1; }
+  .frame--wide { aspect-ratio: 3 / 2; }
+
+  /* Photos that crossfade (Programme cards, the hero): stacked in one frame, the first shows until a script
+     takes over and moves `.is-active`. */
+  .crossfade { display: grid; }
+  .crossfade > img { grid-area: 1 / 1; transition: opacity var(--dur-fade) ease-in-out; }
+  .crossfade > img:not(:first-child) { opacity: 0; }
+  .crossfade[data-cycling] > img { opacity: 0; }
+  .crossfade[data-cycling] > img.is-active { opacity: 1; }
+
+
+  /* ── Chip: a short fact on a pill (an age), with a saffron dot ── */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    min-block-size: 2rem;
+    padding-inline: 0.875rem;
+    border-radius: var(--radius-pill);
+    background: color-mix(in oklab, var(--text) 9%, var(--surface));
+    color: var(--text);
+    font-size: var(--text-s);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+  }
+  .chip::before {
+    content: "";
+    inline-size: 0.45em;
+    block-size: 0.45em;
+    border-radius: 50%;
+    background: var(--mark);
+  }
+  /* A chip over a photo sits on its own stone pill. */
+  .chip--on-photo { --surface: var(--stone); --text: var(--ink); --mark: var(--saffron-deep); background: var(--stone); }
+
+  /* A short label above a heading, only where it carries information (the slide's title, the Programme
+     above its page's headline). Sahel bold, never tracked. */
+  .label {
+    display: block;
+    margin-block-end: var(--space-2);
+    color: var(--label, var(--saffron));
+    font-size: var(--text-xs);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+  }
+
+
+  /* ── Programme card: crossfading photos, the age chip, the name, two lines, and the whole card is the link ── */
+  .programme-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-3);
+    border-radius: var(--radius-panel);
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+  .programme-card:active { transform: scale(0.99); }
+  .programme-card .frame { aspect-ratio: 3 / 2; }
+  .programme-card .chip { position: absolute; inset-block-start: var(--space-3); inset-inline-start: var(--space-3); z-index: 1; margin: var(--space-3); }
+  .programme-card__body { display: grid; gap: var(--space-2); padding: var(--space-4) var(--space-3) var(--space-3); flex: 1; align-content: start; }
+  .programme-card__title { font-size: var(--display-s); }
+  .programme-card__title a { text-decoration: none; }
+  .programme-card__title a::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
+  .programme-card__text { color: var(--text-soft); font-size: var(--text-s); }
+  .programme-card .frame img { transition: transform var(--dur-develop) var(--ease-out), opacity var(--dur-fade) ease-in-out; }
+  @media (hover: hover) and (pointer: fine) {
+    .programme-card:hover .frame img { transform: scale(1.03); }
+  }
+  .programme-card:has(a:focus-visible) { outline: 3px solid var(--focus); outline-offset: 3px; }
+  .programme-card a:focus-visible { outline: none; }
+
+
+  /* ── Instrument tile (RAM): the name and a chevron, a photo flush to the far edge ── */
+  .tile {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 38%;
+    align-items: center;
+    min-block-size: 5.5rem;
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform var(--dur-press) var(--ease-out);
+  }
+  .tile:active { transform: scale(var(--press-scale)); }
+  .tile__name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding-inline: var(--space-4) var(--space-3);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+  }
+  .tile__name .icon { inline-size: 1.125rem; block-size: 1.125rem; color: var(--mark); rotate: 90deg; transition: translate var(--dur-state) var(--ease-out); }
+  .tile__media { align-self: stretch; position: relative; background: color-mix(in oklab, var(--saffron) 22%, var(--stone)); }
+  .tile__media img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
+  .tile__media .shape { position: absolute; inset-block-end: -18%; inset-inline-end: -12%; inline-size: 120%; color: color-mix(in oklab, var(--saffron) 45%, var(--stone)); }
+  @media (hover: hover) and (pointer: fine) {
+    .tile:hover .tile__name .icon { translate: -4px 0; }
+  }
+
+  /* The typographic tile: an Instrument with no photo, its name in large Amiri on stone, the santur's
+     trapezoid cropped off one corner. Used at page-photo size. */
+  .type-tile {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 3 / 2;
+    overflow: hidden;
+    padding: var(--space-6);
+    background: var(--stone);
+    color: var(--ink);
+  }
+  .type-tile .shape {
+    position: absolute;
+    inset-block-end: -22%;
+    inset-inline-start: -14%;
+    inline-size: 78%;
+    color: color-mix(in oklab, var(--saffron) 18%, var(--stone));
+  }
+  .type-tile__name {
+    position: relative;
+    font-family: var(--font-display);
+    font-size: var(--display-l);
+    font-weight: 700;
+    line-height: var(--leading-display);
+    text-align: center;
+    text-wrap: balance;
+  }
+  .shape { display: block; block-size: auto; pointer-events: none; }
+
+
+  /* ── Navbar: an opaque floating pill, the logo at the start, the pages, the call pill at the end ── */
+  .navbar {
+    position: sticky;
+    inset-block-start: var(--space-3);
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    margin: var(--space-3) var(--frame) 0;
+    padding: 0.375rem;
+    padding-inline-start: var(--space-5);
+    border-radius: var(--radius-pill);
+    background: var(--ground);
+  }
+  .navbar__logo { display: block; flex: none; }
+  .navbar__logo img { inline-size: auto; block-size: 2.75rem; }
+  .navbar__links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-inline-start: auto;
+  }
+  .navbar__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border: 0;
+    background: none;
+    color: var(--stone);
+    font-size: var(--text-s);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .navbar__link[aria-current="page"], .navbar__link[aria-current="true"] { color: var(--saffron); }
+  .navbar__link .icon { inline-size: 1rem; block-size: 1rem; transition: rotate var(--dur-state) var(--ease-out); }
+  details[open] > .navbar__link .icon { rotate: 180deg; }
+  @media (hover: hover) and (pointer: fine) {
+    .navbar__link:hover { text-decoration: underline; text-decoration-thickness: 2px; text-decoration-color: var(--saffron); }
+  }
+  /* The phone keeps the logo, «منو» and a round call button. */
+  .navbar__compact { display: none; align-items: center; gap: var(--space-2); margin-inline-start: auto; }
+  @media (max-width: 56.25em) {
+    .navbar { padding-inline-start: var(--space-4); }
+    .navbar__links, .navbar > .btn--primary { display: none; }
+    .navbar__compact { display: flex; }
+    .navbar__logo img { block-size: 2.375rem; }
+  }
+
+
+  /* ── Dropdown (details[data-disclosure]): a stone sheet that floats from its trigger ── */
+  .dropdown { position: relative; }
+  .dropdown > summary { list-style: none; }
+  .dropdown > summary::-webkit-details-marker { display: none; }
+  .dropdown__panel {
+    position: absolute;
+    inset-block-start: calc(100% + var(--space-2));
+    inset-inline-start: 0;
+    z-index: 30;
+    min-inline-size: 15rem;
+    padding: var(--space-2);
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-2)));
+    box-shadow: 0 1.25rem 2.5rem -1rem rgb(0 0 0 / 0.55);
+    transform-origin: top right;
+    transition: opacity var(--dur-state) var(--ease-out), transform var(--dur-state) var(--ease-out);
+    @starting-style { opacity: 0; transform: scale(0.97) translateY(-4px); }
+  }
+  .dropdown__panel a {
+    display: flex;
+    align-items: center;
+    min-block-size: 2.75rem;
+    padding-inline: var(--space-3);
+    border-radius: max(0.5rem, calc(var(--radius-panel) - var(--space-4)));
+    font-size: var(--text-s);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .dropdown__panel a { gap: var(--space-2); }
+  .dropdown__panel a[aria-current]::after {
+    content: "";
+    inline-size: 0.4em;
+    block-size: 0.4em;
+    border-radius: 50%;
+    background: var(--saffron-deep);
+  }
+  .dropdown__panel .dropdown__sub a { padding-inline-start: var(--space-6); font-weight: 400; }
+  @media (hover: hover) and (pointer: fine) {
+    .dropdown__panel a:hover { background: color-mix(in oklab, var(--ink) 7%, var(--stone)); }
+  }
+
+
+  /* ── Full-screen menu (phone): a modal <dialog> on the ground, the call always at its foot ── */
+  .menu-sheet {
+    inline-size: 100%;
+    max-inline-size: none;
+    block-size: 100dvh;
+    max-block-size: none;
+    margin: 0;
+    padding: var(--space-3) var(--frame) max(var(--space-5), env(safe-area-inset-bottom));
+    border: 0;
+    background: var(--ground);
+    color: var(--stone);
+    transition: opacity var(--dur-move) var(--ease-out), transform var(--dur-move) var(--ease-out),
+                display var(--dur-move) allow-discrete, overlay var(--dur-move) allow-discrete;
+  }
+  .menu-sheet:not([open]) { opacity: 0; transform: translateY(-0.75rem); }
+  .menu-sheet[open] {
+    display: flex;
+    flex-direction: column;
+    @starting-style { opacity: 0; transform: translateY(-0.75rem); }
+  }
+  .menu-sheet::backdrop { background: var(--ground); }
+  .menu-sheet__bar { display: flex; align-items: center; justify-content: space-between; padding-inline-start: var(--space-4); }
+  .menu-sheet__links { display: grid; gap: var(--space-1); margin-block: var(--space-6) auto; }
+  .menu-sheet__links a {
+    display: flex;
+    align-items: center;
+    min-block-size: 3.25rem;
+    padding-inline: var(--space-4);
+    font-size: var(--text-l);
+    font-weight: 700;
+    text-decoration: none;
+  }
+  .menu-sheet__links a[aria-current] { color: var(--saffron); }
+  .menu-sheet__links .menu-sheet__sub a { min-block-size: 2.75rem; padding-inline-start: var(--space-7); font-size: var(--text-m); font-weight: 400; color: var(--stone-soft); }
+  .menu-sheet__foot { display: grid; gap: var(--space-2); padding-block-start: var(--space-5); }
+
+
+  /* ── Accordion (FAQ): native <details>, the answer opening to its own height ── */
+  .accordion { display: grid; gap: var(--space-2); }
+  .accordion details {
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    background: color-mix(in oklab, var(--text) 6%, var(--surface));
+    interpolate-size: allow-keywords;
+  }
+  .accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-block-size: 3.5rem;
+    padding: var(--space-3) var(--space-5);
+    list-style: none;
+    font-weight: 700;
+    line-height: var(--leading-ui);
+    cursor: pointer;
+    border-radius: inherit;
+  }
+  .accordion summary::-webkit-details-marker { display: none; }
+  .accordion summary .icon { color: var(--mark); transition: rotate var(--dur-move) var(--ease-out); }
+  .accordion details[open] summary .icon { rotate: 180deg; }
+  .accordion details::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition: block-size var(--dur-move) var(--ease-out), content-visibility var(--dur-move) allow-discrete;
+  }
+  .accordion details[open]::details-content { block-size: auto; }
+  .accordion__answer { padding: 0 var(--space-5) var(--space-5); max-inline-size: var(--measure); }
+  .accordion__answer > * + * { margin-block-start: 0.75em; }
+
+
+  /* ── Marquee (testimonials): a slow sideways drift of quote cards. The list is rendered twice (the copy is
+     aria-hidden), so the loop has no seam. Hover or focus holds it; reduced motion lays the cards out still. ── */
+  /* contain: its max-content track must not widen the page or a grid around it. */
+  .marquee { overflow: hidden; padding-block: var(--space-2); contain: inline-size; }
+  .marquee__track {
+    display: flex;
+    gap: var(--space-4);
+    inline-size: max-content;
+    animation: marquee var(--marquee-duration, 70s) linear infinite;
+  }
+  .marquee__list { display: flex; gap: var(--space-4); }
+  .marquee:hover .marquee__track, .marquee:focus-within .marquee__track { animation-play-state: paused; }
+  /* Right to left, the next card arrives from the reading end (the left): the track drifts rightwards. */
+  @keyframes marquee { to { transform: translateX(50%); } }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee { overflow: visible; }
+    .marquee__track { animation: none; inline-size: auto; }
+    .marquee__list { flex-wrap: wrap; }
+    .marquee__list[aria-hidden="true"] { display: none; }
+  }
+  .quote {
+    display: grid;
+    align-content: space-between;
+    gap: var(--space-4);
+    inline-size: min(22rem, 80vw);
+    padding: var(--space-5);
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+  }
+  .quote blockquote { font-size: var(--text-m); }
+  .quote figcaption { color: var(--text-soft); font-size: var(--text-s); font-weight: 700; }
+
+
+  /* ── Form fields: on stone, a lighter well with a 3:1 edge; focus is an ink ring; errors name the field ── */
+  .field label { display: block; margin-block-end: var(--space-2); font-size: var(--text-s); font-weight: 700; line-height: var(--leading-ui); }
+  .field input:not([type="hidden"]),
+  .field textarea,
+  .field select {
+    display: block;
+    inline-size: 100%;
+    min-block-size: 3.25rem;
+    padding: var(--space-2) var(--space-4);
+    background: var(--field);
+    color: var(--ink);
+    border: 1px solid var(--field-line);
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    font-size: max(1rem, var(--text-m));   /* 16px or more, so phones don't zoom into the field */
+    line-height: 1.6;
+    transition: border-color var(--dur-state) var(--ease-out);
+  }
+  .field textarea { min-block-size: 9rem; resize: vertical; }
+  /* Latin fields keep their own direction but sit on the RTL edge. */
+  .field input[dir="ltr"] { text-align: right; }
+  .field :is(input, textarea, select):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-color: var(--ink); }
+  .field [aria-invalid="true"] { border-color: var(--error); box-shadow: inset 0 0 0 1px var(--error); }
+  .field-error { margin-block-start: var(--space-2); color: var(--error); font-size: var(--text-s); font-weight: 700; }
+
+  .form-summary {
+    padding: var(--space-4) var(--space-5);
+    border-radius: max(0.75rem, calc(var(--radius-panel) - var(--space-3)));
+    background: color-mix(in oklab, var(--error) 10%, var(--stone));
+  }
+  .form-summary:focus { outline: none; }
+  .form-summary p { font-weight: 700; color: var(--error); }
+  .form-summary ul { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin-block-start: var(--space-2); }
+
+  .captcha-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-block-end: var(--space-3); }
+  /* The generated image has a white ground; multiply lays its letters straight on the stone. */
+  .captcha-image { inline-size: 12.5rem; block-size: auto; mix-blend-mode: multiply; border-radius: 0.5rem; }
+  .captcha-refresh {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    background: color-mix(in oklab, var(--ink) 9%, var(--stone));
+    color: var(--ink);
+    border: 0;
+    border-radius: 50%;
+    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
+  }
+  .captcha-refresh:active { transform: scale(var(--press-scale)); }
+  @media (hover: hover) and (pointer: fine) {
+    .captcha-refresh:hover { background: color-mix(in oklab, var(--ink) 15%, var(--stone)); }
+  }
+  /* The captcha answer is Latin letters: tracking helps here, it is not Persian. */
+  .field input[name="captcha_1"] { max-inline-size: 12.5rem; direction: ltr; text-align: center; letter-spacing: 0.15em; }
+
 
   .skip-link {
     position: absolute;
@@ -1365,55 +1889,6 @@
     padding-block-end: var(--space-7);
   }
   .field-wide { grid-column: 1 / -1; }
-  .field label { display: block; margin-block-end: var(--space-1); font-weight: 700; font-size: var(--text-s); }
-  .field input:not([type="hidden"]),
-  .field textarea {
-    display: block;
-    inline-size: 100%;
-    min-block-size: 3rem;
-    padding: var(--space-2) var(--space-3);
-    background: var(--field);
-    border: 1px solid var(--ink-soft);
-    border-radius: var(--radius);
-    line-height: 1.5;
-  }
-  .field textarea { min-block-size: 9rem; resize: vertical; }
-  /* Latin fields keep their own direction but sit on the RTL edge. */
-  .field input[dir="ltr"] { text-align: right; }
-  .field input:not([type="hidden"]):focus-visible,
-  .field textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 0; border-color: var(--focus); }
-  .field [aria-invalid="true"] { border-color: var(--error); box-shadow: inset 0 0 0 1px var(--error); }
-  .field-error { margin-block-start: var(--space-1); color: var(--error); font-size: var(--text-s); font-weight: 700; }
-
-  .form-summary {
-    margin-block-end: var(--space-6);
-    padding: var(--space-4) var(--space-5);
-    border-inline-start: 4px solid var(--error);
-    background: var(--paper-2);
-  }
-  .form-summary:focus { outline: none; }
-  .form-summary p { font-weight: 700; color: var(--error); }
-  .form-summary ul { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-4); margin-block-start: var(--space-2); }
-
-  .captcha-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); margin-block-end: var(--space-3); }
-  /* The generated image has a white ground; multiply lays its letters straight on the paper. */
-  .captcha-image { inline-size: 12.5rem; block-size: auto; mix-blend-mode: multiply; border: 1px solid var(--rule); }
-  .captcha-refresh {
-    display: inline-grid;
-    place-items: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    background: none;
-    border: 1px solid var(--ink-soft);
-    border-radius: var(--radius);
-    font-size: var(--text-m);
-    transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
-  }
-  .captcha-refresh:active { transform: scale(var(--press-scale)); }
-  @media (hover: hover) and (pointer: fine) {
-    .captcha-refresh:hover { background: var(--paper-2); }
-  }
-  .field input[name="captcha_1"] { max-inline-size: 12.5rem; direction: ltr; text-align: center; letter-spacing: 0.15em; }
 
   .contact-details { display: grid; gap: var(--space-7); }
   .contact-block h2 { font-size: var(--text-s); color: var(--text-soft); font-weight: 400; margin-block-end: var(--space-2); }

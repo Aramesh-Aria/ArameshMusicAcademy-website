@@ -349,9 +349,30 @@ document.addEventListener('touchstart', () => {}, { passive: true });
   });
 })();
 
-// Forms: the error summary takes focus after a failed submit, and the captcha can ask for a new image.
+// Forms: the error summary takes focus after a failed submit, the submit button shows it is sending (and a
+// second press can't send twice), and the captcha can ask for a new image.
 (() => {
   document.querySelector('[data-form-summary]')?.focus();
+
+  document.querySelectorAll('form').forEach((form) => {
+    const button = form.querySelector('button[type="submit"][data-busy-label]');
+    if (!button) return;
+    const label = button.querySelector('.btn__label');
+    const idle = label.textContent;
+    form.addEventListener('submit', (event) => {
+      if (button.getAttribute('aria-busy') === 'true') {
+        event.preventDefault();
+        return;
+      }
+      button.setAttribute('aria-busy', 'true');
+      label.textContent = button.dataset.busyLabel;
+    });
+    // Coming back to the page from the history restores it as it was left: idle again.
+    addEventListener('pageshow', () => {
+      button.removeAttribute('aria-busy');
+      label.textContent = idle;
+    });
+  });
 
   document.querySelectorAll('[data-captcha-refresh]').forEach((button) => {
     const field = button.closest('.field');

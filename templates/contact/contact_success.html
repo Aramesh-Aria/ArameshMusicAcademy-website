@@ -14,7 +14,7 @@
     {% if site_phone_primary %}
     <p class="stub-call">
       <span class="soft">اگر زودتر پاسخ می‌خواهید:</span>
-      <a class="btn" href="{{ site_phone_primary|tel_href }}">تماس <span class="num ltr">{{ site_phone_primary|local_phone }}</span></a>
+      {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
     </p>
     {% endif %}
     <p class="cluster stub-links">

@@ -17,7 +17,7 @@
 
     <div class="home-sheet-foot cluster">
       {% if site_phone_primary %}
-      <a class="btn" href="{{ site_phone_primary|tel_href }}">تماس <span class="num ltr">{{ site_phone_primary|local_phone }}</span></a>
+      {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
       {% endif %}
       <a href="{% url 'contact:contact' %}">پیام بگذارید تا با شما تماس بگیریم</a>
     </div>
