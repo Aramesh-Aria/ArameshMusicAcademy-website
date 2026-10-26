@@ -1,0 +1,6 @@
+{# One labelled field with its error tied to it (Django adds aria-invalid and aria-describedby). #}
+<div class="field{% if field.errors %} has-error{% endif %}{% if wide %} field-wide{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.errors %}<p class="field-error" id="{{ field.auto_id }}_error">{{ field.errors|join:' ' }}</p>{% endif %}
+</div>

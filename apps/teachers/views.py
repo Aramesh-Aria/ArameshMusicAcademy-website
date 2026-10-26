@@ -1,4 +1,7 @@
+from django.db.models import Prefetch
 from django.views.generic import DetailView, ListView
+
+from apps.schedules.models import ClassSession
 
 from .models import Teacher
 
@@ -9,10 +12,18 @@ class TeacherListView(ListView):
     context_object_name = 'teachers'
 
     def get_queryset(self):
+        # Each row lists the days the teacher teaches, so their active sessions come in one query.
         return (
             Teacher.objects
             .filter(is_active=True)
-            .prefetch_related('instruments')
+            .prefetch_related(
+                'instruments',
+                Prefetch(
+                    'class_sessions',
+                    queryset=ClassSession.objects.filter(is_active=True).order_by('weekday_order', 'start_time'),
+                    to_attr='active_sessions',
+                ),
+            )
         )
 
 

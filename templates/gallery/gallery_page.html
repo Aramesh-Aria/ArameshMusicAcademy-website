@@ -1,116 +1,86 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}{% if current_page %}{{ current_page.title }} | گالری تصاویر{% else %}گالری تصاویر{% endif %}{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">{% if current_page %}{{ current_page.title }}{% else %}گالری تصاویر{% endif %}</h1>
-    <nav class="breadcrumbs">
-      <ol>
-        <li><a href="{% url 'pages:home' %}">خانه</a></li>
-        <li><a href="{% url 'gallery:gallery_root' %}">گالری</a></li>
-        {% for page in breadcrumbs %}
-          {% if forloop.last %}
-            <li class="current">{{ page.title }}</li>
-          {% else %}
-            <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
-          {% endif %}
-        {% endfor %}
-      </ol>
-    </nav>
-  </div>
-</div>
-{% endblock %}
+{% block title %}{% if current_page %}{{ current_page.title }} | گالری{% else %}گالری{% endif %} | آموزشگاه موسیقی آرامش{% endblock %}
+{% block meta_description %}{{ meta_description|default:'تصاویر و ویدیوهای آموزشگاه موسیقی آرامش: فضای آموزشگاه، کلاس‌ها و کنسرت‌ها.' }}{% endblock %}
+{% block body_class %}page-gallery{% endblock %}
 
 {% block content %}
-<section id="portfolio" class="portfolio section">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>گالری</h2>
-    <p>مرور تصاویر و رویدادها</p>
-  </div>
-
-  <div class="container" data-aos="fade-up">
-    {% if current_page and current_page.intro_text %}<p>{{ current_page.intro_text|linebreaks }}</p>{% endif %}
-
-    {% if child_pages %}
-    <div class="row gy-4 portfolio-grid">
-      {% for page in child_pages %}
-      <div class="col-lg-4 col-md-6 portfolio-item">
-        <div class="portfolio-card">
-          <div class="image-container">
-            <a href="{{ page.get_absolute_url }}" aria-label="ورود به گالری {{ page.title }}">
-              {% if page.cover_image %}
-                <img src="{{ page.cover_image.url }}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
-              {% else %}
-                <img src="{% static 'assets/img/portfolio/portfolio-5.webp' %}" class="img-fluid" alt="{{ page.title }}" loading="lazy">
-              {% endif %}
-            </a>
-            <div class="overlay">
-              <div class="overlay-content">
-                {% if page.cover_image %}
-                <a href="{{ page.cover_image.url }}" class="glightbox zoom-link" title="{{ page.title }}">
-                  <i class="bi bi-zoom-in"></i>
-                </a>
-                {% endif %}
-                <a href="{{ page.get_absolute_url }}" class="details-link" title="مشاهده گالری">
-                  <i class="bi bi-arrow-left"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-          <div class="content">
-            <h3>{{ page.title }}</h3>
-            <p>{{ page.description|default:'برای مشاهده تصاویر این بخش وارد شوید.'|truncatechars:70 }}</p>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
+<section class="gallery grid" aria-labelledby="gallery-title">
+  <header class="gallery-head">
+    {% if current_page %}
+    <nav class="crumbs" aria-label="مسیر">
+      <ol role="list">
+        <li><a href="{% url 'gallery:gallery_root' %}">گالری</a></li>
+        {% for page in breadcrumbs %}{% if not forloop.last %}<li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>{% endif %}{% endfor %}
+      </ol>
+    </nav>
     {% endif %}
+    <h1 id="gallery-title">{% if current_page %}{{ current_page.title }}{% else %}گالری{% endif %}</h1>
+    {% if current_page.intro_text %}<div class="gallery-intro prose">{{ current_page.intro_text|linebreaks }}</div>{% endif %}
+  </header>
 
-    {% if images %}
-    <div class="row g-3">
+  {# ── Albums: the categories at the root, the albums inside a category. ── #}
+  {% if child_pages %}
+  <ul class="albums" role="list">
+    {% for page in child_pages %}{% include 'gallery/_album.html' %}{% endfor %}
+  </ul>
+  {% endif %}
+
+  {# ── Photos at their own ratios, opening in the lightbox. ── #}
+  {% if images %}
+  <section class="gallery-block" aria-labelledby="photos-title">
+    <header class="section-head">
+      <h2 id="photos-title">{% if child_pages or videos %}تصاویر{% else %}<span class="visually-hidden">تصاویر</span>{% endif %}</h2>
+      <span class="soft"><span class="num">{{ images|length }}</span> تصویر</span>
+    </header>
+    <ul class="plates" role="list">
       {% for image in images %}
-      <div class="col-lg-4 col-md-6">
-        <a href="{{ image.image.url }}" class="glightbox d-block rounded-3 overflow-hidden" data-gallery="gallery-images" title="{{ image.title|default:current_page.title }}">
-          <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:current_page.title }}" loading="lazy" style="aspect-ratio:3/2;object-fit:cover">
+      <li>
+        <a class="plate-link" href="{{ image.image.url }}" data-lightbox="gallery"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
+          <img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:current_page.title }}" loading="lazy" decoding="async">
         </a>
-      </div>
+      </li>
       {% endfor %}
-    </div>
-    {% endif %}
+    </ul>
+  </section>
+  {% endif %}
 
-    {% if current_page and not child_pages and not images and not videos %}
-    <p>هنوز تصویری برای این گالری ثبت نشده است.</p>
-    {% endif %}
-
-    {% if videos %}
-    <div class="row gy-4 mt-2">
+  {# ── Videos: a paper poster each; the YouTube or Aparat player loads only on a click. ── #}
+  {% if videos %}
+  <section class="gallery-block" aria-labelledby="videos-title">
+    <header class="section-head">
+      <h2 id="videos-title">{% if child_pages or images %}ویدیوها{% else %}<span class="visually-hidden">ویدیوها</span>{% endif %}</h2>
+      <span class="soft"><span class="num">{{ videos|length }}</span> ویدیو</span>
+    </header>
+    <ul class="videos" role="list">
       {% for video in videos %}
-        {% if video.embed_url %}
-        <div class="col-lg-6">
-          <div class="portfolio-card">
-            <div class="ratio ratio-16x9 rounded-3 overflow-hidden">
-              <iframe
-                src="{{ video.embed_url }}"
-                title="{{ video.title }}"
-                loading="lazy"
-                allowfullscreen
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            </div>
-            <div class="content">
-              <h3>{{ video.title }}</h3>
-              {% if video.caption %}<p>{{ video.caption|truncatechars:80 }}</p>{% endif %}
-            </div>
-          </div>
-        </div>
-        {% endif %}
+      {% if video.embed_url %}
+      <li class="video">
+        <a class="video-poster sheet" href="{{ video.video_url }}" rel="noopener" data-video="{{ video.embed_url }}" data-video-platform="{{ video.platform }}">
+          <span class="video-play"><svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg></span>
+          <span class="video-poster-title">{{ video.title }}</span>
+          <span class="video-poster-meta">پخش از {{ video.get_platform_display }}</span>
+        </a>
+        {% if video.caption %}<p class="video-caption">{{ video.caption }}</p>{% endif %}
+      </li>
+      {% endif %}
       {% endfor %}
-    </div>
-    {% endif %}
+    </ul>
+  </section>
+  {% endif %}
+
+  {# ── Nothing here yet. ── #}
+  {% if not child_pages and not images and not videos %}
+  <div class="gallery-empty sheet">
+    <p>{% if current_page %}هنوز تصویری در این گالری قرار نگرفته است.{% else %}گالری به‌زودی با تصاویر آموزشگاه پر می‌شود.{% endif %}</p>
+    <p class="cluster">
+      {% if current_page.parent %}<a href="{{ current_page.parent.get_absolute_url }}">بازگشت به {{ current_page.parent.title }}</a>{% endif %}
+      {% if current_page %}<a href="{% url 'gallery:gallery_root' %}">همهٔ گالری‌ها</a>{% endif %}
+      <a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a>
+    </p>
   </div>
+  {% endif %}
 </section>
+
+{% include 'partials/page_call.html' %}
 {% endblock %}

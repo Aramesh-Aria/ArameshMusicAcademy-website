@@ -1,227 +1,68 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
-
-{% block extra_head %}
-<style>
-  /* ─── Schedule Table ─────────────────────────────────────────── */
-  .schedule-wrapper {
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 24px rgba(0,0,0,.08);
-  }
-
-  .schedule-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: .93rem;
-    margin-bottom: 0;
-  }
-
-  /* Header */
-  .schedule-table thead tr {
-    background: var(--accent-color, #2c6fad);
-    color: #fff;
-  }
-  .schedule-table thead th {
-    padding: 14px 10px;
-    font-weight: 600;
-    font-size: .88rem;
-    letter-spacing: .02em;
-    border: none;
-    white-space: nowrap;
-    text-align: center;
-  }
-  .schedule-table thead th:first-child {
-    border-radius: 0 12px 0 0;   /* RTL: top-right */
-  }
-  .schedule-table thead th:last-child {
-    border-radius: 12px 0 0 0;   /* RTL: top-left */
-  }
-
-  /* Body cells */
-  .schedule-table tbody td,
-  .schedule-table tbody th {
-    padding: 10px 12px;
-    vertical-align: middle;
-    text-align: center;
-    border: 1px solid rgba(0,0,0,.07);
-  }
-
-  /* Teacher cell */
-  .cell-teacher {
-    font-weight: 700;
-    font-size: .95rem;
-    white-space: nowrap;
-    min-width: 120px;
-    border-right: 3px solid transparent;  /* accent stripe added per-color (RTL) */
-  }
-  .cell-teacher a {
-    color: inherit;
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-  .cell-teacher a:hover {
-    opacity: .8;
-  }
-
-  /* Instruments cell */
-  .cell-instruments {
-    min-width: 130px;
-  }
-  .instrument-chip {
-    display: inline-block;
-    background: rgba(0,0,0,.06);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: .82rem;
-    margin: 2px;
-    white-space: nowrap;
-  }
-
-  /* Time chip */
-  .time-chip {
-    display: inline-block;
-    background: rgba(0,0,0,.06);
-    border-radius: 20px;
-    padding: 3px 10px;
-    font-size: .82rem;
-    font-variant-numeric: tabular-nums;
-    direction: ltr;
-    margin: 2px;
-    white-space: nowrap;
-  }
-  .time-chip small {
-    display: block;
-    font-size: .72rem;
-    opacity: .7;
-    margin-top: 2px;
-  }
-
-  /* Empty cell dash */
-  .cell-empty {
-    color: #ccc;
-    font-size: 1.1rem;
-  }
-
-  /* ─── 6 teacher colour bands ─────────────────────────────────── */
-  /* Each band: a subtle bg for the whole row + a bold accent on the teacher cell */
-  .course-0 td, .course-0 th { background-color: #f0f7ff; }
-  .course-0 .cell-teacher     { border-right-color: #3b82f6; color: #1d4ed8; background-color: #dbeafe; }
-
-  .course-1 td, .course-1 th { background-color: #f0fdf4; }
-  .course-1 .cell-teacher     { border-right-color: #22c55e; color: #15803d; background-color: #dcfce7; }
-
-  .course-2 td, .course-2 th { background-color: #fdf4ff; }
-  .course-2 .cell-teacher     { border-right-color: #a855f7; color: #7e22ce; background-color: #f3e8ff; }
-
-  .course-3 td, .course-3 th { background-color: #fff7ed; }
-  .course-3 .cell-teacher     { border-right-color: #f97316; color: #c2410c; background-color: #ffedd5; }
-
-  .course-4 td, .course-4 th { background-color: #fefce8; }
-  .course-4 .cell-teacher     { border-right-color: #eab308; color: #854d0e; background-color: #fef9c3; }
-
-  .course-5 td, .course-5 th { background-color: #fff1f2; }
-  .course-5 .cell-teacher     { border-right-color: #f43f5e; color: #9f1239; background-color: #ffe4e6; }
-
-  /* Hover row highlight */
-  .schedule-table tbody tr:hover td,
-  .schedule-table tbody tr:hover th {
-    filter: brightness(.96);
-  }
-
-  /* Responsive: on very small screens allow horizontal scroll */
-  .schedule-responsive {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Pin the teacher column so its name stays visible while scrolling the days (RTL: right edge) */
-  .schedule-table thead th:first-child,
-  .schedule-table .cell-teacher {
-    position: sticky;
-    right: 0;
-    z-index: 2;
-    box-shadow: -6px 0 6px -6px rgba(0,0,0,.18);  /* divider on the scrolling (left) side */
-  }
-  .schedule-table thead th:first-child {
-    background: var(--accent-color, #2c6fad);  /* opaque so scrolling cells don't show through */
-    z-index: 3;
-  }
-</style>
-{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">{{ page_title }}</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">{{ page_title }}</li></ol></nav>
-  </div>
-</div>
-{% endblock %}
+{% block meta_description %}{{ meta_description|default:'برنامهٔ هفتگی کلاس‌های آموزشگاه موسیقی آرامش: روزها و ساعت‌های حضور هر استاد و سازهایی که تدریس می‌کند.' }}{% endblock %}
+{% block body_class %}page-schedule{% endblock %}
 
 {% block content %}
-<section class="section">
-  <div class="container" data-aos="fade-up">
-    <h2 class="mb-4">زمان‌بندی کلاس‌های تخصصی</h2>
+<section class="schedule grid" aria-labelledby="schedule-title">
+  <header class="schedule-head">
+    <h1 id="schedule-title">{{ page_title }}</h1>
+    <p>زمان‌بندی کلاس‌های تخصصی. برای هماهنگی جلسهٔ اول با آموزشگاه تماس بگیرید.</p>
+  </header>
 
+  <div class="schedule-sheet sheet sheet-torn">
     {% if schedule_rows %}
-    <div class="schedule-responsive schedule-wrapper">
-      <table class="schedule-table">
-        <thead>
-          <tr>
-            <th>استاد</th>
-            <th>سازها</th>
-            {% for weekday in weekdays %}<th>{{ weekday.label }}</th>{% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in schedule_rows %}
-          <tr class="course-{{ row.color_index }}">
 
-            {# ── Teacher ── #}
-            <th class="cell-teacher" scope="row"><a href="{{ row.teacher.get_absolute_url }}">{{ row.teacher.full_name }}</a></th>
-
-            {# ── Instruments ── #}
-            <td class="cell-instruments">
-              {% for instrument in row.instruments %}
-                <span class="instrument-chip">{{ instrument.name }}</span>
-              {% empty %}
-                <span class="cell-empty">—</span>
-              {% endfor %}
-            </td>
-
-            {# ── Day cells ── #}
-            {% for cell in row.cells %}
-            <td>
-              {% for session in cell.sessions %}
-                <div class="time-chip">
-                  {{ session.start_time|time:'H:i' }} – {{ session.end_time|time:'H:i' }}
-                  {% if session.notes %}<small>{{ session.notes }}</small>{% endif %}
-                </div>
-              {% empty %}
-                <span class="cell-empty">—</span>
-              {% endfor %}
-            </td>
-            {% endfor %}
-
-          </tr>
+    {# ── Desktop: the week diagram, one row per teacher, today's column struck. ── #}
+    <table class="week-table">
+      <caption class="visually-hidden">برنامهٔ هفتگی کلاس‌ها، هر ردیف یک استاد</caption>
+      <thead>
+        <tr>
+          <th scope="col">استاد</th>
+          {% for weekday in weekdays %}
+          <th scope="col" class="{% if weekday == today %}is-today{% endif %}{% if weekday.value == 'fri' %} is-off{% endif %}">
+            {{ weekday.label }}{% if weekday == today %}<small>امروز</small>{% elif weekday.value == 'fri' %}<small>تعطیل</small>{% endif %}
+          </th>
           {% endfor %}
-        </tbody>
-      </table>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in schedule_rows %}
+        <tr>
+          <th scope="row">
+            <a href="{{ row.teacher.get_absolute_url }}">{{ row.teacher.full_name }}</a>
+            {% if row.instruments %}<span>{% for instrument in row.instruments %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>{% endif %}
+          </th>
+          {% for cell in row.cells %}
+          <td class="{% if cell.weekday == today %}is-today{% endif %}">
+            {% for session in cell.sessions %}
+            <span class="week-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
+            {% if session.notes %}<small class="week-note">{{ session.notes }}</small>{% endif %}
+            {% empty %}
+            <span class="visually-hidden">بدون کلاس</span>
+            {% endfor %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {# ── Phones and tablets: the week by day, today first. ── #}
+    <div class="schedule-by-day">
+      {% include 'partials/week.html' %}
     </div>
-
-
 
     {% else %}
-      <p>هنوز برنامه‌ای برای کلاس‌ها ثبت نشده است.</p>
-    {% endif %}
-
-    {% if page_body %}
-    <div class="mt-5 pt-4 border-top">
-      {{ page_body|safe|linebreaks }}
-    </div>
+    <p class="schedule-empty">برنامهٔ کلاس‌ها به‌زودی در اینجا قرار می‌گیرد. برای اطلاع از زمان کلاس‌ها با آموزشگاه تماس بگیرید.</p>
     {% endif %}
   </div>
+
+  {% if page_body %}
+  <div class="schedule-body prose">{{ page_body|safe|linebreaks }}</div>
+  {% endif %}
 </section>
+
+{% include 'partials/page_call.html' %}
 {% endblock %}

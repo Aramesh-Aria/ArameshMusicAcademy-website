@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}صفحه پیدا نشد | آموزشگاه موسیقی آرامش{% endblock %}
+{% block body_class %}page-404{% endblock %}
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+{# ── A programme with a missing page: a short apology and the ways back. ── #}
+<section class="stub grid" aria-labelledby="missing-title">
+  <div class="stub-sheet sheet sheet-torn">
+    <p class="missing-number num" aria-hidden="true">404</p>
+    <h1 id="missing-title">این صفحه در برنامه نیست</h1>
+    <p class="stub-text">نشانی‌ای که باز کردید پیدا نشد. شاید جابه‌جا شده یا در نوشتنش اشتباهی پیش آمده است. از یکی از این‌ها ادامه دهید:</p>
+    <ul class="missing-links" role="list">
+      <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
+      <li><a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a></li>
+      <li><a href="{% url 'teachers:teacher_list' %}">اساتید</a></li>
+      <li><a href="{% url 'contact:contact' %}">تماس با آموزشگاه</a></li>
+    </ul>
+  </div>
+</section>
+{% endblock %}

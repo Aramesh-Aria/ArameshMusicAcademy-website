@@ -66,6 +66,33 @@ class ContactViewTests(TestCase):
         self.assertIn('ali@example.com', mail.outbox[0].reply_to)
         self.assertIn('Question', mail.outbox[0].subject)
 
+    def test_invalid_submission_ties_each_error_to_its_field(self):
+        response = self.client.post(reverse('contact:contact'), {
+            'full_name': '',
+            'email': 'invalid-email',
+            'subject': 'Question',
+            'message': 'Hello',
+            'captcha_0': 'missing',
+            'captcha_1': 'wrong',
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ContactMessage.objects.count(), 0)
+        self.assertContains(response, 'aria-invalid="true"')
+        self.assertContains(response, 'aria-describedby="id_email_error"')
+        self.assertContains(response, 'id="id_email_error"')
+        self.assertContains(response, 'aria-describedby="id_captcha_error"')
+        self.assertContains(response, 'id="id_captcha_error"')
+        self.assertContains(response, 'ایمیل وارد شده معتبر نیست.')
+        # The admin help texts are dropped, so nothing points at a help text that isn't on the page.
+        self.assertNotContains(response, '_helptext')
+
+    def test_success_page_offers_the_phone_and_next_steps(self):
+        response = self.client.get(reverse('contact:contact_success'))
+
+        self.assertContains(response, 'پیام شما رسید')
+        self.assertContains(response, reverse('schedules:schedule'))
+
 
 class ContactMessageModelTests(TestCase):
     def test_contact_message_string_contains_name_and_subject(self):

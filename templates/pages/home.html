@@ -1,153 +1,98 @@
 {% extends 'base.html' %}
-{% load static %}
+{% load site_tags %}
 
-{% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
-{% block body_class %}index-page{% endblock %}
+{% block title %}{% if page_title == 'آموزشگاه موسیقی آرامش' %}{{ page_title }}{% else %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endif %}{% endblock %}
+{% block body_class %}page-home{% endblock %}
 
 {% block content %}
-<section id="hero" class="hero section">
-  <div class="hero-content">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
-          <div class="content">
-            <h1>{{ page_title }}</h1>
-            <p>{{ page_body }}</p>
-            <div class="cta-group">
-              <a href="{% url 'pages:about' %}" class="btn-primary">درباره آموزشگاه</a>
-              <a href="{% url 'contact:contact' %}" class="btn-secondary"><i class="bi bi-envelope"></i><span>ارتباط با ما</span></a>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-          <div class="hero-image">
-            {% if page_hero_image %}
-              <img src="{{ page_hero_image.url }}" alt="آموزشگاه موسیقی آرامش" class="img-fluid">
-            {% else %}
-              <img src="{% static 'assets/img/home_pic.webp' %}" alt="آموزشگاه موسیقی آرامش" class="img-fluid">
-            {% endif %}
-          </div>
-        </div>
-      </div>
+{% with director=featured_teachers.0 %}
+
+{# ── The programme sheet: who is teaching today, and the call. ── #}
+<section class="home-hero grid" aria-labelledby="home-title">
+  <div class="home-sheet sheet sheet-torn">
+    <h1 id="home-title">{{ page_title }}</h1>
+    {% if page_body %}<p class="home-lead">{{ page_body|linebreaksbr }}</p>{% endif %}
+
+    {% include 'partials/week.html' %}
+
+    <div class="home-sheet-foot">
+      {% if site_phone_primary %}
+      <a class="btn" href="{{ site_phone_primary|tel_href }}">تماس <span class="num ltr">{{ site_phone_primary|local_phone }}</span></a>
+      {% endif %}
+      <a href="{% url 'contact:contact' %}">پیام بگذارید تا با شما تماس بگیریم</a>
     </div>
   </div>
+
+  {% if page_hero_image %}
+  <figure class="home-plate home-plate-wide">
+    <img class="mono" src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high">
+  </figure>
+  {% elif director %}
+  <figure class="home-plate">
+    {% include 'partials/portrait.html' with teacher=director %}
+    <figcaption>
+      <a href="{{ director.get_absolute_url }}">{{ director.full_name }}</a>
+      {% if director.instruments.all %}<span class="soft"> · {% for instrument in director.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>{% endif %}
+    </figcaption>
+  </figure>
+  {% endif %}
 </section>
 
-<!-- <section class="featured-services section light-background">
-  <div class="container" data-aos="fade-up">
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <div class="service-item"><h3>اساتید حرفه‌ای</h3><p>تدریس توسط اساتید با تجربه و فعال در اجرا.</p></div>
-      </div>
-      <div class="col-lg-4 col-md-6">
-        <div class="service-item"><h3>برنامه منظم</h3><p>برنامه‌ریزی شفاف برای کلاس‌های گروهی و خصوصی.</p></div>
-      </div>
-      <div class="col-lg-4 col-md-6">
-        <div class="service-item"><h3>فضای آموزشی استاندارد</h3><p>محیط مناسب برای یادگیری پیوسته موسیقی.</p></div>
-      </div>
-    </div>
-  </div>
-</section> -->
 
-{# ── Teacher preview ── #}
-{% if featured_teachers %}
-<section class="team section">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>اساتید ما</h2>
-    <p>آموزش زیر نظر اساتید مجرب و فعال در عرصه اجرا</p>
-  </div>
-  <div class="container" data-aos="fade-up">
-    <div class="row gy-4 justify-content-center">
-      {% for teacher in featured_teachers %}
-      <div class="col-lg-4 col-md-6">
-        <div class="member-card">
-          <div class="member-image-wrapper">
-            <a href="{{ teacher.get_absolute_url }}" aria-label="مشاهده پروفایل {{ teacher.full_name }}">
-              {% if teacher.profile_image %}
-                <img src="{{ teacher.profile_image.url }}" class="img-fluid" alt="{{ teacher.full_name }}">
-              {% else %}
-                <img src="{% static 'assets/img/person/person-m-2.webp' %}" class="img-fluid" alt="{{ teacher.full_name }}">
-              {% endif %}
-            </a>
-          </div>
-          <div class="member-content">
-            <h4 class="member-name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h4>
-            <span class="member-role">
-              {% for instrument in teacher.instruments.all %}
-                {{ instrument.name }}{% if not forloop.last %}، {% endif %}
-              {% endfor %}
-            </span>
-            {% if teacher.biography %}
-              <p class="member-bio">{{ teacher.biography|truncatechars:120 }}</p>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    <div class="text-center mt-4">
-      <a href="{% url 'teachers:teacher_list' %}" class="btn-primary">مشاهده همه اساتید</a>
-    </div>
-  </div>
-</section>
-{% endif %}
+{# ── Teachers: one large with the biography, two beside. The director already stands in the hero. ── #}
+{% if page_hero_image %}{% with teachers=featured_teachers|slice:":3" %}{% include 'pages/_home_teachers.html' %}{% endwith %}
+{% else %}{% with teachers=featured_teachers|slice:"1:4" %}{% include 'pages/_home_teachers.html' %}{% endwith %}{% endif %}
 
-{# ── Testimonials ── #}
-{% if testimonials %}
-<section class="testimonials section light-background">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>نظر هنرجویان و والدین</h2>
-    <p>تجربه کسانی که مسیر یادگیری موسیقی را با ما طی کرده‌اند</p>
-  </div>
-  <div class="container" data-aos="fade-up">
-    <div class="row gy-4">
-      {% for testimonial in testimonials %}
-      <div class="col-lg-4 col-md-6">
-        <div class="testimonial-item h-100 p-4 rounded-3 shadow-sm bg-white">
-          <i class="bi bi-quote" style="font-size:2rem;color:var(--accent-color,#2c6fad)"></i>
-          <p class="mt-2">{{ testimonial.quote }}</p>
-          <div class="mt-3">
-            <strong>{{ testimonial.author_name }}</strong>
-            {% if testimonial.relation %}<div class="text-muted small">{{ testimonial.relation }}</div>{% endif %}
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-{% endif %}
 
-{# ── Gallery preview ── #}
+{# ── The rooms: photos of the Academy as tipped-in plates. ── #}
 {% if gallery_preview_images %}
-<section class="gallery section">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>نگاهی به آموزشگاه</h2>
-    <p>تصاویری از کلاس‌ها، اجراها و فضای آموزشی</p>
-  </div>
-  <div class="container" data-aos="fade-up">
-    <div class="row g-3">
+<section class="home-rooms grid" aria-labelledby="rooms-title">
+  <div class="home-rooms-sheet sheet">
+    <header class="section-head">
+      <h2 id="rooms-title">فضای آموزشگاه</h2>
+      <a href="{{ gallery_preview_images.0.gallery_page.get_absolute_url }}">همهٔ تصاویر</a>
+    </header>
+    <div class="home-rooms-plates">
       {% for image in gallery_preview_images %}
-      <div class="col-lg-4 col-md-6">
-        <a href="{{ image.gallery_page.get_absolute_url }}" class="d-block rounded-3 overflow-hidden">
-          <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:image.gallery_page.title }}" style="aspect-ratio:3/2;object-fit:cover">
-        </a>
-      </div>
+      <img class="mono" src="{{ image.image.url }}" width="480" height="600" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async">
       {% endfor %}
-    </div>
-    <div class="text-center mt-4">
-      <a href="{% url 'gallery:gallery_root' %}" class="btn-primary">مشاهده گالری</a>
     </div>
   </div>
 </section>
 {% endif %}
 
-{# ── Contact call-to-action ── #}
-<section class="cta-section section">
-  <div class="container text-center" data-aos="fade-up">
-    <h2>آماده شروع هستید؟</h2>
-    <p>برای مشاوره رایگان، انتخاب ساز و هماهنگی کلاس با ما در تماس باشید.</p>
-    <a href="{% url 'contact:contact' %}" class="btn-primary mt-2"><i class="bi bi-envelope"></i> تماس با ما</a>
+
+{# ── Letters from parents: hidden until there is a real one. ── #}
+{% if testimonials %}
+<section class="home-letters grid" aria-labelledby="letters-title">
+  <h2 id="letters-title">از زبان والدین</h2>
+  <div class="home-letters-list{% if testimonials|length == 1 %} is-single{% endif %}">
+    {% for testimonial in testimonials %}
+    <figure class="letter sheet">
+      <blockquote>{{ testimonial.quote|linebreaksbr }}</blockquote>
+      <figcaption>{{ testimonial.author_name }}{% if testimonial.relation %}<span class="soft"> · {{ testimonial.relation }}</span>{% endif %}</figcaption>
+    </figure>
+    {% endfor %}
   </div>
 </section>
+{% endif %}
+
+
+{# ── Visit: the map and the way here. Phones, hours and the full address are in the footer. ── #}
+<section class="home-visit grid" aria-labelledby="visit-title">
+  <div class="home-visit-sheet sheet">
+    <div class="home-visit-text">
+      <h2 id="visit-title">به آموزشگاه سر بزنید</h2>
+      {% if site_address %}<p>{{ site_address }}</p>{% endif %}
+      <p class="cluster home-visit-routes">
+        <a href="https://neshan.org/maps/@35.745776,51.331922,17z" rel="noopener">مسیر در نشان</a>
+        <a href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z" rel="noopener">مسیر در گوگل‌مپ</a>
+      </p>
+    </div>
+    <iframe class="home-visit-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe>
+  </div>
+</section>
+
+{% endwith %}
 {% endblock %}

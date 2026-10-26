@@ -1,0 +1,8 @@
+{# django-simple-captcha's widget, with a Persian alt and a "new image" button that site.js wires up. It lives in the app, not templates/, because form widgets render through the app-directories-only form renderer. #}
+{% spaceless %}
+<span class="captcha-row">
+  <img src="{{ image }}" alt="کد امنیتی" class="captcha-image" width="200" height="70" data-captcha-image>
+  <button type="button" class="captcha-refresh" data-captcha-refresh="{% url 'captcha-refresh' %}" hidden>تصویر جدید</button>
+</span>
+{% for widget in widget.subwidgets %}{% include widget.template_name %}{% endfor %}
+{% endspaceless %}

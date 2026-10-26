@@ -1,4 +1,5 @@
-from datetime import time
+from datetime import date, time
+from unittest.mock import patch
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
@@ -146,3 +147,20 @@ class ScheduleViewTests(TestCase):
         self.assertEqual(rows[0]['instruments'], [self.instrument])
         self.assertEqual(rows[0]['cells'][0]['weekday'], Weekday.SATURDAY)
         self.assertEqual(len(rows[0]['cells'][0]['sessions']), 1)
+
+    @patch('apps.schedules.week.timezone.localdate', return_value=date(2026, 10, 26))  # a Monday
+    def test_schedule_marks_today_and_gives_the_week_by_day(self, _localdate):
+        self._make_session(
+            weekday=Weekday.MONDAY,
+            start_time=time(9, 0),
+            end_time=time(10, 0),
+            is_active=True,
+        )
+
+        response = self.client.get(reverse('schedules:schedule'))
+        week = response.context['week_schedule']
+
+        self.assertEqual(response.context['today'], Weekday.MONDAY)
+        self.assertEqual([day['weekday'] for day in week if day['is_today']], [Weekday.MONDAY])
+        self.assertEqual(len(week[2]['sessions']), 1)
+        self.assertContains(response, '<td class="is-today">', html=False)

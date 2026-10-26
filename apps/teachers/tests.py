@@ -69,4 +69,31 @@ class TeacherViewTests(TestCase):
         response = self.client.get(teacher.get_absolute_url())
 
         self.assertIn(session, list(response.context['teacher_sessions']))
-        self.assertContains(response, 'برنامه کلاس‌ها')
+        self.assertContains(response, 'برنامهٔ هفتگی')
+
+    def test_teacher_list_prefetches_active_sessions_in_week_order(self):
+        from datetime import time
+
+        from apps.schedules.models import ClassSession, Weekday
+
+        teacher = self.make_teacher('Sara', 'Karimi')
+        monday = ClassSession.objects.create(
+            teacher=teacher, weekday=Weekday.MONDAY, start_time=time(9, 0), end_time=time(10, 0),
+        )
+        saturday = ClassSession.objects.create(
+            teacher=teacher, weekday=Weekday.SATURDAY, start_time=time(9, 0), end_time=time(10, 0),
+        )
+        ClassSession.objects.create(
+            teacher=teacher, weekday=Weekday.SUNDAY, start_time=time(9, 0), end_time=time(10, 0), is_active=False,
+        )
+        for index in range(3):
+            self.make_teacher(f'Extra{index}', 'Teacher')
+
+        # The gallery menu, then teachers, instruments and sessions: four queries however many teachers there are.
+        with self.assertNumQueries(4):
+            response = self.client.get(reverse('teachers:teacher_list'))
+            teachers = list(response.context['teachers'])
+            sessions = teachers[0].active_sessions
+
+        self.assertEqual(sessions, [saturday, monday])
+        self.assertContains(response, 'شنبه، دوشنبه')

@@ -20,21 +20,13 @@ class ContactForm(forms.ModelForm):
         model = ContactMessage
         fields = ('full_name', 'email', 'phone', 'subject', 'message')
         widgets = {
-            'full_name': forms.TextInput(attrs={
-                'placeholder': 'نام و نام خانوادگی',
-                'autocomplete': 'name',
-            }),
+            'full_name': forms.TextInput(attrs={'autocomplete': 'name'}),
             'email': forms.EmailInput(attrs={
                 'placeholder': 'example@email.com',
                 'autocomplete': 'email',
             }),
-            'phone': forms.TextInput(attrs={
-                'placeholder': 'شماره تماس',
-                'autocomplete': 'tel',
-            }),
-            'subject': forms.TextInput(attrs={
-                'placeholder': 'موضوع پیام',
-            }),
+            'phone': forms.TextInput(attrs={'autocomplete': 'tel'}),
+            'subject': forms.TextInput(),
             'message': forms.Textarea(attrs={
                 'rows': 5,
                 'placeholder': 'پیام خود را بنویسید',
@@ -46,6 +38,16 @@ class ContactForm(forms.ModelForm):
         for field_name, field_errors in self.error_messages.items():
             if field_name in self.fields:
                 self.fields[field_name].error_messages.update(field_errors)
-        for field_name, field in self.fields.items():
-            base_class = 'form-input message-input' if field_name == 'message' else 'form-input'
-            field.widget.attrs['class'] = base_class
+        for field in self.fields.values():
+            # The model's help texts are written for staff in the admin; the public form has its own hints.
+            field.help_text = ''
+        self.fields['phone'].label = 'شماره تماس (اختیاری)'
+        self.fields['phone'].widget.attrs.update({'inputmode': 'tel', 'dir': 'ltr'})
+        self.fields['email'].widget.attrs['dir'] = 'ltr'
+
+
+    def full_clean(self):
+        super().full_clean()
+        # Django links errors to single inputs itself, but not to a multi-part widget like the captcha.
+        if 'captcha' in self._errors:
+            self.fields['captcha'].widget.attrs['aria-describedby'] = f'{self["captcha"].auto_id}_error'

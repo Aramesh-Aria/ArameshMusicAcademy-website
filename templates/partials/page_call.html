@@ -1,0 +1,14 @@
+{# The page's closing call. `title` overrides the heading. #}
+{% load site_tags %}
+<section class="page-call grid" aria-labelledby="call-title">
+  <div class="page-call-inner">
+    <h2 id="call-title">{{ title|default:'برای مشاوره و ثبت‌نام با ما در تماس باشید' }}</h2>
+    <p class="cluster">
+      {% if site_phone_primary %}
+      <a class="btn" href="{{ site_phone_primary|tel_href }}">تماس <span class="num ltr">{{ site_phone_primary|local_phone }}</span></a>
+      {% endif %}
+      <a href="{% url 'schedules:schedule' %}">برنامهٔ کلاس‌ها</a>
+      <a href="{% url 'contact:contact' %}">پیام بگذارید</a>
+    </p>
+  </div>
+</section>

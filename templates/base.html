@@ -1,22 +1,30 @@
-{% load static %}
-<!DOCTYPE html>
+{% load static %}<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>{% block title %}آموزشگاه موسیقی آرامش{% endblock %}</title>
-
-    {% block analytics %}{% if google_analytics_id %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', '{{ google_analytics_id }}');
-    </script>
-    {% endif %}{% endblock %}
-
     <meta name="description" content="{% block meta_description %}{{ meta_description|default:'آموزشگاه موسیقی آرامش؛ آموزش تخصصی موسیقی توسط اساتید مجرب. برای مشاوره و ثبت‌نام با ما در تماس باشید.' }}{% endblock %}">
+    <link rel="canonical" href="{% block canonical %}https://{{ request.get_host }}{{ request.path }}{% endblock %}">
+
+    <link rel="preload" href="{% static 'assets/fonts/amiri-fa-400.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'assets/fonts/amiri-fa-700.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'assets/css/site.css' %}">
+    <script src="{% static 'assets/js/site.js' %}" defer></script>
+    <script>
+      // A portrait whose file is missing becomes a paper plate with initials. Inline so it catches errors
+      // that fire before site.js loads.
+      document.addEventListener('error', function (event) {
+        var img = event.target;
+        if (!img || img.tagName !== 'IMG' || !img.hasAttribute('data-initials')) return;
+        var plate = document.createElement('span');
+        plate.className = img.className.replace(/\bmono\b/, '') + ' portrait-initials';
+        plate.setAttribute('role', 'img');
+        plate.setAttribute('aria-label', img.alt);
+        plate.textContent = img.getAttribute('data-initials');
+        img.replaceWith(plate);
+      }, true);
+    </script>
 
     {# ── Open Graph (link previews on Telegram, WhatsApp, etc.) ── #}
     <meta property="og:type" content="website">
@@ -43,57 +51,32 @@
     <link href="{% static 'assets/img/favicon-16x16.png' %}" rel="icon" type="image/png" sizes="16x16">
     <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon" sizes="180x180">
     <link href="{% static 'assets/img/site.webmanifest' %}" rel="manifest">
-    <meta name="theme-color" content="#09947d">
+    <meta name="theme-color" content="#12201b">
 
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
-    <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
-
-    <style>
-        :root { --default-font: "Vazirmatn", sans-serif; }
-        html, body {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: hidden;
-        }
-        body { position: relative; }
-        img, video, iframe { max-width: 100%; }
-        .navmenu a.active { color: var(--accent-color); }
-        .form-error { color: #b42318; font-size: 0.9rem; margin-top: 4px; display: block; }
-        /* Center the caption shown under a photo in the lightbox */
-        .gslide-description { text-align: center; }
-    </style>
+    {% block analytics %}{% if google_analytics_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ google_analytics_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '{{ google_analytics_id }}');
+    </script>
+    {% endif %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="{% block body_class %}starter-page-page{% endblock %}">
+<body class="{% block body_class %}{% endblock %}">
+{% include 'partials/icons.html' %}
+<a class="skip-link" href="#main">رفتن به محتوای صفحه</a>
 {% include 'partials/header.html' %}
 
-<main class="main">
+<main id="main" tabindex="-1">
   {% block page_header %}{% endblock %}
   {% block content %}{% endblock %}
 </main>
 
 {% include 'partials/footer.html' %}
-
-<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-<div id="preloader"><div></div><div></div><div></div><div></div></div>
-
-<script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
-<script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
-<script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
-<script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
-<script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
-<script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
-<script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
-<script src="{% static 'assets/js/main.js' %}"></script>
+{% include 'partials/callbar.html' %}
+{% include 'partials/menu.html' %}
 {% block page_specific_js %}{% endblock %}
 </body>
 </html>

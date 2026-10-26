@@ -1,56 +1,45 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}اساتید | آموزشگاه موسیقی آرامش{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">اساتید</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">اساتید</li></ol></nav>
-  </div>
-</div>
-{% endblock %}
+{% block meta_description %}اساتید آموزشگاه موسیقی آرامش، سازهایی که تدریس می‌کنند و روزهای حضورشان در آموزشگاه.{% endblock %}
+{% block body_class %}page-teachers{% endblock %}
 
 {% block content %}
-<section class="team section">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>معرفی اساتید</h2>
-  </div>
 
-  <div class="container" data-aos="fade-up">
-    <div class="row gy-4">
+{# ── The performers: one programme entry per teacher. ── #}
+<section class="teachers grid" aria-labelledby="teachers-title">
+  <header class="teachers-head">
+    <h1 id="teachers-title">اساتید</h1>
+    {% if teachers %}<p class="soft"><span class="num">{{ teachers|length }}</span> استاد</p>{% endif %}
+  </header>
+
+  <div class="teachers-sheet sheet sheet-torn">
+    {% if teachers %}
+    <ul class="performers" role="list">
       {% for teacher in teachers %}
-      <div class="col-lg-3 col-md-6">
-        <div class="member-card">
-          <div class="member-image-wrapper">
-            <a href="{{ teacher.get_absolute_url }}" aria-label="مشاهده پروفایل {{ teacher.full_name }}">
-              {% if teacher.profile_image %}
-                <img src="{{ teacher.profile_image.url }}" class="img-fluid" alt="{{ teacher.full_name }}">
-              {% else %}
-                <img src="{% static 'assets/img/person/person-m-2.webp' %}" class="img-fluid" alt="{{ teacher.full_name }}">
-              {% endif %}
-            </a>
-          </div>
-          <div class="member-content">
-            <h4 class="member-name"><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h4>
-            <span class="member-role">
-             {% for instrument in teacher.instruments.all %}
-                {{ instrument.name }}{% if not forloop.last %}، {% endif %}
-              {% empty %}
-                ساز ثبت نشده است
-              {% endfor %}
-            </span>
-            {% if teacher.biography %}
-              <p class="member-bio">{{ teacher.biography|truncatechars:120 }}</p>
-            {% endif %}
-          </div>
+      <li class="performer">
+        {% include 'partials/portrait.html' with teacher=teacher lazy=True class='performer-portrait' %}
+        <div class="performer-text">
+          <h2><a href="{{ teacher.get_absolute_url }}">{{ teacher.full_name }}</a></h2>
+          {% if teacher.instruments.all %}
+          <p class="performer-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+          {% endif %}
         </div>
-      </div>
-      {% empty %}
-      <p>هنوز استادی ثبت نشده است.</p>
+        <p class="performer-days">
+          {% if teacher.active_sessions %}
+          <span class="visually-hidden">روزهای کلاس: </span>{% for session in teacher.active_sessions %}{% ifchanged session.weekday %}{% if not forloop.first %}، {% endif %}{{ session.get_weekday_display }}{% endifchanged %}{% endfor %}
+          {% else %}
+          <span class="soft">برای زمان کلاس تماس بگیرید</span>
+          {% endif %}
+        </p>
+      </li>
       {% endfor %}
-    </div>
+    </ul>
+    {% else %}
+    <p class="teachers-empty">فهرست اساتید به‌زودی در اینجا قرار می‌گیرد. برای آشنایی با اساتید با آموزشگاه تماس بگیرید.</p>
+    {% endif %}
   </div>
 </section>
+
+{% include 'partials/page_call.html' %}
 {% endblock %}

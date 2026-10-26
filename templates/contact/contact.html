@@ -1,149 +1,80 @@
 {% extends 'base.html' %}
+{% load site_tags %}
 
 {% block title %}تماس با ما | آموزشگاه موسیقی آرامش{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">تماس با ما</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">تماس با ما</li></ol></nav>
-  </div>
-</div>
-{% endblock %}
+{% block meta_description %}تماس با آموزشگاه موسیقی آرامش: تلفن، نشانی، ساعت‌های کاری و فرم پیام برای مشاوره و ثبت‌نام.{% endblock %}
+{% block body_class %}page-contact{% endblock %}
 
 {% block content %}
-<section id="contact" class="contact section">
-  <div class="container section-title" data-aos="fade-up">
-    <h2>تماس</h2>
-    <p>نیاز به راهنمایی دارید؟ با ما در ارتباط باشید</p>
-  </div>
+<section class="contact grid" aria-labelledby="contact-title">
+  <header class="contact-head">
+    <h1 id="contact-title">تماس با ما</h1>
+    <p>برای مشاوره، ثبت‌نام یا هماهنگی کلاس تماس بگیرید، یا پیام بگذارید تا با شما تماس بگیریم.</p>
+  </header>
 
-  <div class="container" data-aos="fade-up" data-aos-delay="100">
-    <div class="row align-items-stretch g-4">
-      <div class="col-lg-7 order-lg-1 order-2" data-aos="fade-right" data-aos-delay="200">
-        <div class="contact-form-container">
-          <div class="form-intro">
-            <h2>گفت‌وگو را شروع کنیم</h2>
-            <p>برای دریافت مشاوره ثبت‌نام، انتخاب مسیر آموزشی یا هماهنگی کلاس خصوصی، فرم زیر را تکمیل کنید.</p>
-          </div>
+  {# ── The form, first on every screen. ── #}
+  <div class="contact-sheet sheet sheet-torn">
+    <h2 class="contact-form-title">پیام بگذارید</h2>
 
-          <form method="post" class="contact-form" novalidate>
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger mb-4">
-                {% for error in form.non_field_errors %}
-                  {{ error }}
-                {% endfor %}
-              </div>
-            {% endif %}
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-field">
-                  {{ form.full_name }}
-                  {% if form.full_name.errors %}<span class="form-error">{{ form.full_name.errors|striptags }}</span>{% endif %}
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-field">
-                  {{ form.email }}
-                  {% if form.email.errors %}<span class="form-error">{{ form.email.errors|striptags }}</span>{% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-field">
-                  {{ form.phone }}
-                  {% if form.phone.errors %}<span class="form-error">{{ form.phone.errors|striptags }}</span>{% endif %}
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-field">
-                  {{ form.subject }}
-                  {% if form.subject.errors %}<span class="form-error">{{ form.subject.errors|striptags }}</span>{% endif %}
-                </div>
-              </div>
-            </div>
-
-            <div class="form-field message-field">
-              {{ form.message }}
-              {% if form.message.errors %}<span class="form-error">{{ form.message.errors|striptags }}</span>{% endif %}
-            </div>
-
-            <div class="form-field captcha-field mb-4">
-              <label for="{{ form.captcha.id_for_label }}" class="mb-2 d-block">{{ form.captcha.label }}</label>
-              {{ form.captcha }}
-              {% if form.captcha.errors %}<span class="form-error d-block mt-1">{{ form.captcha.errors|striptags }}</span>{% endif %}
-              <small class="text-muted d-block mt-1">تصویر بالا را به دقت وارد کنید.</small>
-            </div>
-
-            <button type="submit" class="send-button">ارسال پیام <span class="button-arrow">←</span></button>
-          </form>
-        </div>
-      </div>
-
-      <div class="col-lg-5 order-lg-2 order-1" data-aos="fade-left" data-aos-delay="300">
-        <div class="contact-sidebar">
-          <div class="contact-header">
-            <h3>با ما در ارتباط باشید</h3>
-            <p>تیم آموزشگاه برای پاسخ‌گویی به سوالات شما درباره دوره‌ها، سطح‌بندی و زمان‌بندی کلاس‌ها آماده است.</p>
-          </div>
-
-          <div class="contact-methods">
-            <div class="contact-method">
-              <div class="contact-icon"><i class="bi bi-geo-alt"></i></div>
-              <div class="contact-details">
-                <span class="method-label">آدرس</span>
-                <p>{{ site_address }}</p>
-              </div>
-            </div>
-            <div class="contact-method">
-              <div class="contact-icon"><i class="bi bi-envelope"></i></div>
-              <div class="contact-details">
-                <span class="method-label">ایمیل</span>
-                <p dir="ltr">{{ site_email }}</p>
-              </div>
-            </div>
-            <div class="contact-method">
-              <div class="contact-icon"><i class="bi bi-telephone"></i></div>
-              <div class="contact-details">
-                <span class="method-label">تلفن</span>
-                {% for phone in site_phones %}
-                  <p dir="ltr">{{ phone }}</p>
-                {% endfor %}
-              </div>
-            </div>
-            <div class="contact-method">
-              <div class="contact-icon"><i class="bi bi-clock"></i></div>
-              <div class="contact-details">
-                <span class="method-label">ساعت پاسخ‌گویی</span>
-                <p>{% for line in site_hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="connect-section">
-            <span class="connect-label">موقعیت آموزشگاه</span>
-            <div class="ratio ratio-4x3 rounded-3 overflow-hidden border">
-              <iframe
-                src="https://www.google.com/maps?q=Aramesh%20Music%20Academy%2C%2035.7457756%2C51.331922&hl=fa&z=17&output=embed"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-                title="موقعیت آموزشگاه موسیقی آرامش"></iframe>
-            </div>
-            <a
-              href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z/data=!3m1!4b1!4m6!3m5!1s0x3f8dfd180b638fef:0x23f699b845bbd465!8m2!3d35.7457756!4d51.331922!16s%2Fg%2F11jgdggtl1?entry=ttu"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="send-button d-inline-flex align-items-center mt-3">
-              باز کردن مسیر در نقشه
-            </a>
-          </div>
-        </div>
-      </div>
+    {% if form.errors %}
+    <div class="form-summary" role="alert" tabindex="-1" data-form-summary>
+      <p>پیام ارسال نشد. لطفا موارد مشخص‌شده را اصلاح کنید.</p>
+      <ul role="list">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        {% for field in form %}{% if field.errors %}<li><a href="#{{ field.id_for_label }}">{{ field.label }}</a></li>{% endif %}{% endfor %}
+      </ul>
     </div>
+    {% endif %}
+
+    <form method="post" class="contact-form" novalidate>
+      {% csrf_token %}
+      {% include 'contact/_field.html' with field=form.full_name %}
+      {% include 'contact/_field.html' with field=form.phone %}
+      {% include 'contact/_field.html' with field=form.email %}
+      {% include 'contact/_field.html' with field=form.subject %}
+      {% include 'contact/_field.html' with field=form.message wide=True %}
+      {% include 'contact/_field.html' with field=form.captcha wide=True %}
+      <div class="field-wide">
+        <button type="submit" class="btn">ارسال پیام</button>
+      </div>
+    </form>
   </div>
+
+  {# ── The other ways in: phones, the address and the way here, hours. ── #}
+  <aside class="contact-details" aria-label="راه‌های تماس">
+    {% if site_phones %}
+    <div class="contact-block">
+      <h2>تلفن</h2>
+      <ul class="contact-phones" role="list">
+        {% for phone in site_phones %}<li><a href="{{ phone|tel_href }}"><span class="num">{{ phone|local_phone }}</span></a></li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if site_hours %}
+    <div class="contact-block">
+      <h2>ساعت‌ها</h2>
+      <p>{% for line in site_hours %}{{ line }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</p>
+    </div>
+    {% endif %}
+
+    <div class="contact-block">
+      <h2>نشانی</h2>
+      {% if site_address %}<p>{{ site_address }}</p>{% endif %}
+      <p class="cluster contact-routes">
+        <a href="https://neshan.org/maps/@35.745776,51.331922,17z" rel="noopener">مسیر در نشان</a>
+        <a href="https://www.google.com/maps/place/Aramesh+Music+Academy/@35.7457756,51.3293471,17z" rel="noopener">مسیر در گوگل‌مپ</a>
+      </p>
+      <iframe class="contact-map" title="موقعیت آموزشگاه روی نقشه" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              src="https://www.google.com/maps?q=35.7457756,51.331922&hl=fa&z=16&output=embed"></iframe>
+    </div>
+
+    {% if site_email %}
+    <div class="contact-block">
+      <h2>ایمیل</h2>
+      <p><a href="mailto:{{ site_email }}" class="ltr">{{ site_email }}</a></p>
+    </div>
+    {% endif %}
+  </aside>
 </section>
 {% endblock %}

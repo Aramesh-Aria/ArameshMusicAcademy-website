@@ -2,6 +2,7 @@ from django.conf import settings
 from django.views.generic import TemplateView
 
 from apps.gallery.models import GalleryImage, GalleryPage
+from apps.schedules.week import week_schedule
 from apps.teachers.models import Teacher
 from apps.testimonials.models import Testimonial
 
@@ -45,11 +46,13 @@ class HomeView(PageContentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['featured_teachers'] = (
+        # The first teacher stands in the hero as the director; the next three fill the teachers section.
+        context['featured_teachers'] = list(
             Teacher.objects
             .filter(is_active=True)
-            .prefetch_related('instruments')[:3]
+            .prefetch_related('instruments')[:4]
         )
+        context['week_schedule'] = week_schedule()
         space_page = (
             GalleryPage.objects
             .filter(slug=settings.ABOUT_GALLERY_SLUG, is_active=True)

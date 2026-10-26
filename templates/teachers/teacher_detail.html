@@ -1,54 +1,54 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ teacher.full_name }} | آموزشگاه موسیقی آرامش{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">{{ teacher.full_name }}</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li><a href="{% url 'teachers:teacher_list' %}">اساتید</a></li><li class="current">{{ teacher.full_name }}</li></ol></nav>
-  </div>
-</div>
-{% endblock %}
+{% block og_title %}{{ teacher.full_name }}{% endblock %}
+{% block tw_title %}{{ teacher.full_name }}{% endblock %}
+{% block body_class %}page-teacher{% endblock %}
 
 {% block content %}
-<section class="service-details section">
-  <div class="container" data-aos="fade-up">
-    <div class="row g-4 align-items-start">
-      <div class="col-lg-4">
-        {% if teacher.profile_image %}
-          <img src="{{ teacher.profile_image.url }}" class="img-fluid rounded" alt="{{ teacher.full_name }}">
-        {% endif %}
-      </div>
-      <div class="col-lg-8">
-        <h2>{{ teacher.full_name }}</h2>
-        <p>
-          {% for instrument in teacher.instruments.all %}
-            {{ instrument.name }}{% if not forloop.last %}، {% endif %}
-          {% endfor %}
-        </p>
-        <div>{{ teacher.biography|linebreaks }}</div>
 
-        {% if teacher_sessions %}
-        <div class="mt-4">
-          <h3 class="h5 mb-3">برنامه کلاس‌ها</h3>
-          <ul class="list-group">
-            {% for session in teacher_sessions %}
-            <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
-              <span>
-                <strong>{{ session.get_weekday_display }}</strong>
-                <span dir="ltr" class="mx-2">{{ session.start_time|time:'H:i' }} – {{ session.end_time|time:'H:i' }}</span>
-              </span>
-              <span class="text-muted">
-                {% for instrument in session.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}
-              </span>
-            </li>
-            {% endfor %}
-          </ul>
+{# ── The performer page: name, instruments, biography and week on one sheet, the portrait beside it. ── #}
+<section class="teacher-page grid" aria-labelledby="teacher-title">
+  <article class="teacher-sheet sheet sheet-torn">
+    <p class="teacher-back"><a href="{% url 'teachers:teacher_list' %}">اساتید</a></p>
+    <h1 id="teacher-title">{{ teacher.full_name }}</h1>
+    {% if teacher.instruments.all %}
+    <p class="teacher-page-instruments">{% for instrument in teacher.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+    {% endif %}
+
+    {% if teacher.biography %}
+    <div class="teacher-page-bio prose">{{ teacher.biography|linebreaks }}</div>
+    {% endif %}
+
+    <section class="teacher-week" aria-labelledby="week-title">
+      <h2 id="week-title">برنامهٔ هفتگی</h2>
+      {% if teacher_sessions %}
+      {% regroup teacher_sessions by get_weekday_display as days %}
+      <dl class="teacher-days">
+        {% for day in days %}
+        <div class="teacher-day">
+          <dt>{{ day.grouper }}</dt>
+          {% for session in day.list %}
+          <dd>
+            <span class="programme-time num ltr">{{ session.start_time|time:"H:i" }} – {{ session.end_time|time:"H:i" }}</span>
+            <span class="soft">{% for instrument in session.instruments.all %}{{ instrument.name }}{% if not forloop.last %}، {% endif %}{% endfor %}</span>
+          </dd>
+          {% endfor %}
         </div>
-        {% endif %}
-      </div>
-    </div>
-  </div>
+        {% endfor %}
+      </dl>
+      {% else %}
+      <p class="soft">زمان کلاس‌های این استاد هنوز در برنامه ثبت نشده است. برای هماهنگی تماس بگیرید.</p>
+      {% endif %}
+    </section>
+  </article>
+
+  <figure class="teacher-plate">
+    {% include 'partials/portrait.html' with teacher=teacher %}
+  </figure>
 </section>
+
+{% with title='برای هماهنگی کلاس با '|add:teacher.full_name|add:' تماس بگیرید' %}
+{% include 'partials/page_call.html' %}
+{% endwith %}
 {% endblock %}

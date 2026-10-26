@@ -1,43 +1,45 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
-
-{% block page_header %}
-<div class="page-title" data-aos="fade">
-  <div class="container d-lg-flex justify-content-between align-items-center">
-    <h1 class="mb-2 mb-lg-0">{{ page_title }}</h1>
-    <nav class="breadcrumbs"><ol><li><a href="{% url 'pages:home' %}">خانه</a></li><li class="current">درباره ما</li></ol></nav>
-  </div>
-</div>
-{% endblock %}
+{% block body_class %}page-about{% endblock %}
 
 {% block content %}
-<section class="service-details section">
-  <div class="container" data-aos="fade-up">
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="service-intro">
-          <p class="lead">{{ page_body|linebreaks }}</p>
-        </div>
-      </div>
-    </div>
 
-    {% if space_images %}
-    <div class="row mt-5" data-aos="fade-up">
-      <div class="col-lg-10 mx-auto">
-        <h3 class="h4 mb-4">فضای آموزشگاه</h3>
-        <div class="row g-3">
-          {% for image in space_images %}
-          <div class="col-lg-4 col-md-6">
-            <a href="{{ image.image.url }}" class="glightbox d-block rounded-3 overflow-hidden" data-gallery="academy-space" title="{{ image.title|default:'فضای آموزشگاه' }}">
-              <img src="{{ image.image.url }}" class="img-fluid w-100" alt="{{ image.title|default:'فضای آموزشگاه' }}" loading="lazy" style="aspect-ratio:3/2;object-fit:cover">
-            </a>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-    {% endif %}
-  </div>
+{# ── The letter: the admin's text on a paper sheet, signed by the Academy. ── #}
+<section class="about-hero grid{% if page_hero_image %} has-plate{% endif %}" aria-labelledby="about-title">
+  <article class="about-letter sheet sheet-torn">
+    <h1 id="about-title">{{ page_title }}</h1>
+    <div class="about-body prose">{{ page_body|linebreaks }}</div>
+    <p class="about-signature">آموزشگاه موسیقی آرامش</p>
+  </article>
+
+  {% if page_hero_image %}
+  <figure class="about-plate">
+    <img class="mono" src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high">
+  </figure>
+  {% endif %}
 </section>
+
+
+{# ── The rooms: every photo of the space at its own ratio, opening in the lightbox. ── #}
+{% if space_images %}
+<section class="about-rooms grid" aria-labelledby="rooms-title">
+  <header class="section-head">
+    <h2 id="rooms-title">فضای آموزشگاه</h2>
+    <span class="soft"><span class="num">{{ space_images|length }}</span> تصویر</span>
+  </header>
+  <ul class="plates" role="list">
+    {% for image in space_images %}
+    <li>
+      <a class="plate-link" href="{{ image.image.url }}" data-lightbox="rooms"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
+        <img class="mono" src="{{ image.image.url }}" alt="{{ image.title|default:'فضای آموزشگاه' }}" loading="lazy" decoding="async">
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+
+{% include 'partials/page_call.html' %}
 {% endblock %}

@@ -1,6 +1,7 @@
 from django.views.generic import TemplateView
 
 from .models import ClassSession, WEEKDAY_ORDER
+from .week import today_weekday, week_schedule
 from apps.pages.views import PageContentMixin
 from apps.pages.models import SitePageContent
 
@@ -61,4 +62,7 @@ class ScheduleView(PageContentMixin, TemplateView):
 
         context['weekdays'] = WEEKDAY_ORDER
         context['schedule_rows'] = schedule_rows
+        # The desktop week strikes today's column; phones get the week by day, as on the home page.
+        context['today'] = today_weekday()
+        context['week_schedule'] = week_schedule()
         return context

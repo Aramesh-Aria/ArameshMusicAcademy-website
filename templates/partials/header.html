@@ -1,18 +1,50 @@
-<header id="header" class="header sticky-top" >
-  <div dir="ltr" class="topbar d-flex align-items-center dark-background">
-    <div class="container d-flex justify-content-center justify-content-md-between">
-      <div class="contact-info d-flex align-items-center">
-        <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:{{ site_email }}">{{ site_email }}</a></i>
-        <i class="bi bi-phone d-flex align-items-center ms-4"><a href="tel:{{ site_phone_primary|cut:' ' }}">{{ site_phone_primary }}</a></i>
-      </div>
-    </div>
-  </div>
-  <div class="branding d-flex align-items-cente">
-    <div class="container position-relative d-flex align-items-center justify-content-between">
-      <a href="{% url 'pages:home' %}" class="logo d-flex align-items-center">
-        <h1 class="sitename">آموزشگاه موسیقی آرامش</h1>
-      </a>
-      {% include 'partials/navbar.html' %}
-    </div>
-  </div>
+{% load static site_tags %}
+{% with ns=request.resolver_match.namespace un=request.resolver_match.url_name %}
+<header class="site-header">
+  <a class="site-mark" href="{% url 'pages:home' %}">
+    <img src="{% static 'assets/img/logo-paper.webp' %}" width="400" height="232" alt="آموزشگاه موسیقی آرامش">
+  </a>
+
+  <nav class="site-nav" aria-label="اصلی">
+    <ul role="list">
+      <li><a href="{% url 'pages:about' %}"{% if un == 'about' %} aria-current="page"{% endif %}>درباره ما</a></li>
+      <li><a href="{% url 'teachers:teacher_list' %}"{% if ns == 'teachers' %} aria-current="page"{% endif %}>اساتید</a></li>
+      <li><a href="{% url 'schedules:schedule' %}"{% if ns == 'schedules' %} aria-current="page"{% endif %}>برنامه کلاس‌ها</a></li>
+      <li class="gallery-menu">
+        <details data-disclosure>
+          <summary{% if ns == 'gallery' %} aria-current="true"{% endif %}>گالری <svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <div class="gallery-panel sheet">
+            {% if gallery_nav_tree %}
+            <ul role="list">
+              {% for node in gallery_nav_tree %}
+              <li>
+                <a href="{{ node.page.get_absolute_url }}">{{ node.page.title }}</a>
+                {% if node.children %}
+                <ul role="list">
+                  {% for child in node.children %}
+                  <li><a href="{{ child.page.get_absolute_url }}">{{ child.page.title }}</a></li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+              </li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+            <a class="gallery-panel-all" href="{% url 'gallery:gallery_root' %}">همهٔ گالری‌ها</a>
+          </div>
+        </details>
+      </li>
+      <li><a href="{% url 'contact:contact' %}"{% if ns == 'contact' %} aria-current="page"{% endif %}>تماس</a></li>
+    </ul>
+  </nav>
+
+  {% if site_phone_primary %}
+  <a class="header-phone" href="{{ site_phone_primary|tel_href }}">
+    <svg class="icon" aria-hidden="true"><use href="#i-phone"/></svg>
+    <span class="num ltr">{{ site_phone_primary|local_phone }}</span>
+  </a>
+  {% endif %}
+
+  <button class="menu-toggle" type="button" data-menu-open aria-controls="site-menu" aria-expanded="false" hidden>منو</button>
 </header>
+{% endwith %}

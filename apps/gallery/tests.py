@@ -144,4 +144,19 @@ class GalleryViewTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_videos_render_as_posters_without_loading_the_player(self):
+        page = GalleryPage.objects.create(title='Videos', slug='videos')
+        Video.objects.create(
+            gallery_page=page,
+            title='Spring Concert',
+            platform=Video.YOUTUBE,
+            video_url='https://www.youtube.com/watch?v=abc123XYZ_0',
+        )
+
+        response = self.client.get(page.get_absolute_url())
+
+        self.assertContains(response, 'data-video="https://www.youtube.com/embed/abc123XYZ_0"')
+        self.assertContains(response, 'href="https://www.youtube.com/watch?v=abc123XYZ_0"')
+        self.assertNotContains(response, '<iframe')
+
 # Create your tests here.
