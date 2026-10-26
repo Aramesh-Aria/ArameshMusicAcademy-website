@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,30 +27,48 @@ load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-w(p+t0x6&*4295%5nedht10@0yz)bbdth9&0jw8xe$tnk(sgyq)')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-# Comma-separated in .env or Runflare's variables; without it, the hosts the site has always answered on.
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.environ.get(
-        'ALLOWED_HOSTS',
-        'aramesh-academy.ir,aramesh-academy.runflare.run,api.runflare.com,localhost,127.0.0.1',
-    ).split(',')
-    if host.strip()
-]
+# SECURITY WARNING: keep the secret key used in production secret!
+# Required whenever DEBUG is off, so a server missing the variable fails to start instead of
+# running on the development key committed below.
+SECRET_KEY = os.environ.get('SECRET_KEY', '')
+if not SECRET_KEY:
+    if not DEBUG:
+        raise ImproperlyConfigured('Set SECRET_KEY in .env or the environment (required when DEBUG is off).')
+    SECRET_KEY = 'django-insecure-w(p+t0x6&*4295%5nedht10@0yz)bbdth9&0jw8xe$tnk(sgyq)'
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://aramesh-academy.ir',
-    'https://aramesh-academy.runflare.run',
-]
+
+def _env_list(name, default):
+    """A comma-separated environment variable as a list, or the default when it is unset."""
+    return [item.strip() for item in os.environ.get(name, default).split(',') if item.strip()]
+
+
+# Hosts and origins: comma-separated in .env or Runflare's variables; without them, today's values.
+ALLOWED_HOSTS = _env_list(
+    'ALLOWED_HOSTS',
+    'aramesh-academy.ir,aramesh-academy.runflare.run,api.runflare.com,localhost,127.0.0.1',
+)
+# Every https host that serves forms (contact, admin login) must be listed here as well.
+CSRF_TRUSTED_ORIGINS = _env_list(
+    'CSRF_TRUSTED_ORIGINS',
+    'https://aramesh-academy.ir,https://aramesh-academy.runflare.run',
+)
 
 # Runflare terminates TLS at its proxy and forwards the original scheme in this header.
 # Without it, Django thinks every request is http and builds http:// URLs (breaks OG/canonical).
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# With DEBUG off the site is https only: cookies never travel over http, and http requests are
+# redirected. SECURE_SSL_REDIRECT=False in the environment turns the redirect off, for a server
+# run over plain http (a local DEBUG=False check, or a platform health check without the proxy header).
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', str(not DEBUG)) == 'True'
+
+# Turns the https redirect off while tests run.
+TEST_RUNNER = 'apps.core.test_runner.TestRunner'
 
 
 # Application definition
@@ -110,10 +129,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+def _database_path():
+    """DATABASE_PATH from the environment (relative to the project, or absolute), else database/db.sqlite3."""
+    path = Path(os.environ.get('DATABASE_PATH', 'database/db.sqlite3'))
+    return path if path.is_absolute() else BASE_DIR / path
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'database/db.sqlite3',
+        'NAME': _database_path(),
     }
 }
 
@@ -180,7 +205,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Site Information
 # The one public domain: canonical, og:url and og:image name it, whichever host served the page.
-SITE_DOMAIN = 'aramesh-academy.ir'
+SITE_DOMAIN = os.environ.get('SITE_DOMAIN', 'aramesh-academy.ir')
 SITE_EMAIL = 'aramesh.music.acad@gmail.com'
 SITE_PHONES = ['+98 21 4445 7748', '+98 990 233 8431', '+98 21 4445 7746', '+98 21 4613 3707']
 SITE_ADDRESS = 'تهران، اشرفی اصفهانی، پایین تر از تیراژه، نبش خ امام حسین، پلاک ۱۴۲ طبقه دوم '

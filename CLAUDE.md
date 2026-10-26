@@ -40,11 +40,12 @@ There is no linter or frontend build step configured.
 
 ## Configuration
 
-- `config/settings.py` is the only settings file. It loads a gitignored `.env` via python-dotenv. On Runflare, real environment variables are used instead. See `.env.example` for the keys: `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS` (comma-separated; defaults to the production and local hosts when unset), email/SMTP settings, `CONTACT_NOTIFICATION_EMAIL`, `ABOUT_GALLERY_SLUG`, `SITE_INSTAGRAM`/`SITE_TELEGRAM`, `GOOGLE_ANALYTICS_ID`.
-- When no email env vars are set, the console email backend is used, so local dev and tests need no credentials.
-- `SITE_DOMAIN` (the public domain used by canonical, og: tags and the sitemap), `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS` and `SITE_HOURS` are hardcoded in `settings.py`.
+- `config/settings.py` is the only settings file. It loads a gitignored `.env` via python-dotenv. On Runflare, real environment variables are used instead. See `.env.example` for the keys: `SECRET_KEY` (required when `DEBUG` is off; settings refuse to load without it), `DEBUG`, `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` (comma-separated), `SITE_DOMAIN` (the public domain named by canonical, og: tags and the sitemap), `DATABASE_PATH`, `SECURE_SSL_REDIRECT`, email/SMTP settings, `CONTACT_NOTIFICATION_EMAIL`, `ABOUT_GALLERY_SLUG`, `SITE_INSTAGRAM`/`SITE_TELEGRAM`, `GOOGLE_ANALYTICS_ID`. Every key except `SECRET_KEY` (with `DEBUG` off) has a default in `settings.py`, so an unset key keeps today's value.
+- With `DEBUG` off the site is https only: secure session and CSRF cookies, and http redirects to https (`SECURE_SSL_REDIRECT=False` turns the redirect off for plain-http runs). HSTS is not set yet. Tests run through `apps.core.test_runner.TestRunner`, which turns the redirect off.
+- When no email env vars are set, the console email backend is used, so local dev and tests need no email credentials. They do need a `SECRET_KEY` in `.env` (or `DEBUG=True`), since `DEBUG` defaults to off.
+- `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS` and `SITE_HOURS` are hardcoded in `settings.py`.
 - Locale: `LANGUAGE_CODE = 'fa-ir'`, `TIME_ZONE = 'Asia/Tehran'`, and `django_jalali` for Persian dates.
-- The database is SQLite at `database/db.sqlite3` (gitignored), in production too.
+- The database is SQLite at `database/db.sqlite3` (gitignored) unless `DATABASE_PATH` says otherwise, in production too.
 
 ## Static and media files
 
