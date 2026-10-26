@@ -5,13 +5,13 @@
 {% block body_class %}page-schedule{% endblock %}
 
 {% block content %}
-<section class="schedule grid" aria-labelledby="schedule-title">
-  <header class="schedule-head">
+<section class="schedule section page-head" aria-labelledby="schedule-title">
+  <header class="section__head">
     <h1 id="schedule-title">{{ page_title }}</h1>
-    <p>زمان‌بندی کلاس‌های تخصصی. برای هماهنگی جلسهٔ اول با آموزشگاه تماس بگیرید.</p>
+    <p class="section__intro">زمان‌بندی کلاس‌های تخصصی. برای هماهنگی جلسهٔ اول با آموزشگاه تماس بگیرید.</p>
   </header>
 
-  <div class="schedule-sheet sheet sheet-torn">
+  <div class="schedule-sheet panel on-stone">
     {% if schedule_rows %}
 
     {# ── Desktop: the week diagram, one row per teacher, today's column struck. ── #}
@@ -69,5 +69,5 @@
   {% endif %}
 </section>
 
-{% include 'partials/page_call.html' %}
+{% include 'partials/contact_band.html' %}
 {% endblock %}

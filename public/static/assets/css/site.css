@@ -1253,7 +1253,7 @@
     padding: var(--space-1) var(--space-3) var(--space-2);
     background: transparent;
     border: 0;
-    border-radius: var(--radius);
+    border-radius: var(--radius-pill);
     color: inherit;
     line-height: 1.25;
     transition: transform var(--dur-press) var(--ease-out), background-color var(--dur-state) var(--ease-out);
@@ -1261,7 +1261,7 @@
   .days small { min-block-size: 1.3em; font-size: 0.8em; color: var(--text-soft); }
   .days .day-short { display: none; }
   @media (hover: hover) and (pointer: fine) {
-    .days button:hover { background: var(--paper-2); }
+    .days button:hover { background: color-mix(in oklab, var(--text) 8%, var(--surface)); }
   }
   .days button:focus-visible { outline-offset: 2px; }
   .days button:active { transform: scale(var(--press-scale)); }
@@ -1275,9 +1275,9 @@
     margin: 0;
     pointer-events: none;
   }
-  .days-struck button { background: var(--ink); color: var(--paper); transition: transform var(--dur-press) var(--ease-out); }
+  .days-struck button { background: var(--ink); color: var(--stone); transition: transform var(--dur-press) var(--ease-out); }
   .days-struck .is-pressed { transform: scale(var(--press-scale)); }
-  .days-struck small { color: var(--on-ground-soft); }
+  .days-struck small { color: var(--saffron); }
   .days-struck.is-ready { transition: clip-path var(--dur-move) var(--ease-in-out); }
 
   /* One measured grid every programme obeys: time, teacher, instruments. */
@@ -1335,9 +1335,9 @@
 /* ── pages ─────────────────────────────────────────────────────────── */
 @layer pages {
   /* Every page opens the same distance below the header. */
-  .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
+  .about-hero, .teachers, .teacher-page, .gallery, .contact, .stub { padding-block-start: var(--space-6); }
   @media (max-width: 56.25em) {
-    .about-hero, .teachers, .teacher-page, .schedule, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
+    .about-hero, .teachers, .teacher-page, .gallery, .contact, .stub { padding-block-start: var(--space-4); }
   }
 
   /* ── home ── */
@@ -1625,9 +1625,6 @@
 
 
   /* ── schedule: the week diagram, and the week by day on smaller screens ── */
-  .schedule-head { margin-block-end: var(--space-7); }
-  .schedule-head p { margin-block-start: var(--space-4); font-size: var(--text-l); max-inline-size: var(--measure); }
-  .schedule-sheet { grid-column: 1 / -1; }
 
   .week-table {
     inline-size: 100%;
@@ -1646,16 +1643,18 @@
   }
   .week-table thead th:first-child { inline-size: 24%; }
   .week-table thead small { display: block; font-size: var(--text-s); font-weight: 400; color: var(--text-soft); }
-  .week-table thead .is-today { background: var(--ink); color: var(--paper); }
-  .week-table thead .is-today small { color: var(--on-ground-soft); }
+  /* Today: the column head in ink with a saffron «امروز», the column a shade deeper than the stone. */
+  .week-table thead .is-today { border-radius: max(0.5rem, calc(var(--radius-panel) - var(--space-4))) max(0.5rem, calc(var(--radius-panel) - var(--space-4))) 0 0; background: var(--ink); color: var(--stone); }
+  .week-table thead .is-today small { color: var(--saffron); font-weight: 700; }
   .week-table .is-off { color: var(--text-soft); }
-  .week-table td.is-today { background: var(--paper-2); }
-  .week-table tbody tr + tr > * { border-block-start: 1px solid var(--rule); }
-  .week-table tbody th { font-weight: 700; font-size: var(--text-l); line-height: 1.3; }
+  .week-table td.is-today { background: color-mix(in oklab, var(--ink) 6%, var(--stone)); }
+  .week-table tbody tr + tr > * { border-block-start: 1px solid color-mix(in oklab, var(--ink) 14%, var(--stone)); }
+  .week-table tbody th { font-family: var(--font-display); font-weight: 700; font-size: var(--text-l); line-height: 1.3; }
   .week-table tbody th a { text-decoration: none; }
   .week-table tbody th span {
     display: block;
     margin-block-start: var(--space-1);
+    font-family: var(--font-text);
     font-size: var(--text-s);
     font-weight: 400;
     color: var(--text-soft);
@@ -1674,16 +1673,11 @@
   .schedule-empty { font-size: var(--text-l); max-inline-size: var(--measure); padding-block-end: var(--space-6); }
   .schedule-sheet:has(.week-table) { padding-block-end: var(--space-7); }
   .schedule-body {
-    margin-block-start: var(--space-8);
-    font-size: var(--text-l);
-  }
-
-  @media (min-width: 56.3125em) {
-    .schedule-head, .schedule-body { grid-column: 1 / span 8; }
+    margin-block-start: var(--space-7);
+    padding-inline: calc(var(--panel-pad) - var(--space-3));
   }
 
   @media (max-width: 56.25em) {
-    .schedule-head { margin-block-end: var(--space-6); }
     .week-table { display: none; }
     .schedule-by-day { display: block; }
     .schedule-sheet:has(.week-table) { padding-block-end: var(--space-6); }
