@@ -211,7 +211,7 @@ class ScheduleDisplayRuleTests(TestCase):
     def test_a_session_shows_its_instruments_then_the_teachers_programmes(self):
         session = self._session(Weekday.WEDNESDAY, self.guitar, self.piano)
 
-        self.assertEqual(str(session.offerings()), 'پیانو، گیتار پاپ · تئوری و سلفژ')
+        self.assertEqual(str(session.offerings()), 'پیانو، گیتار پاپ؛ تئوری و سلفژ')
 
     def test_a_reserved_session_shows_only_its_programme(self):
         session = self._session(Weekday.THURSDAY, programme=self.ensemble)
@@ -224,7 +224,7 @@ class ScheduleDisplayRuleTests(TestCase):
     def test_children_only_instruments_never_show_on_the_schedule(self):
         session = self._session(Weekday.SATURDAY, self.bells, self.piano)
 
-        self.assertEqual(str(session.offerings()), 'پیانو · تئوری و سلفژ')
+        self.assertEqual(str(session.offerings()), 'پیانو؛ تئوری و سلفژ')
 
     def test_a_session_of_only_childrens_instruments_shows_the_teachers_programme(self):
         children = Programme.objects.create(
@@ -259,11 +259,11 @@ class ScheduleDisplayRuleTests(TestCase):
         response = self.client.get(reverse('schedules:schedule'))
 
         row = response.context['schedule_rows'][0]
-        self.assertEqual(str(row['offerings']), 'پیانو، گیتار پاپ · تئوری و سلفژ، گروه نوازی')
+        self.assertEqual(str(row['offerings']), 'پیانو، گیتار پاپ؛ تئوری و سلفژ، گروه نوازی')
         # Each session offers less than the row's full list, so each cell names its own.
         self.assertContains(response, '<small class="week-instruments">گروه نوازی</small>', html=True)
         self.assertContains(
-            response, '<small class="week-instruments">پیانو، گیتار پاپ · تئوری و سلفژ</small>', html=True,
+            response, '<small class="week-instruments">پیانو، گیتار پاپ؛ تئوری و سلفژ</small>', html=True,
         )
 
 

@@ -157,9 +157,10 @@
 {% if testimonials %}
 <section class="section" aria-labelledby="quotes-title">
   <header class="section__head"><h2 id="quotes-title">از زبان خانواده‌ها</h2></header>
-  <div class="marquee">
+  {# Fewer than four quotes can't fill a wide screen, so they stand still and are listed once. #}
+  <div class="marquee{% if testimonials|length < 4 %} marquee--still{% endif %}">
     <div class="marquee__track">
-      {% for copy in "ab" %}
+      {% for copy in "ab" %}{% if forloop.first or testimonials|length >= 4 %}
       <ul class="marquee__list" role="list"{% if not forloop.first %} aria-hidden="true"{% endif %}>
         {% for testimonial in testimonials %}
         <li>
@@ -170,7 +171,7 @@
         </li>
         {% endfor %}
       </ul>
-      {% endfor %}
+      {% endif %}{% endfor %}
     </div>
   </div>
 </section>

@@ -52,9 +52,9 @@ class Offerings:
         return [item.name for item in self.instruments + self.programmes]
 
     def __str__(self):
-        # «پیانو، گیتار پاپ · تئوری و سلفژ»
+        # «پیانو، گیتار پاپ؛ تئوری و سلفژ»: a Persian semicolon, since a middle dot reads like the digit zero (۰).
         parts = ['، '.join(item.name for item in group) for group in (self.instruments, self.programmes) if group]
-        return ' · '.join(parts)
+        return '؛ '.join(parts)
 
 
 class ClassSessionQuerySet(models.QuerySet):

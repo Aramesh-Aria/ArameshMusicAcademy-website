@@ -170,6 +170,14 @@ class HomePageTests(TestCase):
         self.assertEqual(len(response.context['testimonials']), 8)
         self.assertContains(response, 'class="marquee__list" role="list" aria-hidden="true"', count=1)
 
+    def test_a_single_testimonial_stands_still_and_is_listed_once(self):
+        Testimonial.objects.create(author_name='فاطمه حسینی', quote='دخترم اینجا پیانو می‌زند.')
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'class="marquee marquee--still"')
+        self.assertContains(response, 'دخترم اینجا پیانو می‌زند.', count=1)
+
     def test_only_active_faqs_marked_for_home_show(self):
         FAQ.objects.create(question='بهترین سن؟', answer='.')
         FAQ.objects.create(question='فقط صفحهٔ دوره', answer='.', show_on_home=False)

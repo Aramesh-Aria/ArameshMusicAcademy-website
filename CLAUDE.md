@@ -10,6 +10,7 @@ source .venv/bin/activate                    # Python 3.12
 DEBUG=True python manage.py runserver        # DEBUG defaults to False; True is needed for static serving + error pages
 python manage.py makemigrations && python manage.py migrate
 python manage.py seed_sample_data            # load the real academy content scraped from aramesh-academy.ir (Programmes, Instruments, teachers, sessions, About text, the home page's teaching sections, and the gallery pages concerts / ensemble / academy-space / videos / hidden home-hero, with photos only in academy-space and home-hero; no testimonials or videos). Data + photos: apps/core/management/commands/seed_data/
+DATABASE_PATH=database/worst.sqlite3 DEBUG=True python manage.py seed_worst_case  # dev only, into a separate database: the seed pushed to the models' limits (long names, six Instruments, one testimonial); see docs/redesign/break-ui-step19.md
 python manage.py collectstatic --noinput     # required after any static change (see Static files)
 
 python manage.py test                                         # all tests

@@ -634,6 +634,9 @@
     display: flex;
     align-items: center;
     gap: var(--space-1);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-inline-size: 0;
     margin-inline-start: auto;
   }
   .navbar__link {
@@ -761,6 +764,7 @@
   .section__intro { max-inline-size: var(--measure); color: var(--text-soft); }
 
   .tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.5rem), 1fr)); gap: var(--space-3); }
+  /* Two to a row on phones (below), but one on the narrowest, where a two-line name would break word by word. */
 
   /* ── Teacher card: portrait, name, what they teach, from whom they learned ── */
   .portrait-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: var(--space-7) var(--space-5); }
@@ -805,6 +809,9 @@
     /* The full list of teachers stays a grid: two portraits a row. */
     .portrait-row--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); }
     .portrait-row--grid .teacher-card__name { font-size: var(--text-l); }
+  }
+  @media (max-width: 22.5em) {
+    .tile-grid { grid-template-columns: minmax(0, 1fr); }
   }
 
   /* ── Class times: one raised tile per session (a tone step, no rules), across the page's full width ── */
@@ -977,6 +984,10 @@
     .marquee__list { flex-wrap: wrap; }
     .marquee__list[aria-hidden="true"] { display: none; }
   }
+  /* Too few quotes to fill a wide screen: they sit still, side by side, instead of a copy chasing the original. */
+  .marquee--still { overflow: visible; }
+  .marquee--still .marquee__track { animation: none; inline-size: auto; }
+  .marquee--still .marquee__list { flex-wrap: wrap; }
   .quote {
     display: grid;
     align-content: space-between;
