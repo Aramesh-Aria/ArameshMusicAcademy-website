@@ -292,9 +292,23 @@
   ],
   "gallery_pages": [
     {
-      "slug": "academy-space",
-      "title": "فضای آموزشگاه",
+      "slug": "concerts",
+      "title": "کنسرت‌ها",
       "display_order": 1,
+      "description": "اجراهای هنرجویان و اساتید آموزشگاه؛ هر کنسرت در صفحه‌ای جداگانه.",
+      "images": []
+    },
+    {
+      "slug": "ensemble",
+      "title": "گروه نوازی",
+      "display_order": 2,
+      "description": "تمرین‌ها و اجراهای گروه نوازی هنرجویان.",
+      "images": []
+    },
+    {
+      "slug": "academy-space",
+      "title": "کلاس‌ها و فضای آموزشگاه",
+      "display_order": 3,
       "description": "کلاس‌ها و فضای آموزشی آموزشگاه موسیقی آرامش.",
       "cover_image": "gallery/covers/photo_2026-06-28_01.25.10.jpg",
       "images": [
@@ -362,6 +376,41 @@
           "image": "gallery/2026-07-06_18.00.03.jpg",
           "title": "",
           "display_order": 13
+        }
+      ]
+    },
+    {
+      "slug": "videos",
+      "title": "ویدیوها",
+      "display_order": 4,
+      "description": "ویدیوی اجراهای آموزشگاه.",
+      "images": []
+    },
+    {
+      "slug": "home-hero",
+      "title": "تصاویر صفحه اصلی",
+      "display_order": 99,
+      "description": "تصاویر اسلایدر صفحه اصلی. عنوان هر تصویر روی اسلاید نمایش داده می‌شود.",
+      "images": [
+        {
+          "image": "gallery/2026-07-06_17.59.41.jpg",
+          "title": "کلاس سنتور",
+          "display_order": 1
+        },
+        {
+          "image": "gallery/2026-07-06_20.08.37.jpg",
+          "title": "صدا سازی و آواز کلاسیک",
+          "display_order": 2
+        },
+        {
+          "image": "gallery/2026-07-06_17.59.19.jpg",
+          "title": "کلاس پیانو",
+          "display_order": 3
+        },
+        {
+          "image": "gallery/photo_2026-06-28_01.25.09.jpg",
+          "title": "کلاس تار و سه تار",
+          "display_order": 4
         }
       ]
     }

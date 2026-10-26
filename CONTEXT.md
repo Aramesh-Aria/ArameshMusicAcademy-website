@@ -13,8 +13,19 @@ Aramesh Music Academy itself — the business this site represents.
 _Avoid_: School, institute
 
 **ClassSession**:
-A recurring time slot when a Teacher is present at the academy on a given weekday. A single ClassSession covers one or more Instruments taught by that teacher during that slot — because a teacher may teach multiple instruments to different students simultaneously. The schedule table groups rows by Teacher, with instruments displayed as a list within each row.
+A recurring time slot when a Teacher is present at the academy on a given weekday. A single ClassSession covers one or more Instruments taught by that teacher during that slot — because a teacher may teach multiple instruments to different students simultaneously. The schedule table groups rows by Teacher, with instruments displayed as a list within each row. Any "with the teacher" Programmes the Teacher offers are shown on every ClassSession of theirs. A ClassSession reserved for a fixed-time Programme shows only that Programme.
 _Avoid_: Slot, block, period, course
+
+**Instrument**:
+A real instrument the Academy teaches, such as سنتور, تار, پیانو or ویولن. Voice (آواز) counts as an Instrument. Some Instruments are children-only (بلز, فلوت): they belong to children's music and appear only there, never in the main instrument list. Subjects and kinds of class (theory and solfège, ensemble playing, children's music) are not Instruments; they are Programmes.
+_Avoid_: Subject, class type
+
+**Programme** (دوره):
+A way of studying at the Academy, independent of any one instrument. The Programmes are private lessons (کلاس خصوصی), ensemble playing (گروه نوازی), children's music (موسیقی کودک), and theory and solfège (تئوری و سلفژ). Master classes join them only when there is a real one to show. Every lesson at the Academy is private, so "private" describes the Academy, not a Programme option. Ensemble playing is the one exception: an optional group activity that some students join alongside their private lessons. A Visitor first chooses a Programme, then usually an Instrument within it. A Programme is not a time slot: that's a ClassSession.
+A Programme is one of two kinds:
+- **With the teacher**: taught whenever a Teacher who offers it is at the Academy, with no time of its own. Private lessons, theory and solfège, and children's music are this kind. Children's music covers basic note reading and children's instruments such as بلز and فلوت.
+- **At a fixed time**: has its own reserved ClassSession, and nothing else is taught in that slot. Ensemble playing is this kind (Thursdays). In Persian copy, «دوره» always means a Programme, never a single ClassSession.
+_Avoid_: Course, track, offering, class type
 
 **Testimonial**:
 A short quote from a satisfied parent displayed on the home page, between the teacher preview and the contact call-to-action. Its purpose is social proof — to tip an undecided parent toward making contact.

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Accent comparison: jade vs saffron</title>
+<style>
+  /* Throwaway mockup for choosing the accent (round 1, Q3). Same ground, panels and type; only the accent differs. */
+  @font-face { font-family: "Amiri"; font-weight: 400; src: url("../../../static_dev/assets/fonts/amiri-fa-400.woff2") format("woff2"); }
+  @font-face { font-family: "Amiri"; font-weight: 700; src: url("../../../static_dev/assets/fonts/amiri-fa-700.woff2") format("woff2"); }
+  @font-face { font-family: "Sahel"; font-weight: 100 900; src: url("https://cdn.jsdelivr.net/gh/rastikerdar/sahel-font@v3.4.0/dist/Sahel-VF.woff2") format("woff2"); }
+
+  :root {
+    --ground: #12110f;
+    --panel: #f3eee5;
+    --ink: #1c1a17;
+    --ink-soft: #5a554d;
+    --on-ground: #efeae0;
+  }
+  .jade    { --accent: #0e7a64; --on-accent: #ffffff; --accent-glow: rgba(14,122,100,.45); --name: "A — Jade"; }
+  .saffron { --accent: #e2a72e; --on-accent: #1c1a17; --accent-glow: rgba(226,167,46,.40); }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #2a2826; font-family: "Sahel", sans-serif; color: var(--on-ground); padding: 24px; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .variant { background: var(--ground); border-radius: 28px; padding: 14px; display: grid; gap: 14px; overflow: hidden; }
+  .label { font: 700 15px/1 "Sahel"; letter-spacing: .02em; color: var(--on-ground); padding: 6px 10px 2px; display: flex; justify-content: space-between; }
+  .label span:last-child { color: var(--accent); font-weight: 600; }
+
+  .nav { display: flex; align-items: center; justify-content: space-between; background: #1d1b18; border-radius: 999px; padding: 8px 8px 8px 18px; }
+  .nav .brand { font: 700 22px/1 "Amiri"; padding-inline-start: 10px; }
+  .nav ul { display: flex; gap: 20px; list-style: none; padding: 0; font-size: 14px; color: #cfc9be; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 22px; border-radius: 999px; font: 600 15px/1 "Sahel"; border: 0; }
+  .pill-accent { background: var(--accent); color: var(--on-accent); }
+  .pill-light { background: #fff; color: var(--ink); }
+  .pill-sm { height: 40px; padding: 0 18px; font-size: 14px; }
+
+  .hero { position: relative; border-radius: 24px; overflow: hidden; height: 420px; }
+  .hero img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.85) brightness(.55); }
+  .hero .copy { position: absolute; inset: 0; padding: 36px; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; }
+  .eyebrow { font: 600 12px/1 "Sahel"; letter-spacing: .08em; opacity: .85; }
+  .hero h1 { font: 700 54px/1.15 "Amiri"; }
+  .hero p { font-size: 15px; line-height: 1.8; max-width: 30em; color: #e7e1d6; }
+  .hero .actions { display: flex; gap: 10px; }
+  .hero .dots { position: absolute; bottom: 22px; left: 28px; display: flex; gap: 6px; }
+  .hero .dots i { width: 22px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.35); }
+  .hero .dots i.on { background: var(--accent); }
+
+  .row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 14px; }
+  .panel { background: var(--panel); color: var(--ink); border-radius: 24px; padding: 28px; position: relative; overflow: hidden; }
+  .panel::before { content: ""; position: absolute; width: 260px; height: 260px; border-radius: 50%; background: var(--accent); opacity: .16; inset-block-start: -90px; inset-inline-end: -80px; }
+  .panel .eyebrow { color: var(--ink-soft); }
+  .panel h2 { font: 700 34px/1.25 "Amiri"; margin: 10px 0 12px; position: relative; }
+  .panel p { font-size: 14.5px; line-height: 1.9; color: var(--ink-soft); position: relative; }
+  .panel a { display: inline-block; margin-top: 14px; color: var(--ink); font-weight: 600; font-size: 14px; text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 3px; text-underline-offset: 6px; position: relative; }
+
+  .card { background: var(--panel); color: var(--ink); border-radius: 24px; padding: 8px 8px 16px; display: grid; gap: 12px; }
+  .card .ph { position: relative; border-radius: 18px; overflow: hidden; aspect-ratio: 3 / 2; }
+  .card .ph img { width: 100%; height: 100%; object-fit: cover; }
+  .chip { position: absolute; top: 12px; right: 12px; background: #fff; color: var(--ink); font: 600 12px/1 "Sahel"; padding: 7px 11px; border-radius: 999px; }
+  .card h3 { font: 700 24px/1.2 "Amiri"; padding: 0 10px; }
+  .card p { font-size: 13.5px; line-height: 1.8; color: var(--ink-soft); padding: 0 10px; }
+  .card .pill { margin: 0 8px; justify-content: center; }
+
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; padding: 4px 6px 8px; }
+  .tag { border: 1px solid #3a3732; border-radius: 999px; padding: 8px 14px; font-size: 13px; color: #d9d3c8; }
+  .tag.on { border-color: var(--accent); color: var(--on-ground); box-shadow: inset 0 0 0 1px var(--accent); }
+</style>
+</head>
+<body>
+<div class="compare">
+  <section class="variant jade">
+    <div class="label"><span>گزینه A</span><span>یشمی (Jade) — رنگ فعلی لوگو</span></div>
+    <nav class="nav"><span class="brand">آرامش</span><ul><li>درباره ما</li><li>دوره‌ها</li><li>اساتید</li><li>برنامه کلاس‌ها</li><li>گالری</li></ul><span class="pill pill-accent pill-sm">تماس ۰۲۱ ۴۴۴۵ ۷۷۴۸</span></nav>
+    <div class="hero">
+      <img src="../../../apps/core/management/commands/seed_data/images/gallery/2026-07-06_20.08.37.jpg" alt="">
+      <div class="copy">
+        <span class="eyebrow">آموزشگاه موسیقی آرامش · از ۱۳۹۵</span>
+        <h1>خانهٔ موسیقی ایرانی<br>در قلب تهران</h1>
+        <p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p>
+        <div class="actions"><span class="pill pill-accent">مشاوره و تماس</span><span class="pill pill-light">آشنایی با دوره‌ها</span></div>
+      </div>
+      <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="row">
+      <div class="panel">
+        <span class="eyebrow">درباره ما</span>
+        <h2>با مدیریت مسعود آرامش، آهنگساز و نوازندهٔ سنتور</h2>
+        <p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان به هنر موسیقی.</p>
+        <a>داستان آموزشگاه</a>
+      </div>
+      <div class="card">
+        <div class="ph"><img src="../../../apps/core/management/commands/seed_data/images/gallery/photo_2026-06-28_01.24.56.jpg" alt=""><span class="chip">از ۷ سال</span></div>
+        <h3>کلاس خصوصی ساز</h3>
+        <p>سنتور، تار، پیانو، ویولن و… با برنامه‌ای متناسب با سن و هدف هنرجو.</p>
+        <span class="pill pill-accent">بیشتر بدانید</span>
+      </div>
+    </div>
+    <div class="tags"><span class="tag on">سنتور</span><span class="tag">تار و سه‌تار</span><span class="tag">پیانو</span><span class="tag">تنبک و دف</span><span class="tag">آواز ایرانی</span></div>
+  </section>
+
+  <section class="variant saffron">
+    <div class="label"><span>گزینه B</span><span>زعفرانی (Saffron gold)</span></div>
+    <nav class="nav"><span class="brand">آرامش</span><ul><li>درباره ما</li><li>دوره‌ها</li><li>اساتید</li><li>برنامه کلاس‌ها</li><li>گالری</li></ul><span class="pill pill-accent pill-sm">تماس ۰۲۱ ۴۴۴۵ ۷۷۴۸</span></nav>
+    <div class="hero">
+      <img src="../../../apps/core/management/commands/seed_data/images/gallery/2026-07-06_20.08.37.jpg" alt="">
+      <div class="copy">
+        <span class="eyebrow">آموزشگاه موسیقی آرامش · از ۱۳۹۵</span>
+        <h1>خانهٔ موسیقی ایرانی<br>در قلب تهران</h1>
+        <p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p>
+        <div class="actions"><span class="pill pill-accent">مشاوره و تماس</span><span class="pill pill-light">آشنایی با دوره‌ها</span></div>
+      </div>
+      <div class="dots"><i class="on"></i><i></i><i></i><i></i></div>
+    </div>
+    <div class="row">
+      <div class="panel">
+        <span class="eyebrow">درباره ما</span>
+        <h2>با مدیریت مسعود آرامش، آهنگساز و نوازندهٔ سنتور</h2>
+        <p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان به هنر موسیقی.</p>
+        <a>داستان آموزشگاه</a>
+      </div>
+      <div class="card">
+        <div class="ph"><img src="../../../apps/core/management/commands/seed_data/images/gallery/photo_2026-06-28_01.24.56.jpg" alt=""><span class="chip">از ۷ سال</span></div>
+        <h3>کلاس خصوصی ساز</h3>
+        <p>سنتور، تار، پیانو، ویولن و… با برنامه‌ای متناسب با سن و هدف هنرجو.</p>
+        <span class="pill pill-accent">بیشتر بدانید</span>
+      </div>
+    </div>
+    <div class="tags"><span class="tag on">سنتور</span><span class="tag">تار و سه‌تار</span><span class="tag">پیانو</span><span class="tag">تنبک و دف</span><span class="tag">آواز ایرانی</span></div>
+  </section>
+</div>
+</body>
+</html>

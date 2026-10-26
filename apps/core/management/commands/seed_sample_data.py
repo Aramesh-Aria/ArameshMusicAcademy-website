@@ -94,7 +94,8 @@ class Command(BaseCommand):
                     'is_active': True,
                 },
             )
-            if not page.cover_image:
+            # Pages waiting for the owner's photos have no cover; GalleryPage.display_cover falls back.
+            if not page.cover_image and data.get('cover_image'):
                 self.save_seed_file(page.cover_image, data['cover_image'])
 
             for image_data in data['images']:
