@@ -1,15 +1,15 @@
-# Redesign report: Aramesh Music Academy
+# Redesign report, pass 2: Aramesh Music Academy
 
-The public site was rebuilt from scratch on the `re-design-ui` branch, following `docs/REDESIGN_PROMPT.md`. The chosen direction is **A, "The programme"** (`01-direction.md`): the site reads as the Academy's printed programme, with cool paper sheets on a green-black ground, one jade action and one Naskh family, and every photo printed in monochrome. The system is documented in [`DESIGN.md`](../../DESIGN.md).
+The public site was redesigned a second time on the `re-design-ui` branch, following [02-redesign-brief.md](02-redesign-brief.md) (Phases A to E, steps 1–23). The direction is **«سینه به سینه»** ([03-direction.md](03-direction.md)): Persian music is handed down teacher to student, and the site tells that as a short path of framed panels from a real person to the next step. The look is Ethos-led, as the brief pinned it: stone panels on a warm near-black ground, saffron for the one way in, Amiri over Sahel, pills. The system as shipped is in [DESIGN.md](../../DESIGN.md).
 
-This report takes the eight items of the $10K checklist one at a time, each with evidence and before/after screenshots at 1440, 768 and 390 pixels. It ends with performance numbers, the code review, known gaps, and what to do in the admin.
+This report takes the brief's eight checklist items one at a time, with evidence and before/after screenshots at 1440, 768 and 390 pixels. It ends with measurements, known gaps, and what the owner must do in the admin.
 
 **About the screenshots**
-- **Before** (`screenshots/before/`) is the old CoreBiz/Bootstrap theme on the local seed database.
-- **Live** (`screenshots/live/`) is the production site's real content on 2026-10-26, for comparison.
-- **After** (`screenshots/after/`) is the new design on a copy of that real content, served with `DEBUG=False`. The albums in the gallery screenshots come from a stress-test database, because the real site has no videos yet.
+- **Before** (`screenshots/pass1/`) is the site at the end of the first pass, the design this brief replaced: cool paper sheets on a green-black ground, one jade action, Amiri for everything. (The folder was `screenshots/after/` in the first report.)
+- **After** (`screenshots/pass2/`) is this pass on the seeded real content, served with `DEBUG=False` and hashed static files, on 2026-10-27. Taken with reduced motion on, so the hero and cards show a still frame rather than a crossfade halfway.
+- All are full-page. The Google map is blank in them: the cross-origin iframe doesn't load in the test browser. Programme and Instrument pages are new, so they have no before.
 
-All screenshots are full-page. The Google map is grey in them because the iframe is cross-origin and lazy-loaded; it renders in a real browser.
+**Branch at a glance:** 118 tests pass. Every model change is one the brief listed or the owner approved at a gate. Nothing has been pushed.
 
 ---
 
@@ -17,309 +17,187 @@ All screenshots are full-page. The Google map is grey in them because the iframe
 
 **Verdict: met.**
 
-- **One direction, carried everywhere.** Every page is set as a programme: a sheet with a torn foot, columns of time, performer and instrument, and colour that changes only by whole chapters. The references are *Golha* radio listings and 1960s–70s Tehran concert programmes (see `01-direction.md`).
-- **The home hero answers a parent's real question.** «امروز در آموزشگاه» (today at the academy) shows who teaches today and when, built from real ClassSession data. All seven days sit in a row, today is struck forward in ink, and Friday stays visible, marked تعطیل (closed).
-- **Tied to this academy.** The director's black-and-white portrait at the santur sits on the far side as a tipped-in plate with a short introduction. The jade comes from the Academy's own Nastaliq wordmark.
-- **Inspector.** taste-skill's inspector found no template tells on any of the 11 pages: no gradients, eyebrow labels or card grids. What it did flag is listed under [Known gaps](#known-gaps).
+- **One idea, from the subject.** Every page reads as a path, not a catalogue: Programme → Instrument → the teacher who teaches it → the days they are in → contact. Each teacher is introduced by who taught them, in one line under the name («آموخته نزد هوشنگ ظریف، فرهاد فخرالدینی…»). It passes the competitor test: another academy could copy the panels and pills, but not these teachers and their lineage.
+- **One live thing.** «امروز در آموزشگاه» in the hero says who teaches today and until when, from the real ClassSessions in Tehran time. Before the first class it says «از ساعت ۱۲ تا ۲۳»; after the last one, or on a Friday, it says when classes start again. Server-rendered, so it works with no script.
+- **Restraint.** One accent, two typefaces, two radii, one saffron field per page (the contact band). The santur shape appears only where a picture is missing and one is still wanted. Instrument tiles with no photo are text alone (owner decision).
+- **Checked by:** `/design-taste-frontend`'s inspector ([critique-taste-step16.md](critique-taste-step16.md)), `/impeccable critique`, 24/36 against 19/36 for pass 1 ([critique-step17.md](critique-step17.md)), and the detector. The only pattern it flags is the hero's eyebrow, which the owner pinned.
 
 | Width | Before | After |
 |---|---|---|
-| 1440 | ![](screenshots/before/home-1440.png) | ![](screenshots/after/home-1440.png) |
-| 768 | ![](screenshots/before/home-768.png) | ![](screenshots/after/home-768.png) |
-| 390 | ![](screenshots/before/home-390.png) | ![](screenshots/after/home-390.png) |
+| 1440 | ![](screenshots/pass1/home-1440.png) | ![](screenshots/pass2/home-1440.jpg) |
+| 768 | ![](screenshots/pass1/home-768.png) | ![](screenshots/pass2/home-768.jpg) |
+| 390 | ![](screenshots/pass1/home-390.png) | ![](screenshots/pass2/home-390.jpg) |
 
 ## 2. Typography that does work
 
-**Verdict: met, with one approved deviation.**
+**Verdict: met.**
 
-- **One family.** The checklist asks for "a paired display face and body face". At Phase 2, step 1, you replaced Markazi Text with **Amiri** (Khaled Hosny, OFL) as a single family for display and text, as a programme would be set. Neither Inter nor Roboto is used.
-- **Self-hosted fonts.** The woff2 files are subset into a Persian file and a Latin file per weight:
-  - Persian: 43 KB per weight;
-  - Latin: 20 KB per weight.
-
-  They load with `font-display: swap`, and the two Persian weights are preloaded. No font comes from a CDN, which matters during Iran's internet cuts.
-- **Hierarchy from scale and weight.** There are five sizes (18, 21, 22–27, 34–48 and 44–80px) and two weights (400 and 700), because Amiri ships no 600. Body text is 21px at 1.6 leading on a 34em measure, and headings keep 1.2 leading for Amiri's tall letters.
-- **Numbers.** Phones and times use Latin digits, tabular and lining, kept left-to-right inside RTL text. The street address keeps its Persian digits, by your decision.
+- **Amiri 700 for display only** (the page's one `h1`, section heads, card titles and teacher names), **Sahel for everything else** (body 18–20px, nav, buttons, labels, forms). Neither is Inter or Roboto. Tahoma is the fallback because it sits close to Sahel, so the font swap barely moves the text.
+- **Self-hosted** subset woff2 with `font-display: swap`; Amiri 700 and Sahel 400/700 only.
+- **Persian digits everywhere** come from the font (Sahel FD), including phone numbers and times; `tel:` links keep ASCII digits for the dialler.
+- **Built for Naskh:** leading runs inversely to size (1.25 for display, because Amiri's alef-madda and descenders collide below 1.2; 1.85 for body), letter-spacing is 0 at every size because tracking breaks the joins, and the measure is 36em, about 85 Persian characters.
+- **Hierarchy by scale and weight:** three Amiri steps (26–36, 32–52, 44–76px) over four Sahel steps (14, 16, 18–20, 20–24px).
 
 | Width | Before | After |
 |---|---|---|
-| 1440 | ![](screenshots/before/teacher-1440.png) | ![](screenshots/after/teacher-1440.png) |
-| 768 | ![](screenshots/before/teacher-768.png) | ![](screenshots/after/teacher-768.png) |
-| 390 | ![](screenshots/before/teacher-390.png) | ![](screenshots/after/teacher-390.png) |
+| 1440 | ![](screenshots/pass1/teacher-1440.png) | ![](screenshots/pass2/teacher-1440.jpg) |
+| 768 | ![](screenshots/pass1/teacher-768.png) | ![](screenshots/pass2/teacher-768.jpg) |
+| 390 | ![](screenshots/pass1/teacher-390.png) | ![](screenshots/pass2/teacher-390.jpg) |
 
 ## 3. A restrained colour system
 
 **Verdict: met.**
 
-- **Five colours, all tokens.** The palette is green-black, cool paper, jade, white and an error red, each with only the steps it needs for contrast. They are defined in the tokens layer of `site.css` and listed in the `DESIGN.md` frontmatter.
-- **Jade marks two things only:** the call action and focus rings.
-- **Whole chapters.** A `.sheet` flips the surface, text and focus roles together, so no component hard-codes a colour for where it sits.
-- **Contrast measured.**
-  - Ink on paper: 14.1:1.
-  - Soft ink on paper: 6.9:1.
-  - Text on the ground: 13.5:1.
-  - White on jade: 5.3:1.
-  - Error red on paper: 6.3:1.
-
-  The lowest contrast measured on a rendered page is 5.27:1.
+- **Four colours** (ground `#17130f`, stone `#ebe5dc`, saffron `#e2a72e`, error `#a8321f`), plus only the steps contrast needs (raised ground, two soft text tones, field, field line, deep saffron). All are tokens in `site.css`; components read surface roles (`--surface`, `--text`, `--mark`, `--focus`), and a stone panel or the saffron band flips them.
+- **Every pair is measured:** stone on ground 14.8:1, ink on saffron 8.6:1, saffron on ground 8.6:1, soft text 6.2–7.6:1. Deep saffron (3.7:1) marks things on stone but is never text.
+- **Saffron is rare:** the call pill, current and active states, focus on the ground, today's marker, and one band per page.
+- **The hero scrims** mix `var(--ground)`, so a change to the ground carries through.
 
 | Width | Before | After |
 |---|---|---|
-| 1440 | ![](screenshots/before/schedule-1440.png) | ![](screenshots/after/schedule-1440.png) |
-| 768 | ![](screenshots/before/schedule-768.png) | ![](screenshots/after/schedule-768.png) |
-| 390 | ![](screenshots/before/schedule-390.png) | ![](screenshots/after/schedule-390.png) |
+| 1440 | ![](screenshots/pass1/schedule-1440.png) | ![](screenshots/pass2/schedule-1440.jpg) |
+| 768 | ![](screenshots/pass1/schedule-768.png) | ![](screenshots/pass2/schedule-768.jpg) |
+| 390 | ![](screenshots/pass1/schedule-390.png) | ![](screenshots/pass2/schedule-390.jpg) |
 
 ## 4. Hierarchy that breathes
 
 **Verdict: met.**
 
-- **One h1 per page, and no skipped heading levels.** Checked on all 11 pages at 1440 and 390.
-- **Rhythm.** Chapters sit 96–160px apart on one 12-column grid. Inside a sheet there are clear primary (h1 or name), secondary (lead and instruments) and tertiary (meta, times and days) levels.
-- **The teachers page** is a programme index rather than a card grid. Each entry has a name, instruments and days, and the portrait appears on hover or focus at desktop width. Thumbnails stay visible on the phone.
-- **Long content.** Long notes and titles are clamped:
-  - schedule notes to 2 lines, with the full text in a tooltip;
-  - gallery titles to 3 lines.
+- **One primary per page:** the `h1` in Amiri at 44–76px, then a lead sentence, then section heads, each section in its own panel with `--section` (64–96px) between them and `--panel-pad` (20–64px) inside.
+- **Splits put text beside its picture:** the about panel, Programme and teacher heads. A split with no picture sets its name beside its text on wide screens instead of leaving a hole.
+- **Sections with no content hide** (testimonials, FAQ, an empty album's grid), so a page never shows an empty block.
+- **Pages are paths:** every page ends with a way on, usually the contact band, now cut to its headline and two buttons with the facts kept in the footer (owner decision).
+- **Session times read as tiles,** and identical sessions on neighbouring days are listed once («شنبه تا سه‌شنبه، ۱۲ تا ۲۱»). This is worked out on every request, so an hour changed in the admin simply splits the run.
 
-  Testimonials are capped at 3, so worst-case content can't flatten the page (break-ui, Phase 3).
-
-| Width | Before | After |
-|---|---|---|
-| 1440 | ![](screenshots/before/teachers-1440.png) | ![](screenshots/after/teachers-1440.png) |
-| 768 | ![](screenshots/before/teachers-768.png) | ![](screenshots/after/teachers-768.png) |
-| 390 | ![](screenshots/before/teachers-390.png) | ![](screenshots/after/teachers-390.png) |
+| Width | Before | After (about) | After (a Programme page, new) |
+|---|---|---|---|
+| 1440 | ![](screenshots/pass1/about-1440.png) | ![](screenshots/pass2/about-1440.jpg) | ![](screenshots/pass2/programme-1440.jpg) |
+| 768 | ![](screenshots/pass1/about-768.png) | ![](screenshots/pass2/about-768.jpg) | ![](screenshots/pass2/programme-768.jpg) |
+| 390 | ![](screenshots/pass1/about-390.png) | ![](screenshots/pass2/about-390.jpg) | ![](screenshots/pass2/programme-390.jpg) |
 
 ## 5. Imagery with intent
 
-**Verdict: met for treatment; the files themselves are a known gap.**
+**Verdict: met for what exists; the photos the design needs are the owner's to upload.**
 
-- **One darkroom process.** Every upload is shown in monochrome (grayscale with contrast 1.06) on a paper plate, so mixed phone snapshots read as one set.
-- **Real ratios.** Plates use the ratio the pipeline produces:
-  - portraits: 1:1;
-  - covers: 3:2;
-  - page heroes: 3:2;
-  - gallery photos: their own ratio, in balanced columns.
+- **The real pipeline ratios:** portraits 1:1, Programme and gallery covers 3:2, the hero within 1200px. The hero is framed inside the page margins, never stretched past its pixels.
+- **One treatment:** nested rounded frames and a light multiply of the ground, never a filter that changes faces. The hero has a side and bottom scrim, held dark as far as its copy reaches, so its text measures at least 6.4:1 over the brightest wall.
+- **Designed fallbacks:**
+  - a teacher with no portrait shows their initials in Amiri;
+  - an Instrument tile with no photo is its name alone;
+  - a Programme card with no photo is its text, set at the foot;
+  - an empty album says so and offers the ways on.
+- **Sizes stated, fetched when needed:** album photos carry `width`/`height` (CLS 0.1–0.27 → about 0.01). Hidden hero and card photos wait in `data-src` until they are about to show.
 
-  Nothing is force-cropped, which fixes the old 3:2 crop that cut portrait photos badly.
-- **Fallbacks.**
-  - A missing or broken portrait shows the teacher's initials on a paper plate.
-  - A gallery page with no cover now uses its first active photo (`GalleryPage.display_cover`). With no photos at all, it shows a paper plate set with the title.
-- **Loading.** Photos that are still loading develop out of the paper tone once; images already cached show at once.
-- **Lightbox.** Built in-house to replace GLightbox. It has keyboard support, swipe with a spring-back, and returns focus to the photo when it closes.
-
-| Width | Before | After |
-|---|---|---|
-| 1440 | ![](screenshots/before/gallery-space-1440.png) | ![](screenshots/after/gallery-space-1440.png) |
-| 768 | ![](screenshots/before/gallery-space-768.png) | ![](screenshots/after/gallery-space-768.png) |
-| 390 | ![](screenshots/before/gallery-space-390.png) | ![](screenshots/after/gallery-space-390.png) |
+| Width | Before | After (rooms album) | After (an empty album) |
+|---|---|---|---|
+| 1440 | ![](screenshots/pass1/gallery-space-1440.png) | ![](screenshots/pass2/gallery-space-1440.jpg) | ![](screenshots/pass2/gallery-cat-1440.jpg) |
+| 768 | ![](screenshots/pass1/gallery-space-768.png) | ![](screenshots/pass2/gallery-space-768.jpg) | ![](screenshots/pass2/gallery-cat-768.jpg) |
+| 390 | ![](screenshots/pass1/gallery-space-390.png) | ![](screenshots/pass2/gallery-space-390.jpg) | ![](screenshots/pass2/gallery-cat-390.jpg) |
 
 ## 6. Motion that whispers
 
-**Verdict: met.**
+**Verdict: met.** Reviewed with `/review-animations` and `/animation-performance` ([motion-step18.md](motion-step18.md)), verdict Approve.
 
-- **No AOS fade-up anywhere.** AOS, Swiper, Isotope, GLightbox, PureCounter and Waypoints were all removed. Motion is "printed paper, handled":
-  - **Struck day:** an ink block slides between day tabs (220ms, ease-in-out, interruptible). It is a clipped ink copy of the tab row, so the colour change is exact.
-  - **Programme rows:** they fade over 140ms when the day changes.
-  - **Develop:** photos still loading come up out of the paper tone (600ms, once).
-  - **Entrance:** the opening section is set down on load, its parts 60ms apart (480ms, opacity plus a 0.75rem rise, CSS only). Later sections rise about 2rem into place as they scroll in. This uses a CSS scroll timeline and moves them only, so a page captured without scrolling never shows them missing.
-  - **Lightbox swipe:** the photo follows the finger and springs back (a 560ms damped spring with 1.5% overshoot).
-  - **Press feedback:** pressable controls scale to 0.97 over 120ms. Hover effects run only on devices that can hover.
-- **Video facade.** Videos no longer load YouTube or Aparat iframes on page load. A paper poster is replaced by the iframe on click, and the iframe fades in when it has loaded.
-- **Reviews.** `review-animations` and `animation-performance` ran in Phase 3, and their findings were fixed. Everything animates transform, opacity or clip-path only.
-- **Reduced motion.** Nothing travels. State changes are instant, fades keep an 80–160ms beat, and the scroll settle is off.
+- **Slow where it carries content:**
+  - the hero crossfades the `home-hero` photos every 6.5s (1.2s, sine in-out), and its progress bar is the clock;
+  - Programme cards crossfade their photos on hover;
+  - same-site navigation crossfades through View Transitions, and a teacher's portrait or a Programme's photo travels from its card into the page it opens.
+- **Quick where it answers a hand:**
+  - presses scale to 0.97 (120ms);
+  - the button arrow swaps with its twin and the phone icon tilts (260ms);
+  - dropdowns grow from their trigger, and the phone menu and lightbox open in 260ms;
+  - the day tabs' ink slides under the chosen day with a clip-path.
+- **Interruptible and keyboard-aware:** the lightbox swipe follows the finger and settles on a spring; arrow keys move the day tabs with no animation.
+- **Never gating content:** everything is visible on first paint and with no script. Reduced motion zeroes everything that travels, stops the hero and lays the testimonials out still.
+- **Inside the frame budget:** with the CPU slowed 4×, the hero crossfade, card hover, day strike and menu sheet show no frame over 17.7ms. Only `transform`, `opacity`, `clip-path` and `background-color` animate, except the FAQ's height.
 
-Entrance filmstrips, 0–700ms:
-
-| Home 1440 | Home 390 | About 1440 |
+| Width | Before | After (teachers: cards open into their pages) |
 |---|---|---|
-| ![](screenshots/motion/entrance-home-1440.png) | ![](screenshots/motion/entrance-home-390.png) | ![](screenshots/motion/entrance-about-1440.png) |
+| 1440 | ![](screenshots/pass1/teachers-1440.png) | ![](screenshots/pass2/teachers-1440.jpg) |
+| 768 | ![](screenshots/pass1/teachers-768.png) | ![](screenshots/pass2/teachers-768.jpg) |
+| 390 | ![](screenshots/pass1/teachers-390.png) | ![](screenshots/pass2/teachers-390.jpg) |
 
-Video facade (stress-test data):
-
-| Width | Before | After |
-|---|---|---|
-| 1440 | ![](screenshots/before/gallery-videos-1440.png) | ![](screenshots/after/gallery-videos-1440.png) |
-| 768 | ![](screenshots/before/gallery-videos-768.png) | ![](screenshots/after/gallery-videos-768.png) |
-| 390 | ![](screenshots/before/gallery-videos-390.png) | ![](screenshots/after/gallery-videos-390.png) |
+The hero mid-crossfade is in `screenshots/step12-motion/`.
 
 ## 7. Mobile that's designed, not shrunk
 
-**Verdict: met.**
+**Verdict: met; not yet tried on a real phone.**
 
-- **Navigation.** A full-screen menu on the ground opens from «منو». It closes with Escape, a link, or rotating the phone into the desktop layout, and focus returns to the toggle.
-- **Always-reachable contact.** A fixed bottom bar carries «تماس» (a `tel:` link) and «مسیر» (directions), and respects safe areas.
-- **Schedule.** The desktop week grid becomes a day view on the phone. Day tabs shorten to their first letter, and each day lists time, teacher and instruments. The whole week is never shrunk into a miniature.
-- **Gallery.** Photos sit in two balanced columns, and the lightbox supports swipe.
-- **Contact form.**
-  - Fields are 48px tall and their text is at least 16px, so the page never zooms on focus.
-  - The captcha refresh is an icon button of at least 44px.
-  - Error states show a summary that takes focus.
-- **mobile-native pass.** No tap-highlight flash, no sticky hover, `dvh` instead of `100vh`, and safe-area padding.
+- **Navigation:** the logo, «منو» and a round saffron call button that never leaves the screen; «منو» opens a full-screen sheet whose page list scrolls while call and route stay put.
+- **Schedule:** day tabs, with today open before first paint (no layout shift); the desktop grid is a separate design.
+- **Browsing:** teachers and Programmes become sideways rails with the next card peeking; Instrument and session tiles pair up, one per row on the narrowest phones; the lightbox swipes.
+- **Contact form:** fields at 16px or more (no zoom), `tel`/`email` keyboards, `autocomplete`, and «ارسال» on the keyboard's return key. Phone is required; email and subject are optional.
+- **Phone details:** safe-area padding for the notch and home indicator, `svh`/`dvh` heights, no tap highlight, and hover effects only on devices that hover.
+- **Checked by:** `/mobile-native` (step 13), `/break-ui` at 320px and with large text (step 19).
 
 | Width | Before | After |
 |---|---|---|
-| 1440 | ![](screenshots/before/contact-1440.png) | ![](screenshots/after/contact-1440.png) |
-| 768 | ![](screenshots/before/contact-768.png) | ![](screenshots/after/contact-768.png) |
-| 390 | ![](screenshots/before/contact-390.png) | ![](screenshots/after/contact-390.png) |
+| 1440 | ![](screenshots/pass1/contact-1440.png) | ![](screenshots/pass2/contact-1440.jpg) |
+| 768 | ![](screenshots/pass1/contact-768.png) | ![](screenshots/pass2/contact-768.jpg) |
+| 390 | ![](screenshots/pass1/contact-390.png) | ![](screenshots/pass2/contact-390.jpg) |
 
 ## 8. The invisible expensive stuff
 
-**Verdict: met, except the LCP target on two gallery pages on a slow phone connection** (see [Performance](#performance)).
+**Verdict: met, except LCP on slow networks (see the measurements).**
 
-- **LCP under 2s.**
-  - All 11 pages meet it on desktop.
-  - On a throttled phone (slow 4G), 9 of 11 meet it.
-  - The gallery root (2.08s) and the photo-heavy album (7.3s) miss it because they serve full-size uploads.
-- **WCAG AA contrast.** Measured on every page; there are no failures, and the minimum is 5.27:1.
-- **Keyboard.** Checked with Playwright on 1440 and 390:
-  - The first Tab reaches a skip link, and Enter on it jumps to the main content.
-  - All 30 tab stops on the home page show a visible focus ring, and none of them is off screen.
-  - The gallery menu opens with Enter, and Escape closes it and returns focus to its button.
-  - The phone menu opens with Enter and moves focus inside; Escape closes it and returns focus to the toggle.
-  - The day tabs follow RTL arrow keys (← is the next day), and Home and End work.
-  - The lightbox opens with Enter, the arrow keys move between photos, and Escape closes it and returns focus to the photo.
-  - The map iframe shows a focus ring while it holds focus.
-- **Landmarks and meta.**
-  - Every page has a header, nav, main and footer, `lang="fa" dir="rtl"`, a unique `<title>` and a meta description.
-  - Each page has a canonical link and Open Graph and Twitter cards, all naming `https://aramesh-academy.ir`. Teacher, gallery and hero pages use their own photo as `og:image`.
-- **Forms.** Every field has a label, errors are tied to their fields, and the error summary takes focus. The captcha has an accessible refresh button.
-- **Console.** There are no errors or 404s on real data. The only console errors in testing came from portraits deliberately missing in the stress-test data, which show the initials fallback.
-- **Tests.** `python manage.py test`: 65 tests, all passing.
+- **Accessibility:**
+  - axe-core 4.10.2 (WCAG 2.0–2.2 A/AA and best practice) finds **no violations** on 15 pages at 1440 and 390;
+  - every focus ring measures at least 3:1 against what's behind it;
+  - the keyboard reaches everything in RTL reading order, with a skip link first;
+  - Escape closes every overlay and returns focus.
+- **Semantics and meta:**
+  - all four landmarks and one `h1` on every page;
+  - `lang="fa" dir="rtl"`;
+  - a title, description, canonical and Open Graph tags from `SITE_DOMAIN`, and a sitemap that leaves out the hidden hero album.
+- **Forms:** labelled fields, an error summary that links each field, messages tied to their inputs with `aria-describedby`, and django-simple-captcha. A mail failure never blocks the Visitor.
+- **No console errors** on 43 pages × 3 widths with `DEBUG=False`, and no 4xx apart from the deliberate 404.
+- **Hardened:** worst-case data (long names at the models' limits, six Instruments, one testimonial, empty albums) breaks nothing, and nothing scrolls sideways from 320 to 1440 or at 200% text ([break-ui-step19.md](break-ui-step19.md)).
 
-| Width | Before | After |
-|---|---|---|
-| 1440 | ![](screenshots/before/404-1440.png) | ![](screenshots/after/404-1440.png) |
-| 768 | ![](screenshots/before/404-768.png) | ![](screenshots/after/404-768.png) |
-| 390 | ![](screenshots/before/404-390.png) | ![](screenshots/after/404-390.png) |
-
----
-
-## Remaining before/after pages
-
-| Page | 1440 | 768 | 390 |
+| Width | Before (404) | After (404) | After (message sent) |
 |---|---|---|---|
-| About, before | ![](screenshots/before/about-1440.png) | ![](screenshots/before/about-768.png) | ![](screenshots/before/about-390.png) |
-| About, after | ![](screenshots/after/about-1440.png) | ![](screenshots/after/about-768.png) | ![](screenshots/after/about-390.png) |
-| Gallery root, before | ![](screenshots/before/gallery-root-1440.png) | ![](screenshots/before/gallery-root-768.png) | ![](screenshots/before/gallery-root-390.png) |
-| Gallery root, after | ![](screenshots/after/gallery-root-1440.png) | ![](screenshots/after/gallery-root-768.png) | ![](screenshots/after/gallery-root-390.png) |
-| Gallery category, before | ![](screenshots/before/gallery-cat-1440.png) | ![](screenshots/before/gallery-cat-768.png) | ![](screenshots/before/gallery-cat-390.png) |
-| Gallery category, after | ![](screenshots/after/gallery-cat-1440.png) | ![](screenshots/after/gallery-cat-768.png) | ![](screenshots/after/gallery-cat-390.png) |
-| Gallery album, before | ![](screenshots/before/gallery-album-1440.png) | ![](screenshots/before/gallery-album-768.png) | ![](screenshots/before/gallery-album-390.png) |
-| Gallery album, after | ![](screenshots/after/gallery-album-1440.png) | ![](screenshots/after/gallery-album-768.png) | ![](screenshots/after/gallery-album-390.png) |
-| Contact success, before | ![](screenshots/before/contact-success-1440.png) | ![](screenshots/before/contact-success-768.png) | ![](screenshots/before/contact-success-390.png) |
-| Contact success, after | ![](screenshots/after/contact-success-1440.png) | ![](screenshots/after/contact-success-768.png) | ![](screenshots/after/contact-success-390.png) |
+| 1440 | ![](screenshots/pass1/404-1440.png) | ![](screenshots/pass2/404-1440.jpg) | ![](screenshots/pass2/contact-success-1440.jpg) |
+| 768 | ![](screenshots/pass1/404-768.png) | ![](screenshots/pass2/404-768.jpg) | ![](screenshots/pass2/contact-success-768.jpg) |
+| 390 | ![](screenshots/pass1/404-390.png) | ![](screenshots/pass2/404-390.jpg) | ![](screenshots/pass2/contact-success-390.jpg) |
 
 ---
 
-## Performance
+## Measurements
 
-**How it was measured**
-- Playwright on Chromium against the real-content copy, served with `DEBUG=False` through WhiteNoise, with a cold cache on every run.
-- **Desktop:** 1440×900 on an unthrottled connection.
-- **Phone:** 390×844, throttled to slow 4G (1.6 Mbps down, 150ms latency).
-- **Transfer:** bytes over the wire, compressed, for everything loaded by the end of the run (lazy images included once they load).
-- These are single runs on localhost, so they leave out real server and CDN distance. Treat them as relative, not absolute.
+Measured on 2026-10-27 at 390×844 against the `DEBUG=False` server, with the cache off and Chrome's network throttling (fast 4G: 9 Mb/s, 60 ms; slow 4G: 1.6 Mb/s, 150 ms). Transfer is what the page fetches by `load` plus 2s. CLS is the larger of the 390 and 1440 runs on slow 4G.
 
-| Page | Desktop FCP | Desktop LCP | Desktop transfer | Phone FCP | Phone LCP | Phone transfer |
-|---|---|---|---|---|---|---|
-| Home | 92 ms | 640 ms (portrait) | 1,280 KB / 19 req | 688 ms | 1,088 ms (lead) | 287 KB / 11 req |
-| About | 72 ms | 556 ms | 2,253 KB / 22 req | 688 ms | 1,036 ms | 2,253 KB / 22 req |
-| Teachers | 108 ms | 560 ms | 644 KB / 20 req | 672 ms | 1,104 ms | 616 KB / 20 req |
-| Teacher | 76 ms | 608 ms (portrait) | 244 KB / 10 req | 688 ms | 1,124 ms | 244 KB / 10 req |
-| Schedule | 88 ms | 556 ms | 213 KB / 9 req | 708 ms | 1,092 ms | 213 KB / 9 req |
-| Gallery root | 92 ms | 608 ms (cover) | 347 KB / 10 req | 660 ms | **2,076 ms** (cover) | 347 KB / 10 req |
-| Gallery: space | 76 ms | 708 ms (photo) | 2,253 KB / 22 req | 676 ms | **7,260 ms** (photo) | 2,253 KB / 22 req |
-| Gallery: concerts | 76 ms | 540 ms | 190 KB / 9 req | 672 ms | 672 ms | 190 KB / 9 req |
-| Contact | 72 ms | 540 ms | 198 KB / 10 req | 756 ms | 1,220 ms | 198 KB / 10 req |
-| Contact success | 96 ms | 560 ms | 190 KB / 9 req | 740 ms | 1,208 ms | 190 KB / 9 req |
-| 404 | 76 ms | 560 ms | 190 KB / 9 req | 688 ms | 1,040 ms | 190 KB / 9 req |
+| Page | LCP, fast 4G | LCP, slow 4G | CLS | Transfer |
+|---|---|---|---|---|
+| Home | 0.56s | **2.61s** | 0.038 | 603 KB |
+| Teachers | 0.47s | **2.04s** | 0.005 | 666 KB |
+| Schedule | 0.27s | 0.82s | 0.006 | 259 KB |
+| A Programme (children) | 0.27s | 0.77s | 0.024 | 276 KB |
+| An Instrument (santur) | 0.42s | 1.55s | 0.004 | 254 KB |
+| Contact | 0.25s | 0.76s | 0.035 | 209 KB |
+| Rooms album | 1.16s | **5.76s** | 0.004 | 2,266 KB |
 
-**Before**
-- The old home page made 28 requests: 8 stylesheets and 9 scripts, about 2.1 MB decoded.
-- It also requested a missing background image (404) and loaded fonts from Google.
-- `public/static/` held 29.8 MB in git.
-
-**After**
-- **Shell.** One stylesheet (56 KB, 12 KB compressed) and one deferred script (17 KB, 5.5 KB compressed). The text-only pages weigh about 190–245 KB in total, most of it the four font files.
-- **`public/static/`.** Down to 16.9 MB in git. Most of what's left is the Django admin and the theme files Jazzmin collects.
-- **The entrance animation.** It moves LCP back by about 480ms on desktop: text paints at about 80ms, but Chrome counts LCP when the fade finishes. Every page still finishes well under 2s.
-- **The two misses** are both caused by image files rather than the page:
-  - The space album and About load up to 13 full-size uploads (up to 1920px each, 2.2 MB in total). The backend makes no thumbnails, which was decided in Phase 0.
-  - The gallery root's cover for «فضای آموزشگاه» is a full-size photo, because no 900×600 cover has been uploaded. The new fallback uses the first photo.
-  - In this pass, the first row of gallery covers was changed from lazy to eager loading, so the largest one starts loading at once.
-
----
-
-## Code review
-
-`code-review` ran against `main`, on two axes in parallel: Standards (`CLAUDE.md`, `AGENTS.md`, `CONTEXT.md`, the ADR and `DESIGN.md`) and Spec (`REDESIGN_PROMPT.md` and `01-direction.md`).
-
-**Standards: 3 hard findings and 9 judgement calls. Worst: `DESIGN.md` rules stricter than the shipped code.**
-
-| Finding | Outcome |
-|---|---|
-| Six fluid font sizes outside the five type steps (initials, the week title, the teacher plate names, the single letter, the 404 numeral) | **Fixed in `DESIGN.md`.** These are deliberate display sizes, so the rule now names them as exceptions. |
-| Transitions on `background-color`, `filter` and `clip-path`, while `DESIGN.md` said "transform and opacity only" | **Fixed in `DESIGN.md`.** Anything that travels uses transform or opacity. State fades may use colour or filter, and the struck day uses clip-path, as the motion review approved. |
-| `CLAUDE.md` and `AGENTS.md` don't list `SITE_MAP_NESHAN` or `SITE_MAP_EMBED`, and still describe the schedule as a "rowspan grid" | **Not changed.** These are your agent-guidance files; the edits are proposed below. |
-| The Google Maps iframe loads from google.com | **Kept, by your decision.** The Neshan link is the offline-safe backup. |
-| `display_cover` runs one query per child page without a cover | **Kept.** An index has only a few child pages. Prefetching every photo row to save those queries would cost more. |
-| The gallery `og:image` repeated the cover fallback | **Fixed.** It now uses `display_cover`. |
-| "Director" isn't in `CONTEXT.md` | **Proposed below.** |
-| `week.active_sessions()` shares its name with Teacher's prefetched `active_sessions` and is a thin wrapper | **Kept.** Minor, and both read clearly where they're used. |
-| `.order_by('weekday_order', 'start_time')` repeats the model's `Meta.ordering` | **Kept.** It differs on purpose. `Meta.ordering` adds `teacher__last_name`, which joins the teacher table, and both teacher views fetch only one teacher's sessions, where that join is wasted. |
-| Schedule rows are dicts beside typed `Day` cells | **Kept.** This is a judgement call. |
-| A commented-out `SITE_MAP_GOOGLE` while `site_map_google` is still added to the template context | **Kept.** You switched the Google route link off; the footer shows it again when the setting is set. |
-| Director and testimonial tests sit inside the week-schedule test class | **Kept.** Minor. |
-| `_subpage.html` loads the first three covers eagerly, which assumes a three-column first row | **Kept.** It is documented in the template comment; on the phone this means at most two extra covers. |
-
-**Spec: 7 findings. Worst: the canonical URL takes its host from the request.**
-
-| Finding | Outcome |
-|---|---|
-| Instruments are no longer listed in the footer | **Kept.** The approved "every page" inventory in `01-direction.md` doesn't include instruments in the footer. Instruments appear on the home page, the teachers pages and the schedule. |
-| The schedule isn't a rowspan grid | **Deliberate.** Direction A's "transit diagram" raise has one row per teacher with days as columns, and each cell stacks that day's sessions. It is still grouped by teacher, with each session's instruments. |
-| Context keys changed (`weekdays` and `color_index` removed, `week_schedule` added to the schedule view, `featured_teachers` split into `director` and `home_teachers`) | **Recorded here.** P1 and the three-portrait decision cover the home view. The schedule-view change came with the day view and was not proposed separately. |
-| A new `ClassSessionQuerySet`, and the seed's "gallery-root" page dropped | **Recorded here.** Both are internal and covered by tests. |
-| An HTML comment shipped a dead email block in the contact page source | **Fixed.** It is now a `{% comment %}` block, so nothing renders. |
-| The canonical, og:url and og:image host come from the request, so pages served on `aramesh-academy.runflare.run` call themselves canonical | **Fixed.** A new `SITE_DOMAIN = 'aramesh-academy.ir'` setting (exposed as `site_url`) now builds all three, whichever host served the page. `sitemap.xml` uses the same domain over https, through a shared `PublicSitemap` base. Tests cover both. |
-| Gallery photos have no `width` or `height`, so the page can shift as they load | **Open.** Photos keep their own ratio and the model doesn't store dimensions. The fix needs width and height fields (a migration). |
-
----
+The 2s target holds on fast 4G for every page. On slow 4G it misses on home, the teachers list and the rooms album, which load full-size photos: the hero's LCP photo is a 1111×1280 JPEG (about 204 KB) shown 366px wide on a phone, and the album's 13 photos are up to 1920px. Before step 17 the home page took 4.9s on slow 4G, because it loaded all four hero slides at once.
 
 ## Known gaps
 
-1. **Full-size gallery images.** Albums and About serve original uploads (up to 1920px), with no thumbnails. On a slow phone connection, the 13-photo album needs about 7s to its largest paint. The fix is a backend thumbnail step, for example a 900px-wide copy made on save. It was ruled out in Phase 0, so it's listed here as a proposal and not built.
-2. **Entrance motion and LCP.** Chrome counts the opening section's LCP when its 480ms fade ends. Starting the fade from a barely visible opacity instead of 0 would make LCP match first paint. Left as is, since every page stays under 2s on desktop.
-3. **One typeface.** Amiri is used for both display and text, by your decision. This departs from the checklist's "paired display and body face".
-4. **Home photo preview.** The masonry columns end unevenly, because photos keep their natural ratios (approved earlier). It's a judgement call, not a bug.
-5. **Teacher page at 768px.** The portrait stands alone above the sheet. This is minor.
-6. **Inspector findings left on purpose.**
-   - **"Still page" on short pages:** the motion is kept restrained by design.
-   - **One shadow:** on the gallery dropdown, which really floats.
-   - **Hairline rules:** they are part of the programme style.
-   - **Too few pictures:** on the teachers, schedule and contact pages, by design.
-   - **No video:** there is no footage yet.
-   - **False alarms:** "off-centre" on the schedule (the table doesn't fill its sheet) and "covered text" (the sticky header passes over text while scrolling).
-7. **The map** is Google Maps, which may not load during internet cuts. The Neshan link is the backup.
-8. **Gallery photo dimensions.** Album and About photos have no `width` or `height`, so the columns can shift as photos load. The proposed fix is `width_field` and `height_field` on `GalleryImage` (a migration), written into the `<img>` tags.
-9. **Docs to update.** In `CLAUDE.md` and `AGENTS.md`:
-    - add `SITE_MAP_NESHAN` and `SITE_MAP_EMBED` to the list of hardcoded settings;
-    - describe the schedule as "one row per teacher, a cell per day" instead of "a rowspan grid".
+- **Responsive image sizes.** Smaller copies made on upload (`srcset`/`sizes`) for the hero, portraits and gallery photos are the largest remaining LCP and transfer cost. That's an image-pipeline change, outside this brief.
+- **Not tried on a real phone.** Sticky hover, the landscape notch, the home-indicator inset and the keyboard's return key were checked only in emulation.
+- **Code-review items not yet done** ([code-review-step21.md](code-review-step21.md)):
+  - CONTEXT.md avoids the words "offering" and "Album", but the code uses them;
+  - the image-on-save steps are repeated in six `save()` methods;
+  - `instruments_shown == ALL` stands in for "private lessons".
+- **Photos.** The hero photos (941–1,280px wide) look soft in the 1,392px frame at 1440, and teacher portraits mix black-and-white and colour.
+- **Thin pages.** A page with one teacher or one session tile, such as موسیقی کودک, leaves its row mostly empty on a wide screen until there is more content.
+- **The schedule's time ranges** read left to right in the desktop grid («۱۲:۰۰ – ۲۱:۰۰»), a pass-1 choice kept as is.
 
-    In `CONTEXT.md`, define the **Director** (the Teacher shown in the home hero plate).
-10. **Admin theme files.** About 9.5 MB of Jazzmin/Bootswatch theme CSS is still collected into `public/static/`. Only the admin uses it, and Visitors never download it.
+## What the owner must do in the admin
 
-## Admin to-dos
+**After deploying,** run `python manage.py migrate`. It moves تئوری و سلفژ, گروه نوازی and موسیقی کودک from Instrument to Programme, and adds the new fields: Programme, FAQ, Instrument's fields, `lineage`, phone required, and email and subject optional. Then, in the admin:
 
-1. **Run the migrations on Runflare:** `python manage.py migrate`. The branch adds three:
-   - `pages` 0005: help text on titles;
-   - `gallery` 0005: help text on titles;
-   - `teachers` 0006: `Teacher.home_intro`.
-2. **Write the director's home introduction.** In the admin go to Teachers, then مسعود آرامش, then «معرفی در صفحه اصلی». Two or three sentences for parents, separate from the biography.
-3. **Upload a cover for every gallery page,** especially «کنسرت سال ۱۴۰۴», which has no photos yet and shows an empty paper plate. Covers are cropped to 900×600, so use a landscape photo.
-4. **Add descriptions** to «گالری» and «فضای آموزشگاه», so the first screen says what the visitor is looking at.
-5. **Upload a page hero for About,** a 3:2 landscape photo at 1200px or more. It turns the About sheet into a sheet plus a plate. Without one, the sheet shows the fallback text alone.
-6. **Write the home and About page text** in Page content (SitePageContent). The new fallback copy is real copy, but the Academy's own words are better.
-7. **Remove the emoji** from the live home text («✨», «🎵», «🎹»). The design sets text in Amiri, and emoji break the programme look.
-8. **Keep titles short.** Gallery titles are clamped at 3 lines and schedule notes at 2, with help text in the admin saying so.
-9. **Add testimonials** from parents. The home page shows up to 3 and hides the section when there are none.
-10. **Optional:** get a vector or transparent original of the wordmark, so the logo files can be replaced with a crisper version.
+1. **Photos of students playing** solo, in ensembles and at concerts: one gallery page per concert under کنسرت‌ها, plus گروه نوازی. Until then those albums show their empty state.
+2. **Choose the hero photos** in the hidden gallery page `home-hero`, four to six of them, wider than 1200px if possible. Each photo's title becomes the slide's small text.
+3. **Instruments:** add a photo and a short overview to each. A tile switches from text-only to its photo by itself.
+4. **Programmes:** add photos (up to three each; they crossfade on the card) and age labels (about 20 characters, such as «از ۷ سال»).
+5. **Real testimonials** from parents. The section appears once there is one, and starts moving once there are four.
+6. **FAQ entries.** Tick "show on home" for the home page, and link each to its Programmes.
+7. **The «شیوهٔ آموزش» and «سه قدم» rows** (`teaching` and `first_lesson` in page content), with the approved copy, so they can be edited.
+8. **Ali Shams and Mohsen Homayouni:** a biography and a portrait each. Until then the site hides the «.» biography and shows their initials.
