@@ -3,7 +3,6 @@
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-about{% endblock %}
-{% block og_image %}{% if page_hero_image %}{% include 'partials/og_image.html' with url=page_hero_image.url alt=page_title %}{% elif space_images %}{% include 'partials/og_image.html' with url=space_images.0.image.url alt=page_title %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
 {# ── The Academy in its own words (admin text), beside a photo of its rooms. ── #}

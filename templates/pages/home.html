@@ -3,7 +3,6 @@
 
 {% block title %}آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-home{% endblock %}
-{% block og_image %}{% if hero_slides %}{% include 'partials/og_image.html' with url=hero_slides.0.image.url alt=hero_slides.0.title|default:'آموزشگاه موسیقی آرامش' %}{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% block content %}
 

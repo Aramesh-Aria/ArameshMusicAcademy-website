@@ -1,7 +1,8 @@
 import datetime
 from unittest.mock import patch
 
-from django.test import TestCase
+from django.templatetags.static import static
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -124,6 +125,18 @@ class HomePageTests(TestCase):
         self.assertContains(response, 'class="hero__bar"', count=2)
         self.assertContains(response, 'fetchpriority="high"', count=1)
 
+    def test_the_link_preview_is_the_logo_image_not_a_hero_photo(self):
+        hero = GalleryPage.objects.create(title='تصاویر صفحه اصلی', slug='home-hero')
+        GalleryImage.objects.create(gallery_page=hero, image='gallery/a.jpg', title='کلاس سنتور', display_order=1)
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, f'<meta property="og:image" content="https://aramesh-academy.ir{static("assets/img/og-image.jpg")}">', html=True)
+        self.assertContains(response, '<meta property="og:image:width" content="1200">', html=True)
+        self.assertContains(response, '<meta property="og:image:height" content="630">', html=True)
+        self.assertContains(response, '<meta property="og:image:type" content="image/jpeg">', html=True)
+        self.assertNotContains(response, 'content="https://aramesh-academy.ir/public/media/')
+
     def test_without_hero_photos_the_frame_holds_the_santur_shape(self):
         response = self.client.get(reverse('pages:home'))
 
@@ -214,6 +227,16 @@ class PageViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'آموزشگاه موسیقی آرامش')
+
+    @override_settings(ABOUT_GALLERY_SLUG='academy-space')
+    def test_about_link_preview_is_the_logo_image_not_a_gallery_photo(self):
+        space = GalleryPage.objects.create(title='فضای آموزشگاه', slug='academy-space')
+        GalleryImage.objects.create(gallery_page=space, image='gallery/room.jpg', title='کلاس')
+
+        response = self.client.get(reverse('pages:about'))
+
+        self.assertContains(response, f'property="og:image" content="https://aramesh-academy.ir{static("assets/img/og-image.jpg")}"')
+        self.assertNotContains(response, 'content="https://aramesh-academy.ir/public/media/')
 
     def test_about_page_loads(self):
         response = self.client.get(reverse('pages:about'))
