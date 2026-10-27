@@ -79,11 +79,12 @@ class Instrument(models.Model):
             Instrument.objects.filter(pk=self.pk).update(slug=self.slug)
 
         if photo_changed and self.photo:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             result_name = process_image(self.photo, width=1200, height=800, crop=True)
             if result_name != self.photo.name:
                 Instrument.objects.filter(pk=self.pk).update(photo=result_name)
                 self.photo.name = result_name
+            schedule_image_sizes(self.photo)
 
 
 class Teacher(models.Model):
@@ -148,11 +149,12 @@ class Teacher(models.Model):
         super().save(*args, **kwargs)
 
         if image_changed and self.profile_image:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             result_name = process_image(self.profile_image, width=600, height=600, crop=True)
             if result_name != self.profile_image.name:
                 Teacher.objects.filter(pk=self.pk).update(profile_image=result_name)
                 self.profile_image.name = result_name
+            schedule_image_sizes(self.profile_image)
 
     @property
     def public_biography(self):

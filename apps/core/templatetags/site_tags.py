@@ -62,8 +62,8 @@ def srcset(field, sizes, attr='srcset'):
     """`srcset` and `sizes` attributes offering an uploaded image's smaller copies (see `image_utils.image_sizes`).
 
     `sizes` says how wide the photo is drawn, as in HTML; for a photo cropped with `object-fit: cover`, give the
-    width its crop needs, not its box's. Pass attr='data-srcset' for a photo that waits in `data-src`. Empty when
-    no copy could be made, so the plain `src` stands alone.
+    width its crop needs, not its box's. Pass attr='data-srcset' for a photo that waits in `data-src`. Empty while
+    no copy has been made, so the plain `src` stands alone; the tag never makes one, so a page stays fast.
     """
     candidates = image_sizes(field)
     if not candidates:

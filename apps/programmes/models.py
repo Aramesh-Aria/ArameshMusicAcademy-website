@@ -106,10 +106,11 @@ class Programme(models.Model):
         super().save(*args, **kwargs)
 
         if changed:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             for field in changed:
                 field_file = getattr(self, field)
                 result_name = process_image(field_file, width=900, height=600, crop=True)
                 if result_name != field_file.name:
                     Programme.objects.filter(pk=self.pk).update(**{field: result_name})
                     field_file.name = result_name
+                schedule_image_sizes(field_file)

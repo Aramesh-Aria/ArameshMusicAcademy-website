@@ -5,6 +5,7 @@ from pathlib import Path
 from django.core.files import File
 from django.core.management.base import BaseCommand
 
+from apps.core.image_utils import wait_for_image_sizes
 from apps.gallery.models import GalleryImage, GalleryPage
 from apps.pages.models import SitePageContent
 from apps.programmes.models import Programme
@@ -31,6 +32,8 @@ class Command(BaseCommand):
         self.create_gallery(data['gallery_pages'])
         self.create_about_page(data['about'])
         self.create_sections(data['sections'])
+        # The photos' srcset copies are made in a background thread, which would die with the command.
+        wait_for_image_sizes()
 
         self.stdout.write(self.style.SUCCESS('Academy data is ready.'))
 

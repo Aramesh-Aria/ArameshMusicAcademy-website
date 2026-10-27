@@ -68,11 +68,12 @@ class SitePageContent(models.Model):
         super().save(*args, **kwargs)
 
         if hero_changed and self.hero_image:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             result_name = process_image(self.hero_image, width=1200, height=800, crop=True)
             if result_name != self.hero_image.name:
                 SitePageContent.objects.filter(pk=self.pk).update(hero_image=result_name)
                 self.hero_image.name = result_name
+            schedule_image_sizes(self.hero_image)
 
 
 

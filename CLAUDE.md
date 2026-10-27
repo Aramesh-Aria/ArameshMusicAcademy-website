@@ -11,7 +11,8 @@ DEBUG=True python manage.py runserver        # DEBUG defaults to False; True is 
 python manage.py makemigrations && python manage.py migrate
 python manage.py seed_sample_data            # load the real academy content scraped from aramesh-academy.ir (Programmes, Instruments, teachers, sessions, About text, the home page's teaching sections, and the gallery pages concerts / ensemble / academy-space / videos / hidden home-hero, with photos only in academy-space and home-hero; no testimonials or videos). Data + photos: apps/core/management/commands/seed_data/
 DATABASE_PATH=database/worst.sqlite3 DEBUG=True python manage.py seed_worst_case  # dev only, into a separate database: the seed pushed to the models' limits (long names, six Instruments, one testimonial); see docs/redesign/break-ui-step19.md
-python manage.py collectstatic --noinput     # required after any static change (see Static files)
+python manage.py collectstatic --noinput     # required after any static change (see Static files); never on Runflare
+python manage.py make_image_sizes            # make any missing or stale srcset copies of uploaded photos; safe to re-run
 
 python manage.py test                                         # all tests
 python manage.py test apps.schedules                          # one app
@@ -37,7 +38,7 @@ There is no linter or frontend build step configured.
 
 **Image processing on save:** `Teacher`, `Instrument`, `Programme`, `SitePageContent`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads to JPEG via `core.image_utils.process_image`. This can change the stored filename, which is then written back with a queryset `.update()`.
 
-**Smaller copies for `srcset`:** templates show uploaded photos through `{% srcset field "<sizes>" %}` (`core/templatetags/site_tags.py`), which offers WebP copies at 320/480/800/1200px up to the photo's own width. `image_utils.image_sizes` makes them on first request under `public/media/sizes/` and remakes any older than its photo. A copy that fails is skipped, so a page never breaks over one. The stored JPEG stays the plain `src`. Pass `"data-srcset"` as the third argument for a photo waiting in `data-src` (the hero's and Programme cards' later photos); `site.js` swaps both in.
+**Smaller copies for `srcset`:** templates show uploaded photos through `{% srcset field "<sizes>" %}` (`core/templatetags/site_tags.py`), which offers WebP copies at 320/480/800/1200px up to the photo's own width, kept under `public/media/sizes/` mirroring the photo's path. A page request never makes a copy: `image_utils.image_sizes` offers only those already on disk and no older than their photo, so with none the plain JPEG `src` stands alone. Each model's `save()` calls `schedule_image_sizes`, which on commit queues the upload for one background thread per process (ADR-0003); `make_image_sizes` makes the copies, decoding the photo once. A job lost with its gunicorn worker is caught up by `manage.py make_image_sizes`. Commands that save photos call `wait_for_image_sizes()` before exiting, or the thread dies with them. Pass `"data-srcset"` as the third argument for a photo waiting in `data-src` (the hero's and Programme cards' later photos); `site.js` swaps both in.
 
 **Templates** are project-level under `templates/` (not per-app), with `base.html` as the root layout. `templates/corebiz_raw/` holds raw reference files from the purchased CoreBiz theme. Nothing routes to them. The one exception is `apps/contact/templates/captcha/widgets/captcha.html`: form widgets render through Django's default form renderer, which reads only app template folders, so a copy under `templates/` would be ignored.
 
@@ -61,4 +62,6 @@ There is no linter or frontend build step configured.
 
 ## Deployment
 
-The site deploys from git to Runflare PaaS (`aramesh-academy.runflare.run`), with no Docker. The production domain is `aramesh-academy.ir`.
+The site deploys from git to Runflare PaaS (`aramesh-academy.runflare.run`), with no Docker. The production domain is `aramesh-academy.ir`. Runflare runs gunicorn sync workers with a 30 s timeout (set by Runflare, not this repo), so no request may do slow work.
+
+After a deploy, run only `python manage.py migrate` on Runflare, plus `python manage.py make_image_sizes` when the deploy touched images or how their copies are made. **Never run `collectstatic` on Runflare**: `static_dev/` isn't deployed, so it rewrites `public/static/staticfiles.json` without the site's own files and every page errors.

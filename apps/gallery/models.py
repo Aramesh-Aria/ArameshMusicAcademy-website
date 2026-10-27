@@ -120,11 +120,12 @@ class GalleryPage(models.Model):
         super().save(*args, **kwargs)
 
         if cover_changed and self.cover_image:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             result_name = process_image(self.cover_image, width=900, height=600, crop=True)
             if result_name != self.cover_image.name:
                 GalleryPage.objects.filter(pk=self.pk).update(cover_image=result_name)
                 self.cover_image.name = result_name
+            schedule_image_sizes(self.cover_image)
 
     @cached_property
     def display_cover(self):
@@ -186,11 +187,12 @@ class GalleryImage(models.Model):
         super().save(*args, **kwargs)
 
         if image_changed and self.image:
-            from apps.core.image_utils import process_image
+            from apps.core.image_utils import process_image, schedule_image_sizes
             result_name = process_image(self.image, width=1920, height=1920, crop=False)
             if result_name != self.image.name:
                 GalleryImage.objects.filter(pk=self.pk).update(image=result_name)
                 self.image.name = result_name
+            schedule_image_sizes(self.image)
 
     def __str__(self):
         if self.title:
