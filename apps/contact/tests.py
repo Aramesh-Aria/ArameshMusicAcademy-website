@@ -107,6 +107,8 @@ class ContactViewTests(TestCase):
         response = self.client.get(reverse('contact:contact_success'))
 
         self.assertContains(response, 'پیام شما رسید')
+        # Gate 1's line: the Academy calls back.
+        self.assertContains(response, 'همکاران ما در ساعات کاری با شما تماس می‌گیرند.')
         self.assertContains(response, reverse('schedules:schedule'))
 
 
