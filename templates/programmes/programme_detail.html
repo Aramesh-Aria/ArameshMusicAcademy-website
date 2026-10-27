@@ -47,7 +47,7 @@
     {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
   </header>
   {% if programme_sessions %}
-  {% include 'partials/sessions.html' with sessions=programme_sessions %}
+  {% include 'partials/sessions.html' with runs=programme_runs %}
   {% else %}
   <p class="section__intro section__note">روز و ساعت هر کلاس را با استاد و آموزشگاه هماهنگ می‌کنید؛ روزهای حضور هر استاد در برنامهٔ هفته آمده است.</p>
   {% endif %}

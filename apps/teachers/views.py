@@ -3,7 +3,7 @@ from django.views.generic import DetailView, ListView
 
 from apps.core.text import meta_description
 from apps.schedules.models import ClassSession
-from apps.schedules.week import active_sessions
+from apps.schedules.week import active_sessions, session_runs
 
 from .models import Instrument, Teacher
 
@@ -53,6 +53,7 @@ class TeacherDetailView(DetailView):
             )
         context['teacher_programmes'] = [p for p in teacher.programmes.all() if p.is_active]
         context['teacher_sessions'] = active_sessions().filter(teacher=teacher).order_by('weekday_order', 'start_time')
+        context['teacher_runs'] = session_runs(context['teacher_sessions'], with_offerings=True)
         return context
 
 
@@ -79,4 +80,5 @@ class InstrumentDetailView(DetailView):
         context['instrument_sessions'] = (
             active_sessions().filter(instruments=instrument).order_by('weekday_order', 'start_time')
         )
+        context['instrument_runs'] = session_runs(context['instrument_sessions'])
         return context

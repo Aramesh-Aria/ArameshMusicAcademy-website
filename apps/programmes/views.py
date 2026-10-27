@@ -2,7 +2,7 @@ from django.views.generic import DetailView
 
 from apps.core.text import meta_description
 from apps.pages.models import FAQ
-from apps.schedules.week import active_sessions
+from apps.schedules.week import active_sessions, session_runs
 from apps.teachers.models import Instrument, Teacher
 
 from .models import Programme
@@ -41,5 +41,6 @@ class ProgrammeDetailView(DetailView):
             sessions = sessions.filter(teacher__in=teachers, programme__isnull=True)
         context['programme_teachers'] = teachers
         context['programme_sessions'] = sessions
+        context['programme_runs'] = session_runs(sessions)
         context['faqs'] = FAQ.objects.active().filter(programmes=programme)
         return context

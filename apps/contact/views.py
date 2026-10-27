@@ -22,12 +22,12 @@ class ContactView(FormView):
         return super().form_valid(form)
 
     def send_notification(self, message):
-        subject = f'پیام جدید از سایت: {message.subject}'
+        subject = f'پیام جدید از سایت: {message.subject or message.full_name}'
         body = (
             f'نام: {message.full_name}\n'
             f'تلفن: {message.phone}\n'
             f'ایمیل: {message.email or "—"}\n'
-            f'موضوع: {message.subject}\n\n'
+            f'موضوع: {message.subject or "—"}\n\n'
             f'{message.message}'
         )
         try:

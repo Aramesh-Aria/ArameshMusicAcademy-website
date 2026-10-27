@@ -579,7 +579,8 @@
   .tile__name .icon { inline-size: 1.125rem; block-size: 1.125rem; color: var(--mark); rotate: 90deg; transition: translate var(--dur-state) var(--ease-out); }
   .tile__media { align-self: stretch; position: relative; background: color-mix(in oklab, var(--saffron) 22%, var(--stone)); }
   .tile__media img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; }
-  .tile__media .shape { position: absolute; inset-block-end: -18%; inset-inline-end: -12%; inline-size: 120%; color: color-mix(in oklab, var(--saffron) 45%, var(--stone)); }
+  /* No photo yet: the name and chevron take the whole tile. */
+  .tile:not(:has(.tile__media)) { grid-template-columns: minmax(0, 1fr); }
   @media (hover: hover) and (pointer: fine) {
     .tile:hover .tile__name .icon { translate: -4px 0; }
   }
@@ -856,10 +857,11 @@
     color: var(--text);
   }
   .band h2 { max-inline-size: 16em; }
-  .band__facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: var(--space-5) var(--space-7); font-size: var(--text-s); line-height: 1.8; }
-  .band__label { margin-block-end: var(--space-1); font-family: var(--font-text); font-size: var(--text-xs); color: var(--text-soft); }
-  .band__facts a { text-decoration-thickness: 2px; }
   .band__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  /* Wide screens: the headline at the start, the two buttons at the end of the same row. */
+  @media (min-width: 56.3125em) {
+    .band { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+  }
   /* On saffron the primary pill turns ground, its disc saffron; the secondary stays stone. */
   .band .btn--primary { --btn-bg: var(--ground); --btn-fg: var(--stone); --disc-bg: var(--saffron); --disc-fg: var(--ink); }
   @media (max-width: 37.5em) {

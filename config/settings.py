@@ -228,7 +228,8 @@ SITE_MAP_EMBED = (
 SITE_INSTAGRAM = os.environ.get('SITE_INSTAGRAM', 'https://www.instagram.com/arameshmusic.academy/')
 SITE_TELEGRAM = os.environ.get('SITE_TELEGRAM', 'https://t.me/arameshmusicacademyconcert')
 
-# Working hours shown on the contact page — one entry per displayed line.
+# The hours the phones are answered, shown in the footer and on the contact page, one entry per line.
+# Class times come from the ClassSessions, not from here.
 SITE_HOURS = [
     'شنبه تا چهارشنبه: 10 تا 21 (به غیر از ایام تعطیل)',
     'پنج‌شنبه: 10 تا 14',

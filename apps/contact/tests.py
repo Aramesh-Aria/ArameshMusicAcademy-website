@@ -155,4 +155,13 @@ class ContactFormTests(TestCase):
         self.assertNotIn('phone', form.errors)
         self.assertNotIn('email', form.errors)
 
+    def test_subject_is_optional(self):
+        form = ContactForm(data={'full_name': 'Ali Ahmadi', 'phone': '09120000000', 'message': 'Hi'})
+        form.is_valid()
+        self.assertNotIn('subject', form.errors)
+
+    def test_a_message_without_subject_is_named_by_its_sender(self):
+        message = ContactMessage(full_name='Ali Ahmadi', phone='09120000000', message='Hi')
+        self.assertEqual(str(message), 'Ali Ahmadi')
+
 # Create your tests here.

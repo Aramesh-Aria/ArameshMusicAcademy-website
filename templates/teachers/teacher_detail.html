@@ -31,7 +31,7 @@
     {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
   </header>
   {% if teacher_sessions %}
-  {% include 'partials/sessions.html' with sessions=teacher_sessions show_offerings=True hide_teacher=True %}
+  {% include 'partials/sessions.html' with runs=teacher_runs show_offerings=True hide_teacher=True %}
   {% else %}
   <p class="section__intro section__note">زمان کلاس‌های این استاد هنوز در برنامه ثبت نشده است. برای هماهنگی تماس بگیرید.</p>
   {% endif %}

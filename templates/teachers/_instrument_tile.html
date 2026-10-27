@@ -1,5 +1,5 @@
-{# An Instrument tile: the name and a chevron, its photo (or the santur shape) flush to the far edge. #}
+{# An Instrument tile: the name and a chevron, with its photo flush to the far edge once it has one; until then the tile is its name alone. #}
 <a class="tile on-stone" href="{{ instrument.get_absolute_url }}">
   <span class="tile__name">{{ instrument.name }}<svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></span>
-  <span class="tile__media">{% if instrument.photo %}<img src="{{ instrument.photo.url }}" alt="" loading="lazy" decoding="async">{% else %}{% include 'components/santur.html' %}{% endif %}</span>
+  {% if instrument.photo %}<span class="tile__media"><img src="{{ instrument.photo.url }}" alt="" loading="lazy" decoding="async"></span>{% endif %}
 </a>

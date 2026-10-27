@@ -35,7 +35,7 @@
     <h2 id="times-title">زمان کلاس‌ها</h2>
     {% url 'schedules:schedule' as schedule_url %}{% include "components/button.html" with label="برنامهٔ کامل هفته" href=schedule_url variant="quiet" %}
   </header>
-  {% include 'partials/sessions.html' with sessions=instrument_sessions %}
+  {% include 'partials/sessions.html' with runs=instrument_runs %}
 </section>
 {% endif %}
 

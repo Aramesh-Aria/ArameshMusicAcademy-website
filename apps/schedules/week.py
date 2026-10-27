@@ -3,7 +3,7 @@ from datetime import time
 
 from django.utils import timezone
 
-from .models import ClassSession, Offerings, Weekday, WEEKDAY_ORDER
+from .models import ClassSession, Offerings, Weekday, WEEKDAY_ORDER, WEEKDAY_SORT_VALUES
 
 # The Academy is closed on Fridays unless a class is booked anyway.
 CLOSED_DAYS = {Weekday.FRIDAY}
@@ -104,3 +104,59 @@ def today_status(days, now=None):
         next_from=min(s.start_time for s in resume.sessions) if resume else None,
         is_friday=today.weekday == Weekday.FRIDAY,
     )
+
+
+@dataclass(frozen=True)
+class SessionRun:
+    """Sessions on consecutive days that read the same (hours, teacher and, when shown, what they offer),
+    listed once: «شنبه تا سه‌شنبه، ۱۲ تا ۲۱»."""
+    days: str
+    start_time: time
+    end_time: time
+    teacher: object
+    offerings: Offerings
+
+
+def session_runs(sessions, with_offerings=False):
+    """`sessions` as `SessionRun`s, in week and start order.
+
+    Worked out on every call from the sessions as they are now, so an hour changed in the admin just splits a run
+    in two. Two sessions merge only when everything the page shows for them is the same: the hours and teacher,
+    plus the offerings when `with_offerings` (a page that hides them may merge sessions that differ only there).
+    """
+    groups = {}
+    for session in sessions:
+        offerings = session.offerings()
+        key = (session.start_time, session.end_time, session.teacher_id, str(offerings) if with_offerings else '')
+        group = groups.setdefault(key, {'session': session, 'offerings': offerings, 'days': set()})
+        group['days'].add(WEEKDAY_SORT_VALUES[session.weekday])
+
+    runs = []
+    for (start, end, _, _), group in groups.items():
+        days = sorted(group['days'])
+        # Split the days into runs of neighbours: Saturday, Sunday, Monday → one; Saturday, Monday → two.
+        spans = [[days[0], days[0]]]
+        for day in days[1:]:
+            if day == spans[-1][1] + 1:
+                spans[-1][1] = day
+            else:
+                spans.append([day, day])
+        for first, last in spans:
+            runs.append((first, start, SessionRun(
+                days=_days_label(first, last),
+                start_time=start,
+                end_time=end,
+                teacher=group['session'].teacher,
+                offerings=group['offerings'],
+            )))
+    return [run for _, _, run in sorted(runs, key=lambda item: item[:2])]
+
+
+def _days_label(first, last):
+    """«شنبه», «شنبه و یکشنبه» or «شنبه تا سه‌شنبه» for weekday positions `first`..`last`."""
+    names = [WEEKDAY_ORDER[i].label for i in range(first, last + 1)]
+    if len(names) == 1:
+        return names[0]
+    if len(names) == 2:
+        return f'{names[0]} و {names[1]}'
+    return f'{names[0]} تا {names[-1]}'

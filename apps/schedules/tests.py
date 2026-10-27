@@ -10,7 +10,7 @@ from apps.teachers.models import Instrument, Teacher
 
 from .admin import ClassSessionForm
 from .models import ClassSession, Weekday
-from .week import active_sessions
+from .week import active_sessions, session_runs
 
 
 class ClassSessionModelTests(TestCase):
@@ -265,6 +265,65 @@ class ScheduleDisplayRuleTests(TestCase):
         self.assertContains(
             response, '<small class="week-instruments">پیانو، گیتار پاپ؛ تئوری و سلفژ</small>', html=True,
         )
+
+
+class SessionRunTests(TestCase):
+    """session_runs(): identical sessions on neighbouring days are listed once, worked out from today's data."""
+
+    def setUp(self):
+        self.piano = Instrument.objects.create(name='پیانو', slug='piano')
+        self.santur = Instrument.objects.create(name='سنتور', slug='santur')
+        self.teacher = Teacher.objects.create(
+            first_name='علی', last_name='شمس', biography='.', profile_image='teachers/ali.jpg',
+        )
+
+    def _session(self, weekday, start=12, end=21, instrument=None):
+        session = ClassSession.objects.create(
+            teacher=self.teacher, weekday=weekday, start_time=time(start), end_time=time(end),
+        )
+        session.instruments.add(instrument or self.piano)
+        return session
+
+    def _runs(self, **kwargs):
+        sessions = active_sessions().order_by('weekday_order', 'start_time')
+        return [(run.days, run.start_time.hour, run.end_time.hour) for run in session_runs(sessions, **kwargs)]
+
+    def test_neighbouring_days_with_the_same_hours_merge(self):
+        for weekday in (Weekday.SATURDAY, Weekday.SUNDAY, Weekday.MONDAY, Weekday.TUESDAY):
+            self._session(weekday)
+
+        self.assertEqual(self._runs(), [('شنبه تا سه‌شنبه', 12, 21)])
+
+    def test_two_neighbours_read_with_and_a_gap_splits_the_run(self):
+        for weekday in (Weekday.SATURDAY, Weekday.SUNDAY, Weekday.TUESDAY):
+            self._session(weekday)
+
+        self.assertEqual(self._runs(), [('شنبه و یکشنبه', 12, 21), ('سه‌شنبه', 12, 21)])
+
+    def test_an_hour_changed_in_the_admin_splits_the_run(self):
+        sessions = [self._session(weekday) for weekday in (Weekday.SATURDAY, Weekday.SUNDAY, Weekday.MONDAY)]
+        sessions[1].end_time = time(19)
+        sessions[1].save()
+
+        self.assertEqual(self._runs(), [('شنبه', 12, 21), ('یکشنبه', 12, 19), ('دوشنبه', 12, 21)])
+
+    def test_different_offerings_merge_only_where_they_are_not_shown(self):
+        self._session(Weekday.SATURDAY)
+        self._session(Weekday.SUNDAY, instrument=self.santur)
+
+        self.assertEqual(self._runs(), [('شنبه و یکشنبه', 12, 21)])
+        self.assertEqual(self._runs(with_offerings=True), [('شنبه', 12, 21), ('یکشنبه', 12, 21)])
+
+    def test_no_sessions_give_no_runs(self):
+        self.assertEqual(session_runs(ClassSession.objects.none()), [])
+
+    def test_the_teacher_page_lists_the_merged_days(self):
+        for weekday in (Weekday.SATURDAY, Weekday.SUNDAY, Weekday.MONDAY):
+            self._session(weekday)
+
+        response = self.client.get(self.teacher.get_absolute_url())
+
+        self.assertContains(response, '<span class="times__day">شنبه تا دوشنبه</span>', html=True)
 
 
 class ClassSessionAdminFormTests(TestCase):

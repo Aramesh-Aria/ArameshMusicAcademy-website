@@ -15,8 +15,8 @@ class ContactForm(forms.ModelForm):
     class Meta:
         model = ContactMessage
         fields = ('full_name', 'phone', 'email', 'subject', 'message')
-        # The Academy answers by calling back, so the phone is required and the email is not.
-        labels = {'email': 'ایمیل (اختیاری)'}
+        # The Academy answers by calling back, so the phone is required; the email and subject are not.
+        labels = {'email': 'ایمیل (اختیاری)', 'subject': 'موضوع (اختیاری)'}
         # The model's help texts are written for staff in the admin; the public form has its own hints.
         help_texts = {field: '' for field in fields}
         widgets = {
@@ -39,7 +39,6 @@ class ContactForm(forms.ModelForm):
             'full_name': {'required': 'لطفا نام و نام خانوادگی را وارد کنید.'},
             'phone': {'required': 'لطفا شماره تماس را وارد کنید تا با شما تماس بگیریم.'},
             'email': {'invalid': 'ایمیل وارد شده معتبر نیست.'},
-            'subject': {'required': 'لطفا موضوع پیام را وارد کنید.'},
             'message': {'required': 'لطفا متن پیام را وارد کنید.'},
         }
 
