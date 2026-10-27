@@ -35,9 +35,9 @@ There is no linter or frontend build step configured.
 - Programme pages are routed at `programmes/<slug>/` and Instrument pages at `instruments/` and `instruments/<slug>/` (views in `apps/teachers/views.py`, URLs in `apps/teachers/instrument_urls.py`). `programmes.context_processors.programme_nav` feeds the navbar's دوره‌ها menu.
 - `testimonials`: `Testimonial`, parent quotes shown on the home page.
 
-**Image processing on save:** `Teacher`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads to JPEG via `core.image_utils.process_image`. This can change the stored filename, which is then written back with a queryset `.update()`.
+**Image processing on save:** `Teacher`, `Instrument`, `Programme`, `SitePageContent`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads to JPEG via `core.image_utils.process_image`. This can change the stored filename, which is then written back with a queryset `.update()`.
 
-**Templates** are project-level under `templates/` (not per-app), with `base.html` as the root layout. `templates/corebiz_raw/` holds raw reference files from the purchased CoreBiz theme. Nothing routes to them.
+**Templates** are project-level under `templates/` (not per-app), with `base.html` as the root layout. `templates/corebiz_raw/` holds raw reference files from the purchased CoreBiz theme. Nothing routes to them. The one exception is `apps/contact/templates/captcha/widgets/captcha.html`: form widgets render through Django's default form renderer, which reads only app template folders, so a copy under `templates/` would be ignored.
 
 **Admin** uses the django-jazzmin theme. Staff manage all content through it.
 
@@ -46,14 +46,14 @@ There is no linter or frontend build step configured.
 - `config/settings.py` is the only settings file. It loads a gitignored `.env` via python-dotenv. On Runflare, real environment variables are used instead. See `.env.example` for the keys: `SECRET_KEY` (required when `DEBUG` is off; settings refuse to load without it), `DEBUG`, `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` (comma-separated), `SITE_DOMAIN` (the public domain named by canonical, og: tags and the sitemap), `DATABASE_PATH`, `SECURE_SSL_REDIRECT`, email/SMTP settings, `CONTACT_NOTIFICATION_EMAIL`, `ABOUT_GALLERY_SLUG`, `HERO_GALLERY_SLUG`, `SITE_INSTAGRAM`/`SITE_TELEGRAM`, `GOOGLE_ANALYTICS_ID`. Every key except `SECRET_KEY` (with `DEBUG` off) has a default in `settings.py`, so an unset key keeps today's value.
 - With `DEBUG` off the site is https only: secure session and CSRF cookies, and http redirects to https (`SECURE_SSL_REDIRECT=False` turns the redirect off for plain-http runs). HSTS is not set yet. Tests run through `apps.core.test_runner.TestRunner`, which turns the redirect off.
 - When no email env vars are set, the console email backend is used, so local dev and tests need no email credentials. They do need a `SECRET_KEY` in `.env` (or `DEBUG=True`), since `DEBUG` defaults to off.
-- `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS` and `SITE_HOURS` are hardcoded in `settings.py`.
+- `SITE_EMAIL`, `SITE_PHONES`, `SITE_ADDRESS`, `SITE_HOURS` (the phone answering hours) and the map links `SITE_MAP_NESHAN` / `SITE_MAP_EMBED` are hardcoded in `settings.py`.
 - Locale: `LANGUAGE_CODE = 'fa-ir'`, `TIME_ZONE = 'Asia/Tehran'`, and `django_jalali` for Persian dates.
 - The database is SQLite at `database/db.sqlite3` (gitignored) unless `DATABASE_PATH` says otherwise, in production too.
 
 ## Static and media files
 
 - Edit sources in `static_dev/`. It is **gitignored and dev-only** (`STATICFILES_DIRS`). All styling is in `static_dev/assets/css/site.css` (plain CSS in cascade layers) and all behaviour in `static_dev/assets/js/site.js` (small vanilla modules, loaded with defer). There are no vendor libraries.
-- After editing, run `collectstatic` and **commit `public/static/`** (`STATIC_ROOT`), including `staticfiles.json` and the hashed copies (`site.<hash>.css`). Production serves that directory through WhiteNoise.
+- After editing, run `collectstatic` and **commit `public/static/`** (`STATIC_ROOT`), including `staticfiles.json` and the hashed copies (`site.<hash>.css`). Delete the hashed copies the manifest no longer names, so old ones don't pile up. Production serves that directory through WhiteNoise.
 - Storage is `apps.core.storage.StaticFilesStorage` (WhiteNoise's compressed manifest storage): with `DEBUG` off `{% static %}` links the hashed names, which are cached for a year, and a path missing from the manifest is an error. Only vendor paths under `admin/` and `vendor/` are let through. With `DEBUG` on, plain names are linked. To try production serving locally, run `runserver --nostatic` with `DEBUG=False`; without `--nostatic`, Django serves `static_dev/` first and every hashed URL 404s.
 - Static URL is `/public/static/` and media URL is `/public/media/` (not the Django defaults). Uploads go to `public/media/`, which `config/urls.py` serves explicitly.
 
