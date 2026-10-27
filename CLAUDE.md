@@ -37,6 +37,8 @@ There is no linter or frontend build step configured.
 
 **Image processing on save:** `Teacher`, `Instrument`, `Programme`, `SitePageContent`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads to JPEG via `core.image_utils.process_image`. This can change the stored filename, which is then written back with a queryset `.update()`.
 
+**Smaller copies for `srcset`:** templates show uploaded photos through `{% srcset field "<sizes>" %}` (`core/templatetags/site_tags.py`), which offers WebP copies at 320/480/800/1200px up to the photo's own width. `image_utils.image_sizes` makes them on first request under `public/media/sizes/` and remakes any older than its photo. A copy that fails is skipped, so a page never breaks over one. The stored JPEG stays the plain `src`. Pass `"data-srcset"` as the third argument for a photo waiting in `data-src` (the hero's and Programme cards' later photos); `site.js` swaps both in.
+
 **Templates** are project-level under `templates/` (not per-app), with `base.html` as the root layout. `templates/corebiz_raw/` holds raw reference files from the purchased CoreBiz theme. Nothing routes to them. The one exception is `apps/contact/templates/captcha/widgets/captcha.html`: form widgets render through Django's default form renderer, which reads only app template folders, so a copy under `templates/` would be ignored.
 
 **Admin** uses the django-jazzmin theme. Staff manage all content through it.

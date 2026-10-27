@@ -397,9 +397,13 @@ document.addEventListener('touchstart', () => {}, { passive: true });
 })();
 
 // A stacked photo waiting in `data-src` (the template gives a src to the first only, since "lazy" would still
-// fetch the hidden ones lying in view) gets its file.
+// fetch the hidden ones lying in view) gets its file, and its smaller copies from `data-srcset`.
 const fetchPhoto = (photo) => {
   if (!photo.dataset.src) return;
+  if (photo.dataset.srcset) {
+    photo.srcset = photo.dataset.srcset;
+    delete photo.dataset.srcset;
+  }
   photo.src = photo.dataset.src;
   delete photo.dataset.src;
 };

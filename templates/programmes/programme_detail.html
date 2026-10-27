@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load site_tags %}
 
 {% block title %}{{ programme.name }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-programme{% endblock %}
@@ -15,7 +16,7 @@
   {% with photos=programme.photos %}
   {% if photos %}
   <div class="split__media frame vt crossfade" style="--vt: programme-{{ programme.pk }}">
-    {% for photo in photos %}<img src="{{ photo.url }}" alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% endfor %}
+    {% for photo in photos %}<img src="{{ photo.url }}" {% srcset photo "(min-width: 64em) 40vw, 92vw" %} alt="" width="900" height="600"{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %}>{% endfor %}
   </div>
   {% endif %}
   {% endwith %}

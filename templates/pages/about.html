@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load site_tags %}
 
 {% block title %}{{ page_title }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-about{% endblock %}
@@ -12,9 +13,9 @@
     <div class="prose">{{ page_body|linebreaks }}</div>
   </div>
   {% if page_hero_image %}
-  <div class="split__media frame"><img src="{{ page_hero_image.url }}" width="1200" height="800" alt="{{ page_title }}" fetchpriority="high"></div>
+  <div class="split__media frame"><img src="{{ page_hero_image.url }}" {% srcset page_hero_image "(min-width: 64em) 40vw, 92vw" %} width="1200" height="800" alt="{{ page_title }}" fetchpriority="high"></div>
   {% elif space_images %}
-  <div class="split__media frame"><img src="{{ space_images.0.image.url }}" alt="{{ space_images.0.title|default:'فضای آموزشگاه' }}" fetchpriority="high"></div>
+  <div class="split__media frame"><img src="{{ space_images.0.image.url }}" {% srcset space_images.0.image "(min-width: 64em) 40vw, 92vw" %} alt="{{ space_images.0.title|default:'فضای آموزشگاه' }}" fetchpriority="high"></div>
   {% else %}
   <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
   {% endif %}

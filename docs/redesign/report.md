@@ -138,7 +138,7 @@ The hero mid-crossfade is in `screenshots/step12-motion/`.
 
 ## 8. The invisible expensive stuff
 
-**Verdict: met, except LCP on slow networks (see the measurements).**
+**Verdict: met; one page misses the LCP target on slow 4G at a phone's pixel density (see the measurements).**
 
 - **Accessibility:**
   - axe-core 4.10.2 (WCAG 2.0–2.2 A/AA and best practice) finds **no violations** on 15 pages at 1440 and 390;
@@ -163,23 +163,25 @@ The hero mid-crossfade is in `screenshots/step12-motion/`.
 
 ## Measurements
 
-Measured on 2026-10-27 at 390×844 against the `DEBUG=False` server, with the cache off and Chrome's network throttling (fast 4G: 9 Mb/s, 60 ms; slow 4G: 1.6 Mb/s, 150 ms). Transfer is what the page fetches by `load` plus 2s. CLS is the larger of the 390 and 1440 runs on slow 4G.
+Measured on 2026-10-27 at 390×844 against the `DEBUG=False` server, with the cache off and Chrome's network throttling (fast 4G: 9 Mb/s, 60 ms; slow 4G: 1.6 Mb/s, 150 ms). Transfer is what the page fetches by `load` plus 2s. "Before" is the first measurement, when every page sent each photo at its stored size; "after" is with the smaller copies (see below). The 3× column is the same slow 4G run at a phone's pixel density, which picks larger copies.
 
-| Page | LCP, fast 4G | LCP, slow 4G | CLS | Transfer |
-|---|---|---|---|---|
-| Home | 0.56s | **2.61s** | 0.038 | 603 KB |
-| Teachers | 0.47s | **2.04s** | 0.005 | 666 KB |
-| Schedule | 0.27s | 0.82s | 0.006 | 259 KB |
-| A Programme (children) | 0.27s | 0.77s | 0.024 | 276 KB |
-| An Instrument (santur) | 0.42s | 1.55s | 0.004 | 254 KB |
-| Contact | 0.25s | 0.76s | 0.035 | 209 KB |
-| Rooms album | 1.16s | **5.76s** | 0.004 | 2,266 KB |
+| Page | LCP, fast 4G | LCP, slow 4G (before → after) | LCP, slow 4G at 3× | CLS | Transfer (before → after) |
+|---|---|---|---|---|---|
+| Home | 0.37s | 2.61s → **1.56s** | 1.89s | 0.005 | 603 → 345 KB |
+| Teachers | 0.39s | 2.04s → **1.35s** | 1.64s | 0.004 | 666 → 296 KB |
+| Schedule | 0.28s | 0.82s → 0.82s | 0.82s | 0.005 | 259 → 252 KB |
+| A Programme (children) | 0.29s | 0.77s → 0.77s | 0.76s | 0.004 | 276 → 212 KB |
+| An Instrument (santur) | 0.38s | 1.55s → 1.25s | 1.44s | 0.004 | 254 → 208 KB |
+| Contact | 0.30s | 0.76s → 0.77s | 0.75s | 0.004 | 209 → 201 KB |
+| Rooms album | 0.80s | 5.76s → **1.32s** | **2.55s** | 0.004 | 2,266 → 367 KB |
 
-The 2s target holds on fast 4G for every page. On slow 4G it misses on home, the teachers list and the rooms album, which load full-size photos: the hero's LCP photo is a 1111×1280 JPEG (about 204 KB) shown 366px wide on a phone, and the album's 13 photos are up to 1920px. Before step 17 the home page took 4.9s on slow 4G, because it loaded all four hero slides at once.
+The 2s target now holds on fast and slow 4G for every page. The one miss is the rooms album on slow 4G at 3×: two columns of photos each want an 800px copy there (887 KB in all). Before step 17 the home page took 4.9s on slow 4G, because it loaded all four hero slides at once.
+
+**How the copies work.** Every uploaded photo a page shows (the hero, portraits, gallery photos and covers, Programme and Instrument photos) is offered as WebP at 320, 480, 800 and 1200px wide, up to its own width, through `srcset` and a `sizes` that states how wide the page draws it. The copies are made the first time a page asks for them and kept under `public/media/sizes/`; a copy older than its photo is made again, so a photo replaced in the admin never shows stale. A copy that can't be made is left out and the stored JPEG still shows (`apps/core/image_utils.py`, the `srcset` tag in `site_tags.py`). The lightbox still opens the stored photo.
 
 ## Known gaps
 
-- **Responsive image sizes.** Smaller copies made on upload (`srcset`/`sizes`) for the hero, portraits and gallery photos are the largest remaining LCP and transfer cost. That's an image-pipeline change, outside this brief.
+- **The album at a phone's pixel density.** The rooms album takes 2.55s on slow 4G at 3×. Lazy-loading fewer photos above the fold, or a smaller `sizes` for its two columns, would bring it under 2s.
 - **Not tried on a real phone.** Sticky hover, the landscape notch, the home-indicator inset and the keyboard's return key were checked only in emulation.
 - **Code-review items not yet done** ([code-review-step21.md](code-review-step21.md)):
   - CONTEXT.md avoids the words "offering" and "Album", but the code uses them;

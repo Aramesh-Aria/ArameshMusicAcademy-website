@@ -13,7 +13,7 @@
     {% if hero_slides %}
     <div class="hero__slides crossfade">
       {% for slide in hero_slides %}
-      {% if forloop.first %}<img src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async" fetchpriority="high">{% else %}<img data-src="{{ slide.image.url }}" alt="{{ slide.title }}" decoding="async">{% endif %}
+      {% if forloop.first %}<img src="{{ slide.image.url }}" {% srcset slide.image "(min-width: 90em) 1392px, max(100vw, 80svh)" %} alt="{{ slide.title }}" decoding="async" fetchpriority="high">{% else %}<img data-src="{{ slide.image.url }}" {% srcset slide.image "(min-width: 90em) 1392px, max(100vw, 80svh)" "data-srcset" %} alt="{{ slide.title }}" decoding="async">{% endif %}
       {% endfor %}
     </div>
     {% else %}
@@ -71,7 +71,7 @@
   </div>
   <div class="split__media frame{% if director.profile_image %} split__media--face{% else %} frame--shape{% endif %}">
     {% if director.profile_image %}
-    <img src="{{ director.profile_image.url }}" alt="{{ director.full_name }}" loading="lazy" decoding="async">
+    <img src="{{ director.profile_image.url }}" {% srcset director.profile_image "(min-width: 64em) 40vw, 92vw" %} alt="{{ director.full_name }}" loading="lazy" decoding="async">
     {% else %}
     {% include 'components/santur.html' %}
     {% endif %}
@@ -187,7 +187,7 @@
   </header>
   <ul class="mosaic" role="list">
     {% for image in gallery_preview_images %}
-    <li class="frame"><img src="{{ image.image.url }}" alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async"></li>
+    <li class="frame"><img src="{{ image.image.url }}" {% srcset image.image "(min-width: 56.25em) 25vw, 50vw" %} alt="{{ image.title|default:image.gallery_page.title }}" loading="lazy" decoding="async"></li>
     {% endfor %}
   </ul>
 </section>

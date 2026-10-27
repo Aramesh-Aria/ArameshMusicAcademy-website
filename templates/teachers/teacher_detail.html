@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load site_tags %}
 
 {% block title %}{{ teacher.full_name }} | آموزشگاه موسیقی آرامش{% endblock %}
 {% block og_title %}{{ teacher.full_name }}{% endblock %}
@@ -22,7 +23,7 @@
     </dl>
     {% if teacher.public_biography %}<div class="prose">{{ teacher.public_biography|linebreaks }}</div>{% endif %}
   </div>
-  <div class="split__media frame frame--portrait vt" style="--vt: teacher-{{ teacher.pk }}">{% include 'partials/portrait.html' with teacher=teacher %}</div>
+  <div class="split__media frame frame--portrait vt" style="--vt: teacher-{{ teacher.pk }}">{% include 'partials/portrait.html' with teacher=teacher sizes='(min-width: 64em) 460px, 92vw' %}</div>
 </article>
 
 <section class="section" aria-labelledby="week-title">

@@ -8,7 +8,7 @@
   {% for image in images %}
   <li>
     <a class="plate-link frame" href="{{ image.image.url }}" data-lightbox="{{ group }}"{% if image.caption or image.title %} data-caption="{{ image.caption|default:image.title }}"{% endif %}>
-      <img src="{{ image.image.url }}" alt="{{ image.title|default:alt }}" {% image_size image.image %} loading="lazy" decoding="async">
+      <img src="{{ image.image.url }}" {% srcset image.image "(max-width: 56.25em) 46vw, 31vw" %} alt="{{ image.title|default:alt }}" {% image_size image.image %} loading="lazy" decoding="async">
     </a>
   </li>
   {% endfor %}

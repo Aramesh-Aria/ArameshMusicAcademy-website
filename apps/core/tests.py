@@ -1,10 +1,17 @@
-from django.test import TestCase
+import os
+import shutil
+import tempfile
+
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from apps.programmes.models import Programme
 from apps.teachers.models import Teacher
 
-from .templatetags.site_tags import fa_digits, image_size, local_phone, tel_href
+from PIL import Image
+
+from .image_utils import image_sizes
+from .templatetags.site_tags import fa_digits, image_size, local_phone, srcset, tel_href
 
 
 class PhoneFilterTests(TestCase):
@@ -38,6 +45,60 @@ class ImageSizeTagTests(TestCase):
                 raise FileNotFoundError('gallery/gone.jpg')
         self.assertEqual(image_size(Missing()), '')
 
+
+
+class SrcsetTests(TestCase):
+    """Smaller WebP copies of an upload, made on first use, so a phone isn't sent the 1920px photo."""
+
+    def setUp(self):
+        self.media = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.media)
+        override = override_settings(MEDIA_ROOT=self.media)
+        override.enable()
+        self.addCleanup(override.disable)
+
+    def _portrait(self, width, height=None, name='teachers/a.jpg'):
+        path = os.path.join(self.media, name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        Image.new('RGB', (width, height or width), 'tan').save(path, 'JPEG')
+        return Teacher(profile_image=name).profile_image
+
+    def test_copies_go_up_to_the_originals_own_width(self):
+        sizes = image_sizes(self._portrait(600))
+
+        self.assertEqual([width for _, width in sizes], [320, 480, 600])
+        self.assertEqual(sizes[0][0], '/public/media/sizes/teachers/a-320w.webp')
+        with Image.open(os.path.join(self.media, 'sizes/teachers/a-480w.webp')) as copy:
+            self.assertEqual((copy.format, copy.size), ('WEBP', (480, 480)))
+
+    def test_a_narrow_upload_is_offered_at_its_own_width_only(self):
+        self.assertEqual([width for _, width in image_sizes(self._portrait(300))], [300])
+
+    def test_a_replaced_photo_gets_new_copies(self):
+        field = self._portrait(600)
+        image_sizes(field)
+        copy = os.path.join(self.media, 'sizes/teachers/a-320w.webp')
+        os.utime(copy, (0, 0))  # older than the original, as when the admin uploads over the same name
+
+        image_sizes(field)
+
+        self.assertGreater(os.path.getmtime(copy), 0)
+
+    def test_the_tag_names_each_copy_and_the_sizes(self):
+        html = srcset(self._portrait(600), '50vw', 'data-srcset')
+
+        self.assertEqual(html, 'data-srcset="/public/media/sizes/teachers/a-320w.webp 320w, '
+                               '/public/media/sizes/teachers/a-480w.webp 480w, '
+                               '/public/media/sizes/teachers/a-600w.webp 600w" sizes="50vw"')
+
+    def test_a_missing_or_broken_file_leaves_the_plain_src(self):
+        self.assertEqual(srcset(Teacher(profile_image='teachers/gone.jpg').profile_image, '50vw'), '')
+
+        broken = os.path.join(self.media, 'teachers/broken.jpg')
+        os.makedirs(os.path.dirname(broken), exist_ok=True)
+        with open(broken, 'wb') as f:
+            f.write(b'not a photo')
+        self.assertEqual(srcset(Teacher(profile_image='teachers/broken.jpg').profile_image, '50vw'), '')
 
 class BaseLayoutTests(TestCase):
     def test_every_page_offers_the_primary_phone_and_the_gallery_menu(self):

@@ -1,6 +1,8 @@
 from django import template
 from django.utils.html import format_html
 
+from apps.core.image_utils import image_sizes
+
 register = template.Library()
 
 PERSIAN_DIGITS = str.maketrans('0123456789', '۰۱۲۳۴۵۶۷۸۹')
@@ -53,3 +55,18 @@ def image_size(field):
     if not width or not height:
         return ''
     return format_html('width="{}" height="{}"', width, height)
+
+
+@register.simple_tag
+def srcset(field, sizes, attr='srcset'):
+    """`srcset` and `sizes` attributes offering an uploaded image's smaller copies (see `image_utils.image_sizes`).
+
+    `sizes` says how wide the photo is drawn, as in HTML; for a photo cropped with `object-fit: cover`, give the
+    width its crop needs, not its box's. Pass attr='data-srcset' for a photo that waits in `data-src`. Empty when
+    no copy could be made, so the plain `src` stands alone.
+    """
+    candidates = image_sizes(field)
+    if not candidates:
+        return ''
+    value = ', '.join(f'{url} {width}w' for url, width in candidates)
+    return format_html('{}="{}" sizes="{}"', attr, value, sizes)

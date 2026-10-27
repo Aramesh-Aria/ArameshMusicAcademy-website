@@ -1,10 +1,10 @@
-{# One child gallery page in an index: a stone card with its cover (none until it has one), its title and a line about it. The title is the link; the whole card is its target. #}
+{% load site_tags %}{# One child gallery page in an index: a stone card with its cover (none until it has one), its title and a line about it. The title is the link; the whole card is its target. #}
 {# The first row's covers are the page's largest paint, so they load at once; the rest wait until they're near. #}
 <li>
   <article class="card album on-stone">
     {% with cover=page.display_cover %}
     {% if cover %}
-    <div class="frame"><img src="{{ cover.url }}" width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async"></div>
+    <div class="frame"><img src="{{ cover.url }}" {% srcset cover "(min-width: 48em) 330px, 82vw" %} width="900" height="600" alt=""{% if forloop.counter > 3 %} loading="lazy"{% endif %} decoding="async"></div>
     {% endif %}
     {% endwith %}
     <div class="card__body">
