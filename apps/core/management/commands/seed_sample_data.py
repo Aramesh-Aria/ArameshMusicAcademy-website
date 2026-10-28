@@ -116,7 +116,11 @@ class Command(BaseCommand):
                 image, _ = GalleryImage.objects.update_or_create(
                     gallery_page=page,
                     display_order=image_data['display_order'],
-                    defaults={'title': image_data['title'], 'is_active': True},
+                    defaults={
+                        'title': image_data['title'],
+                        'focal_point': image_data.get('focal_point', GalleryImage.FocalPoint.CENTER),
+                        'is_active': True,
+                    },
                 )
                 if not image.image:
                     self.save_seed_file(image.image, image_data['image'])

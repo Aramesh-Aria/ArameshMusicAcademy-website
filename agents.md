@@ -21,7 +21,7 @@ There is no linter or frontend build step configured.
 
 ## Architecture
 
-**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, Amiri, no CSS framework). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
+**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, IranNastaliq for display over Sahel, no CSS framework). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
 
 **Apps** live under `apps/` and are installed as `apps.<name>`. App labels are the bare names, so migrations and table names don't include the `apps.` prefix.
 - `core`: no models. `context_processors.site_info` injects site contact info, social links, hours and year into every template. `admin_config.ArameshAdminConfig` replaces `django.contrib.admin` in `INSTALLED_APPS` so the admin sidebar can show the unread contact-message count. Also holds `sitemaps.py`, `image_utils.process_image` and the `seed_sample_data` command.

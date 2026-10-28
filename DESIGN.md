@@ -14,20 +14,20 @@ colors:
   error: "#a8321f"
 typography:
   display-l:
-    fontFamily: "Amiri, Sahel, Times New Roman, serif"
-    fontSize: "clamp(2.75rem, 1.6rem + 4.8vw, 4.75rem)"
+    fontFamily: "IranNastaliq, Sahel, Tahoma, serif"
+    fontSize: "clamp(3.6875rem, 2.15rem + 6.5vw, 6.4375rem)"
     fontWeight: 700
-    lineHeight: 1.25
+    lineHeight: 1.7
   display-m:
-    fontFamily: "Amiri, Sahel, Times New Roman, serif"
-    fontSize: "clamp(2rem, 1.5rem + 2.1vw, 3.25rem)"
+    fontFamily: "IranNastaliq, Sahel, Tahoma, serif"
+    fontSize: "clamp(2.6875rem, 2rem + 2.8vw, 4.375rem)"
     fontWeight: 700
-    lineHeight: 1.25
+    lineHeight: 1.7
   display-s:
-    fontFamily: "Amiri, Sahel, Times New Roman, serif"
-    fontSize: "clamp(1.625rem, 1.38rem + 1.05vw, 2.25rem)"
+    fontFamily: "IranNastaliq, Sahel, Tahoma, serif"
+    fontSize: "clamp(2.1875rem, 1.85rem + 1.4vw, 3rem)"
     fontWeight: 700
-    lineHeight: 1.25
+    lineHeight: 1.7
   lead:
     fontFamily: "Sahel, Tahoma, Segoe UI, sans-serif"
     fontSize: "clamp(1.25rem, 1.12rem + 0.56vw, 1.5rem)"
@@ -137,7 +137,7 @@ The rejected look is the category's catalogue of instruments with a "register no
 
 **Key Characteristics:**
 - A warm near-black ground; stone panels where reading happens; saffron only for the way in.
-- Amiri 700 for display, Sahel for everything else, Persian digits everywhere, no letter-spacing.
+- IranNastaliq for display, Sahel for everything else, Persian digits everywhere, no letter-spacing.
 - Two radii (the panel's, nested inside it, and full pills), nothing in between.
 - The Academy's own photos in nested rounded frames; text alone where there is no photo.
 - Content is visible on first paint; motion never gates it.
@@ -166,19 +166,21 @@ Four colours (ground, stone, saffron, error) plus only the steps of them that co
 
 ## Typography
 
-**Display Font:** Amiri 700 (with Sahel, Times New Roman, serif)
+**Display Font:** IranNastaliq, one weight, self-hosted and cut to the Persian letters (with Sahel, Tahoma, serif). Digits, Latin and ASCII punctuation are left out of the file, so Sahel draws them in display text.
 **Body Font:** Sahel 400 and 700, the FD cut with Persian digits (with Tahoma, Segoe UI, sans-serif)
 
-**Character:** a Naskh with real stroke contrast for what is said once and large, over a clear Persian sans for everything read or tapped. Tahoma is the fallback because every Windows and macOS has it and it sits close to Sahel, so the swap barely moves the text.
+**Character:** a Nastaliq drawn for Persian for what is said once and large, over a clear Persian sans for everything read or tapped. Tahoma is the fallback because every Windows and macOS has it and it sits close to Sahel, so the swap barely moves the text.
 
 ### Hierarchy
-- **Display L** (Amiri 700, 44–76px, 1.25): the page's one `h1`.
-- **Display M** (Amiri 700, 32–52px, 1.25): section heads.
-- **Display S** (Amiri 700, 26–36px, 1.25): card titles, teacher names.
+- **Display L** (IranNastaliq, 59–103px, 1.7): the page's one `h1`.
+- **Display M** (IranNastaliq, 43–70px, 1.7): section heads.
+- **Display S** (IranNastaliq, 35–48px, 1.7): card titles, teacher names.
 - **Lead** (Sahel 400, 20–24px, 1.7): the sentence under a page's headline.
 - **Body** (Sahel 400, 18–20px, 1.85 on the ground and 1.8 on stone): running text, buttons, nav. Measure 36em, about 85 Persian characters.
 - **Small** (Sahel 400, 16px): meta, captions, chips, small buttons.
 - **Label** (Sahel 700, 14px): a short label above a heading or a group, in saffron on the ground and soft ink on stone.
+
+IranNastaliq is drawn at one weight; display text asks for 700 so the digits and Latin that Sahel draws in it come out bold, and the face is declared for 400 to 700 so it is never given a synthesised bold. Nastaliq sets a word in about two thirds of Amiri's width at the same size, so the display steps are Amiri's old ones times 1.35. It needs 1.7 leading at every size, and the stroke of ک and گ climbs above the first line and hangs past the start edge of a line: give a heading that clips its overflow (a line clamp) room on those sides.
 
 ### Named Rules
 **The No-Tracking Rule.** Letter-spacing stays 0 at every size: tracking breaks the joins. Ethos's tracked uppercase eyebrows become short Sahel 700 labels.
@@ -195,7 +197,7 @@ RTL throughout: logical properties only (`inline-start`, `block-end`), and the n
 
 ## Elevation & Depth
 
-Flat by default. Depth comes from tone: stone panels on the ground, raised-ground tiles on the ground, a frame inside a panel. The one shadow is the floating sheet of a dropdown (`0 1.25rem 2.5rem -1rem rgb(0 0 0 / 0.55)`). The hero's photo carries a side and bottom scrim of the ground colour, held dark as far as the copy reaches.
+Flat by default. Depth comes from tone: stone panels on the ground, raised-ground tiles on the ground, a frame inside a panel. The one shadow is the floating sheet of a dropdown (`0 1.25rem 2.5rem -1rem rgb(0 0 0 / 0.55)`). The hero's copy sits on the frame's dark ground beside the photo, never over it: the photo fills the far ~60% and fades into the ground under the copy (on phones it stands above the copy at 4:3 and fades into it), so nothing is laid over an instrument.
 
 **The Tone-Not-Shadow Rule.** A surface is lifted by changing its colour, not by casting a shadow; the dropdown is the only exception because it floats over content.
 
@@ -221,7 +223,7 @@ The one shape from the subject is the santur's trapezoid body, cropped large off
 - **Programme card:** stone, its photos crossfading in a 3:2 frame, an age chip on the corner, the title as the link with the whole card as its target. With no photo the card is its text, set at the foot.
 - **Instrument tile (RAM):** the name and a chevron, its photo flush to the far edge; text-only until a photo is uploaded.
 - **Session tile:** raised ground, the days in bold («شنبه تا سه‌شنبه» when neighbouring days match), the hours, the teacher, what is taught.
-- **Teacher card:** a square portrait (Amiri initials on a stone plate when missing), the name in Amiri, instruments in bold, one line of lineage, the days.
+- **Teacher card:** a square portrait (IranNastaliq initials on a stone plate when missing), the name in IranNastaliq, instruments in bold, one line of lineage, the days.
 
 ### Chips
 - A 32px pill, Small type, the surface tinted 9% towards the text colour; on a photo, a saffron dot before the label.
@@ -239,7 +241,7 @@ The one shape from the subject is the santur's trapezoid body, cropped large off
 The one saffron field on a page: a headline and the two ways in (call, send a message). The facts live in the footer just below.
 
 ### «امروز در آموزشگاه»
-A small dark pill in the hero's far corner (under the hero on phones), from the real timetable in Tehran time: before, during and after today's classes, and on closed days when the Academy opens next. Server-rendered; it links to the schedule.
+A small dark pill under the hero's buttons (under the hero on phones), from the real timetable in Tehran time: before, during and after today's classes, and on closed days when the Academy opens next. Server-rendered; it links to the schedule.
 
 ## Do's and Don'ts
 
@@ -251,7 +253,7 @@ A small dark pill in the hero's far corner (under the hero on phones), from the 
 - **Do** write Persian copy only from real facts, with the owner's approval.
 
 ### Don't:
-- **Don't** letter-space Persian, or set Amiri below Display S.
+- **Don't** letter-space Persian, or set IranNastaliq below Display S (a `.label` heading is Sahel).
 - **Don't** add a third radius, a second saffron field on one page, or saffron text on stone.
 - **Don't** draw the santur as a pattern or on the dark ground; it stands in for a missing picture only.
 - **Don't** hide content until a script or an observer reveals it.

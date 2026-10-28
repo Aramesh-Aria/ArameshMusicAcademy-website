@@ -252,19 +252,28 @@ class ScheduleDisplayRuleTests(TestCase):
         with self.assertNumQueries(0):
             [str(session.offerings()) for session in sessions]
 
-    def test_the_schedule_page_shows_the_reserved_session_and_the_teachers_full_list(self):
+    def test_the_teachers_row_leaves_out_a_reserved_session_which_names_its_own_programme(self):
+        self._session(Weekday.SATURDAY, self.piano, self.guitar)
         self._session(Weekday.WEDNESDAY, self.piano, self.guitar)
         self._session(Weekday.THURSDAY, programme=self.ensemble)
 
         response = self.client.get(reverse('schedules:schedule'))
 
         row = response.context['schedule_rows'][0]
-        self.assertEqual(str(row['offerings']), 'پیانو، گیتار پاپ؛ تئوری و سلفژ، گروه نوازی')
-        # Each session offers less than the row's full list, so each cell names its own.
+        self.assertEqual(str(row['offerings']), 'پیانو، گیتار پاپ؛ تئوری و سلفژ')
+        # The normal days offer the row's list, so their cells name nothing; Thursday names its Programme.
         self.assertContains(response, '<small class="week-instruments">گروه نوازی</small>', html=True)
-        self.assertContains(
+        self.assertNotContains(
             response, '<small class="week-instruments">پیانو، گیتار پاپ؛ تئوری و سلفژ</small>', html=True,
         )
+
+    def test_a_teacher_with_only_a_reserved_session_names_it_in_the_cell(self):
+        self._session(Weekday.THURSDAY, programme=self.ensemble)
+
+        response = self.client.get(reverse('schedules:schedule'))
+
+        self.assertEqual(str(response.context['schedule_rows'][0]['offerings']), '')
+        self.assertContains(response, '<small class="week-instruments">گروه نوازی</small>', html=True)
 
 
 class SessionRunTests(TestCase):

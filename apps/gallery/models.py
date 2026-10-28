@@ -154,6 +154,22 @@ class GalleryPage(models.Model):
 
 
 class GalleryImage(models.Model):
+    class FocalPoint(models.TextChoices):
+        """The part of the photo kept in view when a frame crops it: a CSS `object-position`.
+
+        A quarter in from the edge, not the edge itself: the hero crops a photo one way on a desktop and another
+        on a phone, and an instrument nearer one side stays whole in both.
+        """
+        CENTER = 'center', 'وسط'
+        TOP = '50% 25%', 'بالا'
+        BOTTOM = '50% 75%', 'پایین'
+        LEFT = '25% 50%', 'چپ'
+        RIGHT = '75% 50%', 'راست'
+        TOP_LEFT = '25% 25%', 'بالا چپ'
+        TOP_RIGHT = '75% 25%', 'بالا راست'
+        BOTTOM_LEFT = '25% 75%', 'پایین چپ'
+        BOTTOM_RIGHT = '75% 75%', 'پایین راست'
+
     gallery_page = models.ForeignKey(
         GalleryPage,
         on_delete=models.CASCADE,
@@ -164,6 +180,14 @@ class GalleryImage(models.Model):
     title = models.CharField('عنوان', max_length=150, blank=True, help_text='در صورت نیاز برای این تصویر عنوان وارد کنید.')
     image = models.ImageField('تصویر', upload_to='gallery/', help_text='فایل تصویر را بارگذاری کنید.')
     caption = models.TextField('توضیح تصویر', blank=True, help_text='متن کوتاه زیر تصویر یا توضیح تکمیلی.')
+    focal_point = models.CharField(
+        'نقطهٔ مهم تصویر',
+        max_length=13,
+        choices=FocalPoint.choices,
+        default=FocalPoint.CENTER,
+        help_text='قاب تصاویر بالای صفحهٔ اصلی، عکس را می‌بُرد. سمتی از عکس را که ساز در آن است انتخاب کنید '
+                  'تا ساز کامل دیده شود.',
+    )
     is_active = models.BooleanField('فعال', default=True, help_text='فقط تصاویر فعال در سایت نمایش داده می‌شوند.')
     display_order = models.PositiveIntegerField('ترتیب نمایش', default=0, help_text='عدد کمتر یعنی نمایش زودتر در گالری.')
     created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)

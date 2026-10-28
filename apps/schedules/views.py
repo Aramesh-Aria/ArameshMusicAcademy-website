@@ -39,8 +39,9 @@ class ScheduleView(PageContentMixin, TemplateView):
         context['schedule_rows'] = [
             {
                 'teacher': row['teacher'],
-                # Everything the teacher's sessions offer, named once at the start of the row.
-                'offerings': Offerings.combine(row['sessions']),
+                # Everything the teacher's normal sessions offer, named once at the start of the row. A session
+                # reserved for a fixed-time Programme stays out of it and names its Programme in its own cell.
+                'offerings': Offerings.combine(s for s in row['sessions'] if not s.programme_id),
                 # Each cell is that day, holding only this teacher's sessions.
                 'cells': [replace(day, sessions=row['cells'][day.weekday]) for day in week],
             }

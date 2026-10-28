@@ -125,6 +125,18 @@ class HomePageTests(TestCase):
         self.assertContains(response, 'class="hero__bar"', count=2)
         self.assertContains(response, 'fetchpriority="high"', count=1)
 
+    def test_a_hero_photo_keeps_its_focal_point_in_the_frame(self):
+        hero = GalleryPage.objects.create(title='تصاویر صفحه اصلی', slug='home-hero')
+        GalleryImage.objects.create(
+            gallery_page=hero, image='gallery/a.jpg', title='کلاس سنتور', display_order=1,
+            focal_point=GalleryImage.FocalPoint.BOTTOM_LEFT,
+        )
+        GalleryImage.objects.create(gallery_page=hero, image='gallery/b.jpg', title='کلاس پیانو', display_order=2)
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertContains(response, 'style="object-position: 25% 75%"', count=1)
+
     def test_the_link_preview_is_the_logo_image_not_a_hero_photo(self):
         hero = GalleryPage.objects.create(title='تصاویر صفحه اصلی', slug='home-hero')
         GalleryImage.objects.create(gallery_page=hero, image='gallery/a.jpg', title='کلاس سنتور', display_order=1)

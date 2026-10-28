@@ -18,6 +18,7 @@ class GalleryImageInline(admin.TabularInline):
         'image',
         'title',
         'caption',
+        'focal_point',
         'is_active',
         'display_order',
     )

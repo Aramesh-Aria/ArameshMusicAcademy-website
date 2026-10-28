@@ -25,9 +25,10 @@ def tel_href(number):
 
 @register.filter
 def fa_digits(value):
-    """Persian digits for text set in Amiri, which draws ASCII digits as Latin: '404' -> '۴۰۴'.
+    """Persian digits for text whose face draws ASCII digits as Latin: '404' -> '۴۰۴'.
 
-    Sahel needs no filter: the site loads its Farsi-Digits build. Keep tel: links and other machine
+    Sahel needs no filter: the site loads its Farsi-Digits build, and it also draws the digits in
+    IranNastaliq display text, whose file leaves them out. Keep tel: links and other machine
     values in ASCII; this is for what the Visitor reads.
     """
     return str(value).translate(PERSIAN_DIGITS)

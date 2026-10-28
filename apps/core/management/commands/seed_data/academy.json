@@ -565,8 +565,8 @@
           "display_order": 1
         },
         {
-          "image": "gallery/2026-07-06_20.08.37.jpg",
-          "title": "صدا سازی و آواز کلاسیک",
+          "image": "gallery/photo_2026-06-28_01.25.04.jpg",
+          "title": "موسیقی کودک",
           "display_order": 2
         },
         {
@@ -577,7 +577,8 @@
         {
           "image": "gallery/photo_2026-06-28_01.25.09.jpg",
           "title": "کلاس تار و سه تار",
-          "display_order": 4
+          "display_order": 4,
+          "focal_point": "50% 75%"
         }
       ]
     }

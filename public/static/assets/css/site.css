@@ -1,7 +1,7 @@
 /*
   Aramesh Music Academy: site stylesheet.
   Pass 2, «سینه به سینه»: large-radius stone and photo panels inset on a warm near-black frame, saffron as
-  the one accent, Amiri for display over Sahel for everything else (docs/redesign/03-direction.md).
+  the one accent, IranNastaliq for display over Sahel for everything else (docs/redesign/03-direction.md).
   Logical properties throughout, so RTL is native. No build step: this file is served as written.
 */
 
@@ -28,25 +28,19 @@
 }
 
 /*
-  Amiri (Khaled Hosny, SIL OFL 1.1), bold only: it sets display type and nothing else. The Persian file is cut
-  from Fontsource's Arabic subset down to the Persian alphabet; the Latin file is Fontsource's Latin subset.
-  Amiri draws ASCII digits as Latin, so numbers in display type go through the `fa_digits` filter.
+  IranNastaliq (font-store, SIL OFL 1.1), one weight: it sets display type and nothing else. Cut with fontTools
+  to the Persian letters, the Persian comma, semicolon and question mark, space and the joiners, all layout
+  features kept (Apple's morx table is dropped; every browser shapes it from GSUB). The face is declared for
+  400 to 700 so a bold heading uses it as drawn, never a synthesised bold. Digits, Latin and ASCII punctuation
+  are left out, so in display text Sahel draws them (with Persian digits, as everywhere else).
 */
 @font-face {
-  font-family: "Amiri";
+  font-family: "IranNastaliq";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400 700;
   font-display: swap;
-  src: url("../fonts/amiri-fa-700.woff2") format("woff2");
-  unicode-range: U+060C, U+061B, U+061F, U+0621-063A, U+0640-0655, U+066A-066D, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+06F0-06F9, U+200C-200F, U+FD3E-FD3F;
-}
-@font-face {
-  font-family: "Amiri";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("../fonts/amiri-latin-700.woff2") format("woff2");
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  src: url("../fonts/irannastaliq-fa-400.woff2") format("woff2");
+  unicode-range: U+0020, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0655, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+200C-200F, U+FD3E-FD3F;
 }
 
 
@@ -96,25 +90,28 @@
     --mark: var(--saffron);      /* underlines, today markers, small accents */
     --focus: var(--saffron);
 
-    /* Type: Amiri bold for display, Sahel 400/700 for everything else. Tahoma is the closest Persian sans
+    /* Type: IranNastaliq for display, Sahel 400/700 for everything else. Tahoma is the closest Persian sans
        every Windows and macOS has, so the swap from fallback to Sahel barely moves the text. */
     --font-text: "Sahel", Tahoma, "Segoe UI", sans-serif;
-    --font-display: "Amiri", "Sahel", "Times New Roman", serif;
+    --font-display: "IranNastaliq", "Sahel", Tahoma, serif;
 
     /* Sahel steps: labels, meta, body (18 on phones, 20 on desktop) and lead. */
     --text-xs: 0.875rem;                                        /* 14: short labels above a heading */
     --text-s: 1rem;                                             /* 16: meta, captions, chips, small buttons */
     --text-m: clamp(1.125rem, 1.06rem + 0.28vw, 1.25rem);       /* 18-20: body, buttons, nav */
     --text-l: clamp(1.25rem, 1.12rem + 0.56vw, 1.5rem);         /* 20-24: leads, the supporting sentence */
-    /* Amiri steps: card titles and names, section heads, the page's one h1. */
-    --display-s: clamp(1.625rem, 1.38rem + 1.05vw, 2.25rem);    /* 26-36 */
-    --display-m: clamp(2rem, 1.5rem + 2.1vw, 3.25rem);          /* 32-52 */
-    --display-l: clamp(2.75rem, 1.6rem + 4.8vw, 4.75rem);       /* 44-76 */
+    /* IranNastaliq steps: card titles and names, section heads, the page's one h1. Nastaliq sets a word in
+       about two thirds of Amiri's width at the same size, so these are Amiri's old steps (26-36, 32-52,
+       44-76) times 1.35, which keeps each heading's visual size. */
+    --display-s: clamp(2.1875rem, 1.85rem + 1.4vw, 3rem);       /* 35-48 */
+    --display-m: clamp(2.6875rem, 2rem + 2.8vw, 4.375rem);      /* 43-70 */
+    --display-l: clamp(3.6875rem, 2.15rem + 6.5vw, 6.4375rem);  /* 59-103 */
 
-    /* Leading runs inversely to size. Naskh needs more than Latin: Amiri's alef-madda and deep descenders
-       collide below 1.2, and Sahel's tall ascenders want 1.8 in running text. Light text on the ground
+    /* Leading runs inversely to size, except in Nastaliq: its words climb the line and its descenders run
+       deep, so display lines need 1.7 at every size or they overlap. Sahel's tall ascenders want 1.8 in
+       running text. Light text on the ground
        gets a touch more air than ink on stone. Tracking stays 0 at every size: it breaks the joins. */
-    --leading-display: 1.25;
+    --leading-display: 1.7;
     --leading-ui: 1.4;          /* buttons, labels, nav: one line */
     --leading-body: 1.85;
     --leading-body-stone: 1.8;
@@ -205,7 +202,7 @@
     overflow-x: clip;
   }
 
-  /* Headings are Amiri; weight 700 is the only one loaded. h4 and below are Sahel labels. */
+  /* Headings are IranNastaliq (drawn at one weight, declared for 700 too). h4 and below are Sahel labels. */
   h1, h2, h3 {
     font-family: var(--font-display);
     font-weight: 700;
@@ -511,10 +508,12 @@
   .chip--on-photo { --surface: var(--stone); --text: var(--ink); --mark: var(--saffron-deep); background: var(--stone); }
 
   /* A short label above a heading, only where it carries information (the slide's title, the Programme
-     above its page's headline). Sahel bold, never tracked. */
+     above its page's headline). Sahel bold, never tracked, even on a heading (the footer's and contact
+     page's h2s): Nastaliq is unreadable at label size. */
   .label {
     display: block;
     margin-block-end: var(--space-2);
+    font-family: var(--font-text);
     color: var(--label, var(--saffron));
     font-size: var(--text-xs);
     font-weight: 700;
@@ -585,7 +584,7 @@
     .tile:hover .tile__name .icon { translate: -4px 0; }
   }
 
-  /* The typographic tile: an Instrument with no photo, its name in large Amiri on stone, the santur's
+  /* The typographic tile: an Instrument with no photo, its name in large IranNastaliq on stone, the santur's
      trapezoid cropped off one corner. Used at page-photo size. */
   .type-tile {
     position: relative;
@@ -809,7 +808,7 @@
     .programme-row { --rail-col: 82%; }
     /* The full list of teachers stays a grid: two portraits a row. */
     .portrait-row--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); }
-    .portrait-row--grid .teacher-card__name { font-size: var(--text-l); }
+    .portrait-row--grid .teacher-card__name { font-size: calc(var(--text-l) * 1.35); }
   }
   @media (max-width: 22.5em) {
     .tile-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1193,21 +1192,21 @@
     object-fit: cover;
     background: var(--ground-2);
   }
-  /* No photo: the initials in Amiri on the same saffron-tinted stone as the other no-photo frames. */
+  /* No photo: the initials in IranNastaliq on the same saffron-tinted stone as the other no-photo frames. */
   .portrait-initials {
     display: grid;
     place-items: center;
     background: color-mix(in oklab, var(--saffron) 14%, var(--stone));
     color: var(--ink-soft);
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 1rem + 5vw, 5rem);
+    font-size: clamp(3.375rem, 1.35rem + 6.75vw, 6.75rem);
     font-weight: 700;
-    line-height: 1;
+    line-height: var(--leading-display);
   }
 
 
   /* The week: every day present, the chosen one struck forward. */
-  .week-title { font-size: clamp(1.5rem, 1.3rem + 0.6vw, 1.875rem); }
+  .week-title { font-size: clamp(2rem, 1.75rem + 0.8vw, 2.5rem); }
   .days {
     position: relative;   /* the struck copy (site.js) is laid over it */
     display: flex;
@@ -1306,8 +1305,10 @@
 /* ── pages ─────────────────────────────────────────────────────────── */
 @layer pages {
   /* ── home ── */
-  /* The hero: a full-height frame of the Academy's own rooms. Copy sits at the start over a side and bottom
-     scrim; the slide bars ride the far top corner; today's strip sits in the far bottom corner. */
+  /* The hero: a full-height frame of the Academy's own rooms. Copy sits at the start on the frame's dark ground,
+     and the photo fills the far ~60% beside it, fading into the ground under the copy, so nothing is laid over
+     an instrument. Phones stack the photo above the copy. The slide bars ride the far top corner; today's strip
+     sits under the copy's buttons. */
   .hero { position: relative; margin: var(--space-3) var(--frame) 0; }
   .hero__frame {
     display: grid;
@@ -1316,24 +1317,23 @@
     border-radius: var(--radius-panel);
     isolation: isolate;
   }
-  .hero__slides { position: absolute; inset: 0; }
-  .hero__slides > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
-  .hero__frame:not(.frame--shape)::before {
-    content: "";
+  /* The -webkit- copy is for Chrome before 120, still common on phones here. */
+  .hero__slides {
+    --fade: linear-gradient(to left, transparent, #000 12rem);
     position: absolute;
     inset: 0;
-    z-index: 1;
-    background:
-      /* Held dark as far as the copy reaches (47.5rem), so the saffron title keeps 4.5:1 even over a white wall. */
-      linear-gradient(to left, color-mix(in srgb, var(--ground) 88%, transparent) 0, color-mix(in srgb, var(--ground) 86%, transparent) 47.5rem, transparent calc(47.5rem + 18rem)),
-      linear-gradient(to top, color-mix(in srgb, var(--ground) 60%, transparent), transparent 45%);
-    pointer-events: none;
+    inset-inline-start: 42%;
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
   }
+  .hero__slides > img { inline-size: 100%; block-size: 100%; object-fit: cover; }
   .hero__frame::after { z-index: 1; }
   .hero__frame.frame--shape { color: var(--ink); }
   .hero__frame.frame--shape .shape { inset-inline-start: auto; inset-inline-end: -10%; inline-size: 60%; }
   .hero__copy { position: relative; z-index: 2; max-inline-size: 47.5rem; padding: var(--panel-pad); }
-  .hero__copy h1 { margin-block-end: var(--space-4); font-size: clamp(2.75rem, 1rem + 4.4vw, 4.875rem); }
+  /* Room under the buttons for today's strip. */
+  .hero:has(.today) .hero__copy { padding-block-end: calc(var(--panel-pad) + 4.5rem); }
+  .hero__copy h1 { margin-block-end: var(--space-4); font-size: clamp(3.6875rem, 1.35rem + 5.95vw, 6.5625rem); }
   .hero__lede { max-inline-size: 34em; margin-block-end: var(--space-6); font-size: var(--text-l); line-height: 1.7; color: var(--text); }
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   /* The slide titles share one cell; the active one shows. */
@@ -1351,12 +1351,12 @@
   .hero[data-paused] .hero__bar.is-active i { animation-play-state: paused; }
   @keyframes hero-fill { to { transform: none; } }
 
-  /* «امروز در آموزشگاه»: a small dark pill in the hero's far bottom corner, under the hero on phones. */
+  /* «امروز در آموزشگاه»: a small dark pill under the hero's buttons, under the hero on phones. */
   .today {
     position: absolute;
     z-index: 2;
-    inset-block-end: var(--space-5);
-    inset-inline-end: var(--space-5);
+    inset-block-end: var(--panel-pad);
+    inset-inline-start: var(--panel-pad);
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -1442,12 +1442,19 @@
 
   @media (max-width: 56.25em) {
     .hero__frame { min-block-size: min(43.75rem, calc(100svh - 7rem)); }   /* a floor, so a phone on its side grows it rather than clipping the call */
-    .hero__frame:not(.frame--shape)::before {
-      /* Dark at least 30rem up from the foot, so the copy is covered even when a phone on its side leaves the
-         frame little taller than the copy. */
-      background: linear-gradient(to top, color-mix(in srgb, var(--ground) 94%, transparent) 0, color-mix(in srgb, var(--ground) 86%, transparent) max(62%, 30rem), transparent calc(max(62%, 30rem) + 8rem));
+    /* With photos, the photo stands above the copy at 4:3 (the frame grows to fit), fading into it. */
+    .hero__frame:not(.frame--shape) { min-block-size: 0; align-items: start; }
+    .hero__slides {
+      position: relative;
+      inset: auto;
+      aspect-ratio: 4 / 3;
+      min-block-size: 0;
+      grid-template-rows: minmax(0, 1fr);   /* the photos fill the 4:3 box, not their own height */
+      max-block-size: 55svh;
+      --fade: linear-gradient(to top, transparent, #000 5rem);
     }
-    .hero__copy { padding: var(--space-5); }
+    .hero__slides + .hero__copy { margin-block-start: -3rem; }
+    .hero__copy, .hero:has(.today) .hero__copy { padding: var(--space-5); }
     .hero__lede { font-size: var(--text-m); }
     .hero__actions > .btn { flex: 1 1 100%; justify-content: space-between; }
     .today {
@@ -1492,7 +1499,7 @@
   .week-table .is-off { color: var(--text-soft); }
   .week-table td.is-today { background: color-mix(in oklab, var(--ink) 6%, var(--stone)); }
   .week-table tbody tr + tr > * { border-block-start: 1px solid color-mix(in oklab, var(--ink) 14%, var(--stone)); }
-  .week-table tbody th { font-family: var(--font-display); font-weight: 700; font-size: var(--text-l); line-height: 1.3; }
+  .week-table tbody th { font-family: var(--font-display); font-weight: 700; font-size: calc(var(--text-l) * 1.35); line-height: var(--leading-display); }
   .week-table tbody th a { text-decoration: none; }
   .week-table tbody th span {
     display: block;
@@ -1544,6 +1551,12 @@
     -webkit-line-clamp: 3;
     line-clamp: 3;
     overflow: hidden;
+    /* The stroke of Nastaliq's ک and گ climbs above the first line and hangs past the start edge of a line;
+       keep it inside the clip. */
+    padding-block-start: 0.5em;
+    padding-inline: 0.4em;
+    margin-block-start: -0.5em;
+    margin-inline: -0.4em;
   }
 
   .videos { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 24rem), 1fr)); gap: var(--space-6) var(--frame); }
@@ -1589,7 +1602,7 @@
     overflow: hidden;
     font-size: var(--text-l);
     font-weight: 700;
-    line-height: var(--leading-display);
+    line-height: 1.3;
   }
   .video-poster-meta { font-size: var(--text-s); color: var(--text-soft); }
   .video-caption { margin-block-start: var(--space-3); padding-inline: var(--space-3); font-size: var(--text-s); color: var(--text-soft); max-inline-size: var(--measure); }

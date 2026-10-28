@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nastaliq comparison</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;700&display=swap">
+<style>
+  /* Throwaway mockup for choosing a Nastaliq display face to replace Amiri. Same ground, panel, sizes and
+     Sahel body text as the site (static_dev/assets/css/site.css); only the display face and its leading change. */
+  @font-face { font-family: "Amiri"; font-weight: 700; src: url("../../../static_dev/assets/fonts/amiri-fa-700.woff2") format("woff2"); }
+  @font-face { font-family: "Sahel"; font-weight: 400; src: url("../../../static_dev/assets/fonts/sahel-fd-400.woff2") format("woff2"); }
+  @font-face { font-family: "Sahel"; font-weight: 700; src: url("../../../static_dev/assets/fonts/sahel-fd-700.woff2") format("woff2"); }
+  @font-face { font-family: "IranNastaliq"; src: url("https://cdn.jsdelivr.net/gh/font-store/font-IranNastaliq@master/WebFonts/IranNastaliq-Web.woff2") format("woff2"); }
+
+  :root {
+    --ground: #12110f;
+    --panel: #f3eee5;
+    --ink: #1c1a17;
+    --ink-soft: #5a554d;
+    --on-ground: #efeae0;
+    --soft: #b9b2a6;
+    --saffron: #e2a72e;
+    --display-s: clamp(1.625rem, 1.38rem + 1.05vw, 2.25rem);
+    --display-m: clamp(2rem, 1.5rem + 2.1vw, 3.25rem);
+    --display-l: clamp(2.75rem, 1.6rem + 4.8vw, 4.75rem);
+  }
+  .amiri   { --face: "Amiri";              --lead: 1.25; --weight: 700; }
+  .iran    { --face: "IranNastaliq";       --lead: 1.7;  --weight: 400; }
+  .noto    { --face: "Noto Nastaliq Urdu"; --lead: 2.1;  --weight: 700; }
+  .gulzar  { --face: "Gulzar";             --lead: 1.9;  --weight: 400; }
+
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--ground); color: var(--on-ground); font: 400 1.125rem/1.85 "Sahel", Tahoma, sans-serif; padding: 24px 16px 64px; }
+  .intro { max-inline-size: 60rem; margin: 0 auto 32px; color: var(--soft); }
+  .intro h1 { font: 700 1.5rem/1.4 "Sahel"; color: var(--on-ground); margin-block-end: 8px; }
+
+  .variant { max-inline-size: 75rem; margin: 0 auto 40px; display: grid; gap: 14px; }
+  .label { display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: baseline; font-size: 0.9375rem; color: var(--soft); border-block-end: 1px solid #2e2b27; padding-block-end: 10px; }
+  .label b { font: 700 1.125rem/1.4 "Sahel"; color: var(--saffron); }
+
+  .d { font-family: var(--face), "Sahel", serif; font-weight: var(--weight); line-height: var(--lead); letter-spacing: 0; }
+  .num { font-family: "Sahel"; font-weight: 700; font-size: 0.8em; }
+
+  .hero { border-radius: 28px; padding: clamp(24px, 4vw, 48px); background: linear-gradient(to left, #1d1b18, #26221d); }
+  .hero .eyebrow { font: 700 0.875rem/1.4 "Sahel"; color: var(--soft); margin-block-end: 12px; }
+  .hero h2 { font-size: var(--display-l); color: var(--saffron); margin-block-end: 16px; }
+  .hero p { max-inline-size: 34em; font-size: 1.25rem; line-height: 1.7; }
+
+  .row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; }
+  .panel { background: var(--panel); color: var(--ink); border-radius: 24px; padding: clamp(20px, 3vw, 32px); }
+  .panel .eyebrow { font: 700 0.875rem/1.4 "Sahel"; color: var(--ink-soft); }
+  .panel h3 { font-size: var(--display-m); margin-block: 6px 10px; }
+  .panel p { color: var(--ink-soft); }
+
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .card { background: #1d1b18; border-radius: 20px; padding: 18px 20px; }
+  .card h4 { font-size: var(--display-s); color: var(--on-ground); }
+  .card p { font-size: 1rem; color: var(--soft); }
+
+  .heads { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: var(--display-m); }
+
+  @media (max-width: 47.99rem) {
+    .row, .cards { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="intro">
+  <h1>مقایسهٔ قلم نستعلیق برای تیترها</h1>
+  <p>هر بخش همان اندازه‌ها و رنگ‌های سایت را دارد و فقط قلم تیترها عوض شده است. متن عادی همه جا ساحل است. اعداد داخل تیترها با ساحل نوشته شده‌اند.</p>
+</div>
+
+<section class="variant amiri">
+  <div class="label"><b>فعلی: Amiri</b><span>نسخ · برای مقایسه</span></div>
+  <div class="hero"><div class="eyebrow">آموزشگاه موسیقی آرامش · از <span class="num">۱۳۹۵</span></div><h2 class="d">موسیقی، در فضایی آرام</h2><p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p></div>
+  <div class="row">
+    <div class="panel"><span class="eyebrow">درباره ما</span><h3 class="d">با مدیریت مسعود آرامش</h3><p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان.</p></div>
+    <div class="cards">
+      <div class="card"><h4 class="d">کلاس خصوصی</h4><p>هر کلاس، یک استاد و یک هنرجو.</p></div>
+      <div class="card"><h4 class="d">گروه نوازی</h4><p>پنجشنبه‌ها</p></div>
+      <div class="card"><h4 class="d">موسیقی کودک</h4><p>بلز، فلوت و نت‌خوانی</p></div>
+      <div class="card"><h4 class="d">سیاوش برهانی</h4><p>سنتور</p></div>
+    </div>
+  </div>
+  <div class="heads d"><span>سازهایی که آموزش می‌دهیم</span><span>استادان آرامش</span><span>از زبان خانواده‌ها</span><span>پرسش‌های متداول</span></div>
+</section>
+
+<section class="variant iran">
+  <div class="label"><b>IranNastaliq</b><span>نستعلیق فارسی · OFL · حدود <span class="num">۱۹۲</span> کیلوبایت · فقط یک وزن</span></div>
+  <div class="hero"><div class="eyebrow">آموزشگاه موسیقی آرامش · از <span class="num">۱۳۹۵</span></div><h2 class="d">موسیقی، در فضایی آرام</h2><p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p></div>
+  <div class="row">
+    <div class="panel"><span class="eyebrow">درباره ما</span><h3 class="d">با مدیریت مسعود آرامش</h3><p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان.</p></div>
+    <div class="cards">
+      <div class="card"><h4 class="d">کلاس خصوصی</h4><p>هر کلاس، یک استاد و یک هنرجو.</p></div>
+      <div class="card"><h4 class="d">گروه نوازی</h4><p>پنجشنبه‌ها</p></div>
+      <div class="card"><h4 class="d">موسیقی کودک</h4><p>بلز، فلوت و نت‌خوانی</p></div>
+      <div class="card"><h4 class="d">سیاوش برهانی</h4><p>سنتور</p></div>
+    </div>
+  </div>
+  <div class="heads d"><span>سازهایی که آموزش می‌دهیم</span><span>استادان آرامش</span><span>از زبان خانواده‌ها</span><span>پرسش‌های متداول</span></div>
+</section>
+
+<section class="variant noto">
+  <div class="label"><b>Noto Nastaliq Urdu</b><span>گوگل · طراحی برای اردو · OFL · دو وزن</span></div>
+  <div class="hero"><div class="eyebrow">آموزشگاه موسیقی آرامش · از <span class="num">۱۳۹۵</span></div><h2 class="d">موسیقی، در فضایی آرام</h2><p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p></div>
+  <div class="row">
+    <div class="panel"><span class="eyebrow">درباره ما</span><h3 class="d">با مدیریت مسعود آرامش</h3><p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان.</p></div>
+    <div class="cards">
+      <div class="card"><h4 class="d">کلاس خصوصی</h4><p>هر کلاس، یک استاد و یک هنرجو.</p></div>
+      <div class="card"><h4 class="d">گروه نوازی</h4><p>پنجشنبه‌ها</p></div>
+      <div class="card"><h4 class="d">موسیقی کودک</h4><p>بلز، فلوت و نت‌خوانی</p></div>
+      <div class="card"><h4 class="d">سیاوش برهانی</h4><p>سنتور</p></div>
+    </div>
+  </div>
+  <div class="heads d"><span>سازهایی که آموزش می‌دهیم</span><span>استادان آرامش</span><span>از زبان خانواده‌ها</span><span>پرسش‌های متداول</span></div>
+</section>
+
+<section class="variant gulzar">
+  <div class="label"><b>Gulzar</b><span>گوگل · طراحی برای اردو · OFL · یک وزن</span></div>
+  <div class="hero"><div class="eyebrow">آموزشگاه موسیقی آرامش · از <span class="num">۱۳۹۵</span></div><h2 class="d">موسیقی، در فضایی آرام</h2><p>آموزش ساز و آواز برای کودکان، نوجوانان و بزرگسالان، زیر نظر اساتید فعال در اجرا.</p></div>
+  <div class="row">
+    <div class="panel"><span class="eyebrow">درباره ما</span><h3 class="d">با مدیریت مسعود آرامش</h3><p>بیش از چهل سال فعالیت در موسیقی، در فضایی آرام برای هنرجویان و علاقه‌مندان.</p></div>
+    <div class="cards">
+      <div class="card"><h4 class="d">کلاس خصوصی</h4><p>هر کلاس، یک استاد و یک هنرجو.</p></div>
+      <div class="card"><h4 class="d">گروه نوازی</h4><p>پنجشنبه‌ها</p></div>
+      <div class="card"><h4 class="d">موسیقی کودک</h4><p>بلز، فلوت و نت‌خوانی</p></div>
+      <div class="card"><h4 class="d">سیاوش برهانی</h4><p>سنتور</p></div>
+    </div>
+  </div>
+  <div class="heads d"><span>سازهایی که آموزش می‌دهیم</span><span>استادان آرامش</span><span>از زبان خانواده‌ها</span><span>پرسش‌های متداول</span></div>
+</section>
+</body>
+</html>
