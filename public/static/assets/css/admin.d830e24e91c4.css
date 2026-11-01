@@ -1,0 +1,26 @@
+/* Admin fixes for the RTL Jazzmin admin, linked through JAZZMIN_SETTINGS['custom_css']. */
+
+/* AdminLTE hides its screen-reader live region at left: -10000px. In RTL the page
+   scrolls toward the left, so that made every admin page 10,000px wide. Hide it in place. */
+.live-region:not(.live-region-visible) {
+    left: 0;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+/* Textareas and file inputs keep their fixed width on a phone. */
+#content-main textarea,
+#content-main input[type="file"] {
+    max-width: 100%;
+}
+
+/* A wide tabular inline (the gallery page's photos) scrolls in its own box, not the page.
+   position: relative keeps Select2's absolutely positioned hidden selects inside it. */
+.inline-group .tabular {
+    position: relative;
+    overflow-x: auto;
+}
+
+.inline-group .tabular fieldset {
+    min-width: 0;
+}

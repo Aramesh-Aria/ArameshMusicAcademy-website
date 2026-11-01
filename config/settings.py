@@ -312,6 +312,9 @@ JAZZMIN_SETTINGS = {
     'default_icon_parents': 'fas fa-chevron-circle-left',
     'default_icon_children': 'fas fa-circle',
 
+    # RTL fixes, mainly the 10,000px horizontal scroll (static_dev/assets/css/admin.css)
+    'custom_css': 'assets/css/admin.css',
+
     # Keep the familiar stacked fieldsets instead of tabbed forms
     'changeform_format': 'single',
     'show_ui_builder': False,
