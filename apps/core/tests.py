@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
-from django.test import TestCase, override_settings
+from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
 
 from apps.gallery.models import GalleryImage, GalleryPage
@@ -20,6 +20,7 @@ from PIL import Image
 from . import image_utils
 from .image_utils import image_sizes, make_image_sizes, wait_for_image_sizes
 from .templatetags.site_tags import fa_digits, image_size, local_phone, srcset, tel_href
+from .views import server_error
 
 
 def _jpeg_bytes(width, height):
@@ -324,3 +325,35 @@ class NotFoundPageTests(TestCase):
         self.assertTemplateUsed(response, '404.html')
         self.assertContains(response, 'این صفحه در برنامه نیست', status_code=404)
         self.assertContains(response, f'href="{reverse("schedules:schedule")}"', status_code=404)
+
+
+class ServerErrorPageTests(TestCase):
+    def test_the_site_500_handler_is_installed(self):
+        from config import urls
+
+        self.assertEqual(urls.handler500, 'apps.core.views.server_error')
+
+    def test_server_error_page_gives_the_phone_without_touching_the_database(self):
+        with self.assertNumQueries(0):
+            response = server_error(RequestFactory().get('/'))
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, 'مشکلی پیش آمد', status_code=500)
+        self.assertContains(response, 'href="tel:+982144457748"', status_code=500)
+
+    def test_a_server_error_page_that_cannot_render_still_answers_500(self):
+        with patch('apps.core.views.loader.get_template', side_effect=RuntimeError), self.assertLogs('apps.core.views', 'ERROR'):
+            response = server_error(RequestFactory().get('/'))
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, 'Server Error (500)', status_code=500)
+
+
+class ExpiredFormPageTests(TestCase):
+    def test_a_form_sent_without_its_csrf_cookie_gets_the_persian_page_with_the_form_link(self):
+        response = Client(enforce_csrf_checks=True).post(reverse('contact:contact'), {'full_name': 'x', 'phone': '09120000000'})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, '403_csrf.html')
+        self.assertContains(response, 'فرم منقضی شد', status_code=403)
+        self.assertContains(response, f'href="{reverse("contact:contact")}"', status_code=403)

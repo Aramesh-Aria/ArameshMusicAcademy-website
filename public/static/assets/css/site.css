@@ -1649,7 +1649,9 @@
   }
 
 
-  /* ── notices (contact success, 404): a split stone panel with the ways on ── */
+  /* ── notices (contact success, 404, 500, expired form): a split stone panel with the ways on ── */
+  /* Nastaliq's tall strokes (the ک of «مشکلی») rise well above the h1's box: room for them under the label. */
+  .notice .label + h1 { margin-block-start: 0.4em; }
   .notice__links { display: grid; inline-size: 100%; max-inline-size: 26rem; }
   .notice__links li + li { border-block-start: 1px solid color-mix(in oklab, var(--ink) 14%, var(--stone)); }
   .notice__links a {

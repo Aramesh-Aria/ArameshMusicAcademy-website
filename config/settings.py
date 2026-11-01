@@ -66,6 +66,8 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', str(not DEBUG)) == 'True'
+# A form sent with an expired CSRF cookie gets a Persian page with the ways back, not Django's English 403.
+CSRF_FAILURE_VIEW = 'apps.core.views.csrf_failure'
 
 # Turns the https redirect off while tests run.
 TEST_RUNNER = 'apps.core.test_runner.TestRunner'
