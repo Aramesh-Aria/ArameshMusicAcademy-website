@@ -1413,7 +1413,12 @@
 
 
   .teaching { display: grid; gap: var(--section); margin-block-start: var(--section); }
-  .teaching__part > h2 { margin-block-end: var(--space-6); }
+  /* One saffron-deep rule under each heading spans its whole row of points or steps. */
+  .teaching__part > h2 {
+    margin-block-end: var(--space-7);
+    padding-block-end: var(--space-2);
+    border-block-end: 3px solid var(--mark);
+  }
   .points, .steps {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 17rem), 1fr));
@@ -1423,8 +1428,6 @@
   }
   .points h3, .steps h3 { margin-block-end: var(--space-2); font-size: var(--display-s); }
   .points p, .steps p { color: var(--text-soft); }
-  /* The steps are an ordered list in words; a short saffron-deep rule above each carries the sequence. */
-  .steps li { padding-block-start: var(--space-4); border-block-start: 3px solid var(--mark); }
   .steps .steps__note { margin-block-start: var(--space-2); color: var(--text); font-weight: 700; }
 
   /* The rooms as a mosaic: one large photo leads, four fill the other half. */
