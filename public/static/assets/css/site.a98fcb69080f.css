@@ -989,6 +989,94 @@
   .marquee--still { overflow: visible; }
   .marquee--still .marquee__track { animation: none; inline-size: auto; }
   .marquee--still .marquee__list { flex-wrap: wrap; }
+  /* ── Notice (partials/announcement.html): a saffron strip above the navbar for an exceptional message. The
+     text drifts rightwards in one line, as the testimonials do; the label and the stop button stay put. ── */
+  .notice {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-3) var(--frame) 0;
+    padding: 0.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--saffron);
+    color: var(--ink);
+    --focus: var(--ink);
+  }
+  .notice__label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex: none;
+    padding: var(--space-1) var(--space-4);
+    border-radius: var(--radius-pill);
+    background: var(--ground);
+    color: var(--saffron);
+    font-size: var(--text-s);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+  }
+  .notice__dot { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: currentColor; }
+  /* container-type: each copy is at least this window's width (100cqi), so a short notice leaves the right edge
+     before its copy enters on the left, and the track never shows a hole. */
+  .notice__window {
+    --fade: linear-gradient(to left, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
+    flex: 1;
+    min-inline-size: 0;
+    overflow: hidden;
+    container-type: inline-size;
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
+  }
+  .notice__track {
+    display: flex;
+    inline-size: max-content;
+    animation: marquee var(--notice-duration, 30s) linear infinite;
+  }
+  .notice__copy {
+    flex: none;
+    min-inline-size: 100cqi;
+    padding-inline-end: var(--space-8);
+    font-size: var(--text-m);
+    font-weight: 700;
+    line-height: var(--leading-ui);
+    white-space: nowrap;
+  }
+  .notice__copy > span + span::before { content: "•"; margin-inline: var(--space-5); }
+  .notice[data-paused] .notice__track { animation-play-state: paused; }
+  /* A mouse resting on the text holds it for reading; the button beside it is outside, so it can restart it. */
+  @media (hover: hover) and (pointer: fine) {
+    .notice__window:hover .notice__track { animation-play-state: paused; }
+  }
+  .notice__toggle {
+    display: grid;
+    place-items: center;
+    flex: none;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    transition: background-color var(--dur-state) var(--ease-out), scale var(--dur-press) var(--ease-out);
+  }
+  .notice__toggle:active { scale: var(--press-scale); }
+  @media (hover: hover) and (pointer: fine) {
+    .notice__toggle:hover { background: color-mix(in oklab, var(--ink) 12%, transparent); }
+  }
+  .notice__toggle .icon { inline-size: 1.25rem; block-size: 1.25rem; }
+  @media (max-width: 35.9375em) {
+    .notice__label { padding-inline: var(--space-3); }
+    .notice__copy { font-size: var(--text-s); }
+  }
+  /* Still, the whole notice wraps onto as many lines as it needs, beside the label. */
+  @media (prefers-reduced-motion: reduce) {
+    .notice { align-items: flex-start; border-radius: var(--radius-panel); padding-inline-end: var(--space-4); }
+    .notice__window { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .notice__track { display: block; animation: none; inline-size: auto; }
+    .notice__copy { min-inline-size: 0; padding: var(--space-1) 0; white-space: normal; }
+    .notice__copy[aria-hidden="true"], .notice__toggle { display: none; }
+  }
+
   .quote {
     display: grid;
     align-content: space-between;

@@ -31,6 +31,10 @@ _Avoid_: Course, track, offering, class type
 A short quote from a satisfied parent displayed on the home page, between the teacher preview and the contact call-to-action. Its purpose is social proof — to tip an undecided parent toward making contact.
 _Avoid_: Review, comment, feedback
 
+**Announcement** (اطلاعیه):
+A notice for an exceptional moment, such as classes closed until further notice, run in one moving line along the top of the home page while it is active. It is not news or a blog post: most of the time there is none.
+_Avoid_: News, alert, banner
+
 **Video**:
 A concert or performance video embedded from YouTube or Aparat (not uploaded directly). Lives inside the gallery structure under a dedicated top-level category.
 _Avoid_: Upload, hosted video

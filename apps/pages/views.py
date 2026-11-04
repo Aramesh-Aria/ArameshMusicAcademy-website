@@ -7,7 +7,7 @@ from apps.schedules.week import today_status, week_schedule
 from apps.teachers.models import Instrument, Teacher
 from apps.testimonials.models import Testimonial
 
-from .models import FAQ, SitePageContent
+from .models import FAQ, Announcement, SitePageContent
 
 
 def gallery_images(slug):
@@ -59,6 +59,7 @@ class HomeView(PageContentMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['announcements'] = list(Announcement.objects.live())
         context['hero_slides'] = gallery_images(settings.HERO_GALLERY_SLUG)[:6]
         context['gallery_preview_images'] = gallery_images(settings.ABOUT_GALLERY_SLUG)[:5]
         context['programmes'] = Programme.objects.active()

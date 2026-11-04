@@ -500,3 +500,36 @@ const crossfadeTo = (stack, index) => {
   if (!marquee) return;
   new IntersectionObserver(([entry]) => marquee.toggleAttribute('data-paused', !entry.isIntersecting)).observe(marquee);
 })();
+
+// Announcement strip (`[data-notice]`): every notice drifts at one reading speed, so its loop lasts as long as
+// one copy's width needs; fonts arriving or the window resizing re-measure it. The button stops and restarts it,
+// and it rests while off the screen or the tab is hidden. Reduced motion shows it still and needs none of this.
+(() => {
+  const notice = document.querySelector('[data-notice]');
+  if (!notice || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const track = notice.querySelector('.notice__track');
+  const copy = notice.querySelector('.notice__copy');
+  const toggle = notice.querySelector('.notice__toggle');
+  const pixelsPerSecond = 60;
+
+  new ResizeObserver(() => {
+    track.style.setProperty('--notice-duration', `${Math.max(copy.offsetWidth / pixelsPerSecond, 8)}s`);
+  }).observe(copy);
+
+  const holds = new Set();
+  const hold = (reason, on) => {
+    if (on) holds.add(reason); else holds.delete(reason);
+    notice.toggleAttribute('data-paused', holds.size > 0);
+  };
+
+  toggle.hidden = false;
+  toggle.addEventListener('click', () => {
+    const stopped = toggle.getAttribute('aria-pressed') !== 'true';
+    toggle.setAttribute('aria-pressed', String(stopped));
+    toggle.setAttribute('aria-label', stopped ? 'ادامهٔ حرکت اطلاعیه' : 'توقف حرکت اطلاعیه');
+    toggle.querySelector('use').setAttribute('href', stopped ? '#i-play' : '#i-pause');
+    hold('button', stopped);
+  });
+  new IntersectionObserver(([entry]) => hold('offscreen', !entry.isIntersecting)).observe(notice);
+  document.addEventListener('visibilitychange', () => hold('hidden', document.hidden));
+})();

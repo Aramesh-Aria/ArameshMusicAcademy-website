@@ -13,7 +13,7 @@ from apps.schedules.week import today_status, week_schedule
 from apps.teachers.models import Instrument, Teacher
 from apps.testimonials.models import Testimonial
 
-from .models import FAQ, SitePageContent
+from .models import FAQ, Announcement, SitePageContent
 
 
 def make_teacher(first_name, is_active=True):
@@ -219,6 +219,40 @@ class HomePageTests(TestCase):
 
         self.assertNotContains(response, '{#')
         self.assertNotContains(response, '#}')
+
+
+class AnnouncementTests(TestCase):
+    def test_without_a_live_announcement_the_home_page_has_no_strip(self):
+        Announcement.objects.create(text='پیش‌نویس', is_active=False)
+        Announcement.objects.create(text='گذشته', ends_at=timezone.now() - datetime.timedelta(minutes=1))
+
+        response = self.client.get(reverse('pages:home'))
+
+        self.assertNotContains(response, 'data-notice')
+
+    def test_a_live_announcement_runs_above_the_navbar_once_for_readers(self):
+        Announcement.objects.create(text='کلاس‌ها تا اطلاع ثانوی تعطیل است.')
+
+        response = self.client.get(reverse('pages:home'))
+        html = response.content.decode()
+
+        self.assertLess(html.index('data-notice'), html.index('class="navbar"'))
+        self.assertContains(response, 'کلاس‌ها تا اطلاع ثانوی تعطیل است.', count=2)
+        self.assertContains(response, 'class="notice__copy" aria-hidden="true"', count=1)
+
+    def test_live_announcements_are_the_active_unexpired_ones_newest_first(self):
+        older = Announcement.objects.create(text='قدیمی')
+        newer = Announcement.objects.create(text='تازه', ends_at=timezone.now() + datetime.timedelta(days=1))
+        Announcement.objects.create(text='خاموش', is_active=False)
+
+        self.assertEqual(list(Announcement.objects.live()), [newer, older])
+
+    def test_other_pages_do_not_show_the_strip(self):
+        Announcement.objects.create(text='کلاس‌ها تعطیل است.')
+
+        response = self.client.get(reverse('pages:about'))
+
+        self.assertNotContains(response, 'data-notice')
 
 
 class PageViewTests(TestCase):

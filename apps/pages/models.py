@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class SitePageContent(models.Model):
@@ -107,3 +108,39 @@ class FAQ(models.Model):
 
     def __str__(self):
         return self.question
+
+
+class AnnouncementQuerySet(models.QuerySet):
+    def live(self):
+        """The active announcements whose end time, if any, has not passed: the ones the home page shows."""
+        now = timezone.now()
+        return self.filter(is_active=True).filter(models.Q(ends_at__isnull=True) | models.Q(ends_at__gt=now))
+
+
+class Announcement(models.Model):
+    """A notice for an exceptional moment (classes closed until further notice), run along the top of the home page."""
+
+    text = models.TextField(
+        'متن اطلاعیه',
+        help_text='در یک خط، روان از چپ به راست حرکت می‌کند؛ هر طولی که باشد کامل نمایش داده می‌شود. '
+                  'کوتاه و روشن بنویسید، مثلاً «کلاس‌ها تا اطلاع ثانوی تعطیل است.»',
+    )
+    is_active = models.BooleanField('فعال', default=True, help_text='برای برداشتن اطلاعیه از سایت، این تیک را بردارید.')
+    ends_at = models.DateTimeField(
+        'پایان نمایش',
+        null=True,
+        blank=True,
+        help_text='اختیاری. از این زمان به بعد اطلاعیه خودبه‌خود نمایش داده نمی‌شود. خالی یعنی تا وقتی فعال است.',
+    )
+    created_at = models.DateTimeField('تاریخ ایجاد', auto_now_add=True)
+    updated_at = models.DateTimeField('تاریخ بروزرسانی', auto_now=True)
+
+    objects = AnnouncementQuerySet.as_manager()
+
+    class Meta:
+        ordering = ['-created_at', '-pk']
+        verbose_name = 'اطلاعیه'
+        verbose_name_plural = 'اطلاعیه‌ها'
+
+    def __str__(self):
+        return self.text[:60]

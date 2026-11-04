@@ -4,6 +4,8 @@
 {% block title %}آموزشگاه موسیقی آرامش{% endblock %}
 {% block body_class %}page-home{% endblock %}
 
+{% block announcement %}{% if announcements %}{% include 'partials/announcement.html' %}{% endif %}{% endblock %}
+
 {% block content %}
 
 {# ── 1. Hero: the Academy's own rooms, framed; who is in today; the call. ── #}

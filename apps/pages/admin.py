@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import FAQ, SitePageContent
+from .models import FAQ, Announcement, SitePageContent
 
 
 @admin.register(SitePageContent)
@@ -43,6 +43,26 @@ class FAQAdmin(admin.ModelAdmin):
         }),
         ('انتشار', {
             'fields': ('is_active', 'display_order')
+        }),
+        ('تاریخ‌ها', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'is_active', 'ends_at', 'updated_at')
+    list_filter = ('is_active',)
+    list_editable = ('is_active',)
+    search_fields = ('text',)
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('اطلاعیه', {
+            'fields': ('text',)
+        }),
+        ('انتشار', {
+            'fields': ('is_active', 'ends_at')
         }),
         ('تاریخ‌ها', {
             'fields': ('created_at', 'updated_at')
