@@ -28,7 +28,7 @@ def fa_digits(value):
     """Persian digits for text whose face draws ASCII digits as Latin: '404' -> '۴۰۴'.
 
     Sahel needs no filter: the site loads its Farsi-Digits build, and it also draws the digits in
-    IranNastaliq display text, whose file leaves them out. Keep tel: links and other machine
+    Noto Nastaliq display text, whose file leaves them out. Keep tel: links and other machine
     values in ASCII; this is for what the Visitor reads.
     """
     return str(value).translate(PERSIAN_DIGITS)

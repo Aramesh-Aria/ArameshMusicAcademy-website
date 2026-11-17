@@ -6,10 +6,18 @@
 {% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
 
 {% block content %}
-{# ── A form sent with an expired cookie (apps.core.views.csrf_failure): nothing was sent; the ways to try again. ── #}
+{# ── A form sent with an expired cookie (apps.core.views.csrf_failure): nothing was saved; the ways to try again.
+     Usually the contact form; in_admin marks a form of the admin (its login page left open, mostly). ── #}
 <section class="split panel on-stone page-head notice" aria-labelledby="expired-title">
   <div class="split__text">
     <h1 id="expired-title">فرم منقضی شد</h1>
+    {% if in_admin %}
+    <p class="split__lead">چیزی ثبت نشد. شاید صفحه مدت زیادی باز مانده یا کوکی‌های مرورگر پاک شده‌اند. پنل مدیریت را دوباره باز کنید و فرم را از نو بفرستید.</p>
+    <ul class="notice__links" role="list">
+      <li><a href="{% url 'admin:index' %}">بازکردن دوبارهٔ پنل مدیریت</a></li>
+      <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
+    </ul>
+    {% else %}
     <p class="split__lead">پیام شما فرستاده نشد. شاید صفحه مدت زیادی باز مانده یا کوکی‌های مرورگر پاک شده‌اند. فرم را دوباره باز کنید و بفرستید، یا با آموزشگاه تماس بگیرید.</p>
     {% if site_phone_primary %}
     {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
@@ -18,6 +26,7 @@
       <li><a href="{% url 'contact:contact' %}">بازکردن دوبارهٔ فرم تماس</a></li>
       <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
     </ul>
+    {% endif %}
   </div>
   <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
 </section>

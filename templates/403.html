@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}دسترسی مجاز نیست | آموزشگاه موسیقی آرامش{% endblock %}
+{% block body_class %}page-403{% endblock %}
+{% block extra_head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+{# ── Permission denied. In practice a staff account opening a part of the admin it has no permission for. ── #}
+<section class="split panel on-stone page-head notice" aria-labelledby="forbidden-title">
+  <div class="split__text">
+    <p class="label num" aria-hidden="true">۴۰۳</p>
+    <h1 id="forbidden-title">اجازهٔ دیدن این صفحه را ندارید</h1>
+    <p class="split__lead">حساب شما به این بخش دسترسی ندارد. اگر فکر می‌کنید باید داشته باشد، از مدیر سایت بخواهید دسترسی‌تان را بررسی کند.</p>
+    <ul class="notice__links" role="list">
+      {% if request.user.is_staff %}
+      <li><a href="{% url 'admin:index' %}">بازگشت به پنل مدیریت</a></li>
+      {% endif %}
+      <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
+      <li><a href="{% url 'contact:contact' %}">تماس با آموزشگاه</a></li>
+    </ul>
+  </div>
+  <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
+</section>
+{% endblock %}

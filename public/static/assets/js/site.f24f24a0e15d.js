@@ -507,9 +507,9 @@ const crossfadeTo = (stack, index) => {
 (() => {
   const notice = document.querySelector('[data-notice]');
   if (!notice || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const track = notice.querySelector('.notice__track');
-  const copy = notice.querySelector('.notice__copy');
-  const toggle = notice.querySelector('.notice__toggle');
+  const track = notice.querySelector('.announce__track');
+  const copy = notice.querySelector('.announce__copy');
+  const toggle = notice.querySelector('.announce__toggle');
   const pixelsPerSecond = 60;
 
   new ResizeObserver(() => {

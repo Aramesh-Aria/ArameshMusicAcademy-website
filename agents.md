@@ -21,7 +21,7 @@ There is no linter or frontend build step configured.
 
 ## Architecture
 
-**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, IranNastaliq for display over Sahel, no CSS framework). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
+**Django 5.2, server-rendered, Persian RTL** (`lang="fa" dir="rtl"`, Noto Nastaliq for display over Sahel, no CSS framework). Informational site only: the goal is getting visitors to contact the academy. Enrollment, payment and student accounts are out of scope by design. `CONTEXT.md` defines the domain vocabulary (Visitor, ClassSession, GalleryPage, Testimonial, Conversion…) and the terms to avoid. ADRs live in `docs/adr/`.
 
 **Apps** live under `apps/` and are installed as `apps.<name>`. App labels are the bare names, so migrations and table names don't include the `apps.` prefix.
 - `core`: no models. `context_processors.site_info` injects site contact info, social links, hours and year into every template. `admin_config.ArameshAdminConfig` replaces `django.contrib.admin` in `INSTALLED_APPS` so the admin sidebar can show the unread contact-message count. Also holds `sitemaps.py`, `image_utils.process_image` and the `seed_sample_data` command.
@@ -32,7 +32,9 @@ There is no linter or frontend build step configured.
 - `contact`: a form protected by django-simple-captcha. The view saves `ContactMessage` first, then emails `CONTACT_NOTIFICATION_EMAIL`. SMTP errors are logged and swallowed, so they never block the visitor.
 - `testimonials`: `Testimonial`, parent quotes shown on the home page.
 
-**Image processing on save:** `Teacher`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads to JPEG via `core.image_utils.process_image`. This can change the stored filename, which is then written back with a queryset `.update()`.
+**Image processing on save:** `Teacher`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads and store them as WebP via `core.image_utils.process_image`. This changes the stored filename (`.webp`, under a name storage confirms is free), which is then written back with a queryset `.update()`. Photos stored before this are JPEG and stay so until replaced.
+
+**Unused uploads are removed:** `core.media_cleanup` (connected in `CoreConfig.ready`) listens to every model with a file field: when a save replaces or clears a file, or a row is deleted, the old file and its srcset copies are removed after the commit, unless another row still names the file. `manage.py clean_media` lists what was left behind before that (and by anything that bypasses signals, such as a queryset `.update()`); it only lists unless given `--delete`, skips files changed in the last hour, and refuses to delete when the database names no file at all.
 
 **Templates** are project-level under `templates/` (not per-app), with `base.html` as the root layout. `templates/corebiz_raw/` holds raw reference files from the purchased CoreBiz theme. Nothing routes to them.
 

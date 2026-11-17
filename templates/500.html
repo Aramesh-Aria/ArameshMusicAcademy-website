@@ -1,30 +1,10 @@
-{% load static site_tags %}<!DOCTYPE html>
-{% comment %}
-  The server error page. It stands alone, not on base.html: Django renders it without the request or
-  the context processors, and the error may be the database, so it uses only settings
-  (apps.core.views.server_error passes site_info).
-{% endcomment %}
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <title>خطای سرور | آموزشگاه موسیقی آرامش</title>
-    <meta name="robots" content="noindex">
-    <link rel="preload" href="{% static 'assets/fonts/sahel-fd-400.woff2' %}" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="{% static 'assets/fonts/irannastaliq-fa-400.woff2' %}" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="{% static 'assets/css/site.css' %}">
-    <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" sizes="any">
-    <meta name="theme-color" content="#17130f">
-</head>
-<body class="page-500">
-{% include 'partials/icons.html' %}
-<header class="navbar">
-  <a class="navbar__logo" href="{% url 'pages:home' %}">
-    <img src="{% static 'assets/img/logo-saffron.webp' %}" width="400" height="235" alt="آموزشگاه موسیقی آرامش">
-  </a>
-</header>
+{% extends 'error_base.html' %}
+{% load site_tags %}
 
-<main id="main">
+{% block title %}خطای سرور{% endblock %}
+{% block body_class %}page-500{% endblock %}
+
+{% block content %}
 {# ── Our fault: say so, and give the phone, which works whatever the site is doing. ── #}
 <section class="split panel on-stone page-head notice" aria-labelledby="error-title">
   <div class="split__text">
@@ -46,6 +26,4 @@
   </div>
   <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
 </section>
-</main>
-</body>
-</html>
+{% endblock %}

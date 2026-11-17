@@ -1,7 +1,7 @@
 /*
   Aramesh Music Academy: site stylesheet.
   Pass 2, «سینه به سینه»: large-radius stone and photo panels inset on a warm near-black frame, saffron as
-  the one accent, IranNastaliq for display over Sahel for everything else (docs/redesign/03-direction.md).
+  the one accent, Noto Nastaliq for display over Sahel for everything else (docs/redesign/03-direction.md).
   Logical properties throughout, so RTL is native. No build step: this file is served as written.
 */
 
@@ -28,18 +28,18 @@
 }
 
 /*
-  IranNastaliq (font-store, SIL OFL 1.1), one weight: it sets display type and nothing else. Cut with fontTools
-  to the Persian letters, the Persian comma, semicolon and question mark, space and the joiners, all layout
-  features kept (Apple's morx table is dropped; every browser shapes it from GSUB). The face is declared for
-  400 to 700 so a bold heading uses it as drawn, never a synthesised bold. Digits, Latin and ASCII punctuation
-  are left out, so in display text Sahel draws them (with Persian digits, as everywhere else).
+  Noto Nastaliq Urdu (Google's Noto project, SIL OFL 1.1), the variable file, weights 400 to 700: it sets
+  display type and nothing else. It replaced IranNastaliq, whose dots collide («بیایید», «پنجشنبه») because
+  that font has no rule for moving them apart. Cut with fontTools to the Persian letters, the Persian comma,
+  semicolon and question mark, space and the joiners, all layout features kept. Digits, Latin and ASCII
+  punctuation are left out, so in display text Sahel draws them (with Persian digits, as everywhere else).
 */
 @font-face {
-  font-family: "IranNastaliq";
+  font-family: "Noto Nastaliq";
   font-style: normal;
   font-weight: 400 700;
   font-display: swap;
-  src: url("../fonts/irannastaliq-fa-400.woff2") format("woff2");
+  src: url("../fonts/notonastaliq-fa.woff2") format("woff2");
   unicode-range: U+0020, U+060C, U+061B, U+061F, U+0621-063A, U+0640-0655, U+0670, U+067E, U+0686, U+0698, U+06A9, U+06AF, U+06C0, U+06CC, U+200C-200F, U+FD3E-FD3F;
 }
 
@@ -90,28 +90,30 @@
     --mark: var(--saffron);      /* underlines, today markers, small accents */
     --focus: var(--saffron);
 
-    /* Type: IranNastaliq for display, Sahel 400/700 for everything else. Tahoma is the closest Persian sans
+    /* Type: Noto Nastaliq for display, Sahel 400/700 for everything else. Tahoma is the closest Persian sans
        every Windows and macOS has, so the swap from fallback to Sahel barely moves the text. */
     --font-text: "Sahel", Tahoma, "Segoe UI", sans-serif;
-    --font-display: "IranNastaliq", "Sahel", Tahoma, serif;
+    --font-display: "Noto Nastaliq", "Sahel", Tahoma, serif;
 
     /* Sahel steps: labels, meta, body (18 on phones, 20 on desktop) and lead. */
     --text-xs: 0.875rem;                                        /* 14: short labels above a heading */
     --text-s: 1rem;                                             /* 16: meta, captions, chips, small buttons */
     --text-m: clamp(1.125rem, 1.06rem + 0.28vw, 1.25rem);       /* 18-20: body, buttons, nav */
     --text-l: clamp(1.25rem, 1.12rem + 0.56vw, 1.5rem);         /* 20-24: leads, the supporting sentence */
-    /* IranNastaliq steps: card titles and names, section heads, the page's one h1. Nastaliq sets a word in
-       about two thirds of Amiri's width at the same size, so these are Amiri's old steps (26-36, 32-52,
-       44-76) times 1.35, which keeps each heading's visual size. */
-    --display-s: clamp(2.1875rem, 1.85rem + 1.4vw, 3rem);       /* 35-48 */
-    --display-m: clamp(2.6875rem, 2rem + 2.8vw, 4.375rem);      /* 43-70 */
-    --display-l: clamp(3.6875rem, 2.15rem + 6.5vw, 6.4375rem);  /* 59-103 */
+    /* Noto Nastaliq steps: card titles and names, section heads, the page's one h1. Noto sets a word about
+       half again as wide as IranNastaliq did at the same size (measured at weight 700), so these are
+       IranNastaliq's steps (35-48, 43-70, 59-103) times 0.66, which keeps each heading's visual size. */
+    --display-s: clamp(1.4375rem, 1.22rem + 0.92vw, 2rem);      /* 23-32 */
+    --display-m: clamp(1.75rem, 1.3rem + 1.85vw, 2.875rem);     /* 28-46 */
+    --display-l: clamp(2.4375rem, 1.42rem + 4.3vw, 4.25rem);    /* 39-68 */
 
     /* Leading runs inversely to size, except in Nastaliq: its words climb the line and its descenders run
-       deep, so display lines need 1.7 at every size or they overlap. Sahel's tall ascenders want 1.8 in
+       deep, so display lines need 2.1 at every size or they overlap. Sahel's tall ascenders want 1.8 in
        running text. Light text on the ground
        gets a touch more air than ink on stone. Tracking stays 0 at every size: it breaks the joins. */
-    --leading-display: 1.7;
+    --leading-display: 2.1;
+    /* Noto Nastaliq kerns one word up against the next («آموزشگاه بیایید» reads as one): open the word space. */
+    --display-word-space: 0.14em;
     --leading-ui: 1.4;          /* buttons, labels, nav: one line */
     --leading-body: 1.85;
     --leading-body-stone: 1.8;
@@ -202,9 +204,10 @@
     overflow-x: clip;
   }
 
-  /* Headings are IranNastaliq (drawn at one weight, declared for 700 too). h4 and below are Sahel labels. */
+  /* Headings are Noto Nastaliq at its own 700. h4 and below are Sahel labels. */
   h1, h2, h3 {
     font-family: var(--font-display);
+    word-spacing: var(--display-word-space);
     font-weight: 700;
     line-height: var(--leading-display);
     text-wrap: balance;
@@ -584,7 +587,7 @@
     .tile:hover .tile__name .icon { translate: -4px 0; }
   }
 
-  /* The typographic tile: an Instrument with no photo, its name in large IranNastaliq on stone, the santur's
+  /* The typographic tile: an Instrument with no photo, its name in large Noto Nastaliq on stone, the santur's
      trapezoid cropped off one corner. Used at page-photo size. */
   .type-tile {
     position: relative;
@@ -604,6 +607,7 @@
   .type-tile__name {
     position: relative;
     font-family: var(--font-display);
+    word-spacing: var(--display-word-space);
     font-size: var(--display-l);
     font-weight: 700;
     line-height: var(--leading-display);
@@ -808,7 +812,7 @@
     .programme-row { --rail-col: 82%; }
     /* The full list of teachers stays a grid: two portraits a row. */
     .portrait-row--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-3); }
-    .portrait-row--grid .teacher-card__name { font-size: calc(var(--text-l) * 1.35); }
+    .portrait-row--grid .teacher-card__name { font-size: calc(var(--text-l) * 0.9); }
   }
   @media (max-width: 22.5em) {
     .tile-grid { grid-template-columns: minmax(0, 1fr); }
@@ -989,9 +993,9 @@
   .marquee--still { overflow: visible; }
   .marquee--still .marquee__track { animation: none; inline-size: auto; }
   .marquee--still .marquee__list { flex-wrap: wrap; }
-  /* ── Notice (partials/announcement.html): a saffron strip above the navbar for an exceptional message. The
+  /* ── Announcement (partials/announcement.html; `.announce`, since `.notice` is the 404-style panel): a saffron strip above the navbar for an exceptional message. The
      text drifts rightwards in one line, as the testimonials do; the label and the stop button stay put. ── */
-  .notice {
+  .announce {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -1002,7 +1006,7 @@
     color: var(--ink);
     --focus: var(--ink);
   }
-  .notice__label {
+  .announce__label {
     display: flex;
     align-items: center;
     gap: var(--space-2);
@@ -1015,10 +1019,10 @@
     font-weight: 700;
     line-height: var(--leading-ui);
   }
-  .notice__dot { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: currentColor; }
+  .announce__dot { inline-size: 0.5rem; block-size: 0.5rem; border-radius: 50%; background: currentColor; }
   /* container-type: each copy is at least this window's width (100cqi), so a short notice leaves the right edge
      before its copy enters on the left, and the track never shows a hole. */
-  .notice__window {
+  .announce__window {
     --fade: linear-gradient(to left, transparent, #000 2rem, #000 calc(100% - 2rem), transparent);
     flex: 1;
     min-inline-size: 0;
@@ -1027,12 +1031,12 @@
     -webkit-mask-image: var(--fade);
     mask-image: var(--fade);
   }
-  .notice__track {
+  .announce__track {
     display: flex;
     inline-size: max-content;
     animation: marquee var(--notice-duration, 30s) linear infinite;
   }
-  .notice__copy {
+  .announce__copy {
     flex: none;
     min-inline-size: 100cqi;
     padding-inline-end: var(--space-8);
@@ -1041,13 +1045,13 @@
     line-height: var(--leading-ui);
     white-space: nowrap;
   }
-  .notice__copy > span + span::before { content: "•"; margin-inline: var(--space-5); }
-  .notice[data-paused] .notice__track { animation-play-state: paused; }
+  .announce__copy > span + span::before { content: "•"; margin-inline: var(--space-5); }
+  .announce[data-paused] .announce__track { animation-play-state: paused; }
   /* A mouse resting on the text holds it for reading; the button beside it is outside, so it can restart it. */
   @media (hover: hover) and (pointer: fine) {
-    .notice__window:hover .notice__track { animation-play-state: paused; }
+    .announce__window:hover .announce__track { animation-play-state: paused; }
   }
-  .notice__toggle {
+  .announce__toggle {
     display: grid;
     place-items: center;
     flex: none;
@@ -1059,22 +1063,22 @@
     background: transparent;
     transition: background-color var(--dur-state) var(--ease-out), scale var(--dur-press) var(--ease-out);
   }
-  .notice__toggle:active { scale: var(--press-scale); }
+  .announce__toggle:active { scale: var(--press-scale); }
   @media (hover: hover) and (pointer: fine) {
-    .notice__toggle:hover { background: color-mix(in oklab, var(--ink) 12%, transparent); }
+    .announce__toggle:hover { background: color-mix(in oklab, var(--ink) 12%, transparent); }
   }
-  .notice__toggle .icon { inline-size: 1.25rem; block-size: 1.25rem; }
+  .announce__toggle .icon { inline-size: 1.25rem; block-size: 1.25rem; }
   @media (max-width: 35.9375em) {
-    .notice__label { padding-inline: var(--space-3); }
-    .notice__copy { font-size: var(--text-s); }
+    .announce__label { padding-inline: var(--space-3); }
+    .announce__copy { font-size: var(--text-s); }
   }
   /* Still, the whole notice wraps onto as many lines as it needs, beside the label. */
   @media (prefers-reduced-motion: reduce) {
-    .notice { align-items: flex-start; border-radius: var(--radius-panel); padding-inline-end: var(--space-4); }
-    .notice__window { overflow: visible; -webkit-mask-image: none; mask-image: none; }
-    .notice__track { display: block; animation: none; inline-size: auto; }
-    .notice__copy { min-inline-size: 0; padding: var(--space-1) 0; white-space: normal; }
-    .notice__copy[aria-hidden="true"], .notice__toggle { display: none; }
+    .announce { align-items: flex-start; border-radius: var(--radius-panel); padding-inline-end: var(--space-4); }
+    .announce__window { overflow: visible; -webkit-mask-image: none; mask-image: none; }
+    .announce__track { display: block; animation: none; inline-size: auto; }
+    .announce__copy { min-inline-size: 0; padding: var(--space-1) 0; white-space: normal; }
+    .announce__copy[aria-hidden="true"], .announce__toggle { display: none; }
   }
 
   .quote {
@@ -1280,14 +1284,15 @@
     object-fit: cover;
     background: var(--ground-2);
   }
-  /* No photo: the initials in IranNastaliq on the same saffron-tinted stone as the other no-photo frames. */
+  /* No photo: the initials in Noto Nastaliq on the same saffron-tinted stone as the other no-photo frames. */
   .portrait-initials {
     display: grid;
     place-items: center;
     background: color-mix(in oklab, var(--saffron) 14%, var(--stone));
     color: var(--ink-soft);
     font-family: var(--font-display);
-    font-size: clamp(3.375rem, 1.35rem + 6.75vw, 6.75rem);
+    word-spacing: var(--display-word-space);
+    font-size: clamp(2.25rem, 0.9rem + 4.45vw, 4.5rem);
     font-weight: 700;
     line-height: var(--leading-display);
   }
@@ -1421,7 +1426,7 @@
   .hero__copy { position: relative; z-index: 2; max-inline-size: 47.5rem; padding: var(--panel-pad); }
   /* Room under the buttons for today's strip. */
   .hero:has(.today) .hero__copy { padding-block-end: calc(var(--panel-pad) + 4.5rem); }
-  .hero__copy h1 { margin-block-end: var(--space-4); font-size: clamp(3.6875rem, 1.35rem + 5.95vw, 6.5625rem); }
+  .hero__copy h1 { margin-block-end: var(--space-4); font-size: clamp(2.4375rem, 0.9rem + 3.93vw, 4.3125rem); }
   .hero__lede { max-inline-size: 34em; margin-block-end: var(--space-6); font-size: var(--text-l); line-height: 1.7; color: var(--text); }
   .hero__actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   /* The slide titles share one cell; the active one shows. */
@@ -1590,7 +1595,7 @@
   .week-table .is-off { color: var(--text-soft); }
   .week-table td.is-today { background: color-mix(in oklab, var(--ink) 6%, var(--stone)); }
   .week-table tbody tr + tr > * { border-block-start: 1px solid color-mix(in oklab, var(--ink) 14%, var(--stone)); }
-  .week-table tbody th { font-family: var(--font-display); font-weight: 700; font-size: calc(var(--text-l) * 1.35); line-height: var(--leading-display); }
+  .week-table tbody th { font-family: var(--font-display); word-spacing: var(--display-word-space); font-weight: 700; font-size: calc(var(--text-l) * 0.9); line-height: var(--leading-display); }
   .week-table tbody th a { text-decoration: none; }
   .week-table tbody th span {
     display: block;

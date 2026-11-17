@@ -198,8 +198,10 @@ class ScheduledCopiesTests(MediaRootMixin, TestCase):
             callback()
         wait_for_image_sizes()
 
+        # The stored photo is WebP itself, so it is its own 600px copy.
         stem = os.path.splitext(teacher.profile_image.name)[0]
-        self.assertEqual(self._copies(), [f'{stem}-{width}w.webp' for width in (320, 480, 600)])
+        self.assertEqual(self._copies(), [f'{stem}-{width}w.webp' for width in (320, 480)])
+        self.assertEqual(image_sizes(teacher.profile_image)[-1], (teacher.profile_image.url, 600))
 
     def test_every_model_that_processes_an_upload_schedules_its_copies(self):
         def upload():
@@ -357,3 +359,238 @@ class ExpiredFormPageTests(TestCase):
         self.assertTemplateUsed(response, '403_csrf.html')
         self.assertContains(response, 'فرم منقضی شد', status_code=403)
         self.assertContains(response, f'href="{reverse("contact:contact")}"', status_code=403)
+
+    def test_a_form_of_the_admin_sent_without_its_csrf_cookie_points_back_to_the_admin(self):
+        response = Client(enforce_csrf_checks=True).post(reverse('admin:login'), {'username': 'x', 'password': 'x'})
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, '403_csrf.html')
+        self.assertContains(response, f'href="{reverse("admin:index")}"', status_code=403)
+        self.assertNotContains(response, 'پیام شما فرستاده نشد', status_code=403)
+
+
+class ForbiddenPageTests(TestCase):
+    def test_a_staff_account_without_permission_gets_the_persian_403_with_the_way_back_to_the_admin(self):
+        from django.contrib.auth import get_user_model
+
+        user = get_user_model().objects.create_user('staff', password='x', is_staff=True)
+        self.client.force_login(user)
+
+        response = self.client.get(reverse('admin:teachers_teacher_changelist'))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTemplateUsed(response, '403.html')
+        self.assertContains(response, 'اجازهٔ دیدن این صفحه را ندارید', status_code=403)
+        self.assertContains(response, f'href="{reverse("admin:index")}"', status_code=403)
+
+
+class BadRequestPageTests(TestCase):
+    def test_the_site_400_handler_is_installed(self):
+        from config import urls
+
+        self.assertEqual(urls.handler400, 'apps.core.views.bad_request')
+
+    @override_settings(ALLOWED_HOSTS=['aramesh-academy.ir'])
+    def test_a_request_for_a_host_that_is_not_ours_gets_the_persian_400_without_touching_the_database(self):
+        with self.assertNumQueries(0), self.assertLogs('django.security.DisallowedHost', 'ERROR'):
+            response = self.client.get('/', HTTP_HOST='bad.example')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'این درخواست درست نرسید', status_code=400)
+        self.assertContains(response, 'href="tel:+982144457748"', status_code=400)
+
+
+def _upload(name='a.jpg', size=400, colour='tan'):
+    buffer = BytesIO()
+    Image.new('RGB', (size, size), colour).save(buffer, 'JPEG')
+    return SimpleUploadedFile(name, buffer.getvalue(), content_type='image/jpeg')
+
+
+class StoredAsWebpTests(MediaRootMixin, TestCase):
+    def _teacher(self, **kwargs):
+        return Teacher.objects.create(first_name='علی', last_name='شمس', biography='.', **kwargs)
+
+    def _files(self):
+        return sorted(
+            os.path.relpath(os.path.join(folder, name), self.media)
+            for folder, _, names in os.walk(self.media) for name in names
+        )
+
+    def test_an_uploaded_jpeg_is_stored_as_webp_and_the_jpeg_is_gone(self):
+        teacher = self._teacher(profile_image=_upload('portrait.jpg', 900))
+
+        self.assertEqual(teacher.profile_image.name, 'teachers/portrait.webp')
+        self.assertEqual(self._files(), ['teachers/portrait.webp'])
+        with Image.open(teacher.profile_image.path) as stored:
+            self.assertEqual((stored.format, stored.size), ('WEBP', (600, 600)))
+        self.assertEqual(Teacher.objects.get(pk=teacher.pk).profile_image.name, 'teachers/portrait.webp')
+
+    def test_a_second_upload_with_the_same_file_name_does_not_overwrite_the_first(self):
+        first = self._teacher(profile_image=_upload('portrait.jpg', colour='red'))
+        second = self._teacher(profile_image=_upload('portrait.jpg', colour='blue'))
+
+        self.assertNotEqual(first.profile_image.name, second.profile_image.name)
+        with Image.open(first.profile_image.path) as stored:
+            red, _, blue = stored.convert('RGB').getpixel((10, 10))
+        self.assertGreater(red, blue)
+
+    def test_a_link_preview_of_a_webp_upload_says_it_is_webp(self):
+        teacher = self._teacher(profile_image=_upload())
+
+        response = self.client.get(reverse('teachers:teacher_detail', args=[teacher.pk]))
+
+        self.assertContains(response, '<meta property="og:image:type" content="image/webp">', html=True)
+
+
+class ReplacedUploadsTests(MediaRootMixin, TestCase):
+    def _teacher(self, **kwargs):
+        return Teacher.objects.create(first_name='علی', last_name='شمس', biography='.', **kwargs)
+
+    def _exists(self, name):
+        return os.path.exists(os.path.join(self.media, name))
+
+    def _with_copies(self, teacher):
+        make_image_sizes(teacher.profile_image)
+        copy = f'sizes/{os.path.splitext(teacher.profile_image.name)[0]}-320w.webp'
+        self.assertTrue(self._exists(copy))
+        return teacher.profile_image.name, copy
+
+    def test_replacing_a_photo_removes_the_old_file_and_its_copies_once_the_save_commits(self):
+        teacher = self._teacher(profile_image=_upload('old.jpg'))
+        old, old_copy = self._with_copies(teacher)
+
+        with patch('apps.core.image_utils._enqueue'), self.captureOnCommitCallbacks(execute=True):
+            teacher.profile_image = _upload('new.jpg')
+            teacher.save()
+            self.assertTrue(self._exists(old))  # not before the commit: a rolled-back save keeps its photo
+
+        self.assertFalse(self._exists(old))
+        self.assertFalse(self._exists(old_copy))
+        self.assertTrue(self._exists(teacher.profile_image.name))
+
+    def test_saving_a_row_without_touching_its_photo_keeps_the_photo(self):
+        teacher = self._teacher(profile_image=_upload())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            teacher.first_name = 'رضا'
+            teacher.save()
+
+        self.assertTrue(self._exists(teacher.profile_image.name))
+
+    def test_clearing_an_optional_photo_removes_its_file(self):
+        instrument = Instrument.objects.create(name='سنتور', slug='santur', photo=_upload())
+        name = instrument.photo.name
+
+        with self.captureOnCommitCallbacks(execute=True):
+            instrument.photo = ''
+            instrument.save()
+
+        self.assertFalse(self._exists(name))
+
+    def test_deleting_a_row_removes_its_file_and_copies(self):
+        teacher = self._teacher(profile_image=_upload())
+        name, copy = self._with_copies(teacher)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            teacher.delete()
+
+        self.assertFalse(self._exists(name))
+        self.assertFalse(self._exists(copy))
+
+    def test_deleting_a_gallery_page_removes_the_files_of_its_images(self):
+        page = GalleryPage.objects.create(title='کنسرت', slug='concerts')
+        image = GalleryImage.objects.create(gallery_page=page, image=_upload())
+
+        with self.captureOnCommitCallbacks(execute=True):
+            page.delete()
+
+        self.assertFalse(self._exists(image.image.name))
+
+    def test_a_file_another_row_still_names_is_kept(self):
+        first = self._teacher(profile_image=_upload())
+        self._teacher(profile_image=first.profile_image.name)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            first.delete()
+
+        self.assertTrue(self._exists(first.profile_image.name))
+
+    def test_a_copy_of_a_longer_named_photo_is_not_taken_for_this_ones(self):
+        teacher = self._teacher(profile_image=_upload('a.jpg'))
+        other = self._teacher(profile_image=_upload('a-1.jpg'))
+        _, other_copy = self._with_copies(other)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            teacher.delete()
+
+        self.assertTrue(self._exists(other_copy))
+
+
+class CleanMediaCommandTests(MediaRootMixin, TestCase):
+    def _old_file(self, name, age=2 * 60 * 60):
+        path = os.path.join(self.media, name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'wb') as f:
+            f.write(b'x' * 2048)
+        os.utime(path, (time.time() - age,) * 2)
+        return path
+
+    def _run(self, *args):
+        out = StringIO()
+        call_command('clean_media', *args, stdout=out)
+        return out.getvalue()
+
+    def setUp(self):
+        super().setUp()
+        self.teacher = Teacher.objects.create(first_name='علی', last_name='شمس', biography='.', profile_image=_upload('kept.jpg'))
+        make_image_sizes(self.teacher.profile_image)
+        self.kept = self.teacher.profile_image.path
+        self.kept_copy = os.path.join(self.media, 'sizes/teachers/kept-320w.webp')
+        for path in (self.kept, self.kept_copy):
+            os.utime(path, (time.time() - 7200,) * 2)
+        self.orphan = self._old_file('teachers/replaced.jpg')
+        self.orphan_copy = self._old_file('sizes/teachers/replaced-320w.webp')
+
+    def test_it_only_lists_unless_told_to_delete(self):
+        out = self._run()
+
+        self.assertIn('teachers/replaced.jpg', out)
+        self.assertIn('sizes/teachers/replaced-320w.webp', out)
+        self.assertNotIn('kept', out)
+        self.assertIn('2 unused files', out)
+        self.assertIn('Nothing was removed', out)
+        self.assertTrue(os.path.exists(self.orphan))
+
+    def test_delete_removes_unused_files_and_keeps_photos_in_use_with_their_copies(self):
+        self._run('--delete')
+
+        self.assertFalse(os.path.exists(self.orphan))
+        self.assertFalse(os.path.exists(self.orphan_copy))
+        self.assertTrue(os.path.exists(self.kept))
+        self.assertTrue(os.path.exists(self.kept_copy))
+
+    def test_a_file_changed_in_the_last_hour_is_left_alone(self):
+        fresh = self._old_file('gallery/uploading.jpg', age=60)
+
+        out = self._run('--delete')
+
+        self.assertTrue(os.path.exists(fresh))
+        self.assertIn('1 unused files changed in the last hour', out)
+
+    def test_it_refuses_to_delete_when_the_database_names_no_file_at_all(self):
+        from django.core.management.base import CommandError
+
+        Teacher.objects.all().delete()
+        self._old_file('teachers/kept.webp')
+
+        with self.assertRaises(CommandError):
+            self._run('--delete')
+        self.assertTrue(os.path.exists(self.orphan))
+
+    def test_a_file_outside_the_upload_folders_is_never_touched(self):
+        other = self._old_file('backups/db.sqlite3')
+
+        out = self._run('--delete')
+
+        self.assertTrue(os.path.exists(other))
+        self.assertIn('1 files outside the upload folders were not looked at', out)

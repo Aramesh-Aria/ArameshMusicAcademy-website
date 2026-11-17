@@ -3,16 +3,16 @@
    Each copy is at least the strip's width, so a short notice still loops cleanly, and a long one just takes
    longer: site.js sets the duration from its width so every notice moves at one reading speed. The button
    stops it for touch and keyboard; reduced motion shows the text still and wrapped, whatever its length.{% endcomment %}
-<aside class="notice" aria-label="اطلاعیه" data-notice>
-  <p class="notice__label"><span class="notice__dot" aria-hidden="true"></span>اطلاعیه</p>
-  <div class="notice__window">
-    <div class="notice__track">
+<aside class="announce" aria-label="اطلاعیه" data-notice>
+  <p class="announce__label"><span class="announce__dot" aria-hidden="true"></span>اطلاعیه</p>
+  <div class="announce__window">
+    <div class="announce__track">
       {% for copy in "12" %}
-      <p class="notice__copy"{% if not forloop.first %} aria-hidden="true"{% endif %}>{% for announcement in announcements %}<span>{{ announcement.text }}</span>{% endfor %}</p>
+      <p class="announce__copy"{% if not forloop.first %} aria-hidden="true"{% endif %}>{% for announcement in announcements %}<span>{{ announcement.text }}</span>{% endfor %}</p>
       {% endfor %}
     </div>
   </div>
-  <button class="notice__toggle" type="button" aria-pressed="false" aria-label="توقف حرکت اطلاعیه" hidden>
+  <button class="announce__toggle" type="button" aria-pressed="false" aria-label="توقف حرکت اطلاعیه" hidden>
     <svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg>
   </button>
 </aside>

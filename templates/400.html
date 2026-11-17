@@ -1,0 +1,23 @@
+{% extends 'error_base.html' %}
+{% load site_tags %}
+
+{% block title %}درخواست نادرست{% endblock %}
+{% block body_class %}page-400{% endblock %}
+
+{% block content %}
+{# ── A request the server could not accept (a broken address, a host that is not ours): the ways back. ── #}
+<section class="split panel on-stone page-head notice" aria-labelledby="bad-request-title">
+  <div class="split__text">
+    <p class="label num" aria-hidden="true">۴۰۰</p>
+    <h1 id="bad-request-title">این درخواست درست نرسید</h1>
+    <p class="split__lead">نشانی یا درخواستی که فرستاده شد برای سایت خوانا نبود. از صفحهٔ اصلی دوباره شروع کنید، یا با آموزشگاه تماس بگیرید.</p>
+    {% if site_phone_primary %}
+    {% include "components/button.html" with label="تماس" href=site_phone_primary|tel_href number=site_phone_primary|local_phone icon="phone" %}
+    {% endif %}
+    <ul class="notice__links" role="list">
+      <li><a href="{% url 'pages:home' %}">صفحهٔ اصلی</a></li>
+    </ul>
+  </div>
+  <div class="split__media frame frame--shape">{% include 'components/santur.html' %}</div>
+</section>
+{% endblock %}

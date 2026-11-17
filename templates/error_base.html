@@ -1,0 +1,31 @@
+{% load static site_tags %}<!DOCTYPE html>
+{% comment %}
+  The layout of the error pages that must not touch the database or trust the request: 500 (the error
+  may be the database) and 400 (the request itself is bad, e.g. a host that is not ours). It stands
+  alone, not on base.html, and uses only settings (apps.core.views passes site_info).
+{% endcomment %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{% block title %}{% endblock %} | آموزشگاه موسیقی آرامش</title>
+    <meta name="robots" content="noindex">
+    <link rel="preload" href="{% static 'assets/fonts/sahel-fd-400.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'assets/fonts/notonastaliq-fa.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{% static 'assets/css/site.css' %}">
+    <link href="{% static 'assets/img/favicon.ico' %}" rel="icon" sizes="any">
+    <meta name="theme-color" content="#17130f">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% include 'partials/icons.html' %}
+<header class="navbar">
+  <a class="navbar__logo" href="{% url 'pages:home' %}">
+    <img src="{% static 'assets/img/logo-saffron.webp' %}" width="400" height="235" alt="آموزشگاه موسیقی آرامش">
+  </a>
+</header>
+
+<main id="main">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

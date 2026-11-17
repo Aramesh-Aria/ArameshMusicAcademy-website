@@ -238,7 +238,7 @@ class AnnouncementTests(TestCase):
 
         self.assertLess(html.index('data-notice'), html.index('class="navbar"'))
         self.assertContains(response, 'کلاس‌ها تا اطلاع ثانوی تعطیل است.', count=2)
-        self.assertContains(response, 'class="notice__copy" aria-hidden="true"', count=1)
+        self.assertContains(response, 'class="announce__copy" aria-hidden="true"', count=1)
 
     def test_live_announcements_are_the_active_unexpired_ones_newest_first(self):
         older = Announcement.objects.create(text='قدیمی')

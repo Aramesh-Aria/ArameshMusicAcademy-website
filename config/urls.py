@@ -26,6 +26,7 @@ from django.views.static import serve
 from apps.core.sitemaps import sitemaps
 from apps.gallery import urls as gallery_urls
 
+handler400 = 'apps.core.views.bad_request'
 handler500 = 'apps.core.views.server_error'
 
 urlpatterns = [
