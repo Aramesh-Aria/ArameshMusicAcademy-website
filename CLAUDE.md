@@ -14,6 +14,7 @@ DATABASE_PATH=database/worst.sqlite3 DEBUG=True python manage.py seed_worst_case
 python manage.py collectstatic --noinput     # required after any static change (see Static files); never on Runflare
 python manage.py make_image_sizes            # make any missing or stale srcset copies of uploaded photos; safe to re-run
 python manage.py clean_media                 # list the files in public/media no row names any more; --delete removes them
+python manage.py convert_media_to_webp        # one-off: list the photos stored before uploads became WebP; --convert re-stores them as WebP
 
 python manage.py test                                         # all tests
 python manage.py test apps.schedules                          # one app
@@ -37,7 +38,7 @@ There is no linter or frontend build step configured.
 - Programme pages are routed at `programmes/<slug>/` and Instrument pages at `instruments/` and `instruments/<slug>/` (views in `apps/teachers/views.py`, URLs in `apps/teachers/instrument_urls.py`). `programmes.context_processors.programme_nav` feeds the navbar's دوره‌ها menu.
 - `testimonials`: `Testimonial`, parent quotes shown on the home page.
 
-**Image processing on save:** `Teacher`, `Instrument`, `Programme`, `SitePageContent`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads and store them as WebP via `core.image_utils.process_image`. This changes the stored filename (`.webp`, under a name storage confirms is free), which is then written back with a queryset `.update()`. Photos stored before this are JPEG and stay so until replaced.
+**Image processing on save:** `Teacher`, `Instrument`, `Programme`, `SitePageContent`, `GalleryPage` and `GalleryImage` override `save()` to resize/crop new uploads and store them as WebP via `core.image_utils.process_image`. This changes the stored filename (`.webp`, under a name storage confirms is free), which is then written back with a queryset `.update()`. Photos stored before this are JPEG and stay so until replaced, or until `manage.py convert_media_to_webp --convert` re-stores them (same pixels, WebP; it repoints every row with `.update()`, removes the JPEG and its copies and makes new copies; a photo whose WebP would not be lighter is left alone).
 
 **Unused uploads are removed:** `core.media_cleanup` (connected in `CoreConfig.ready`) listens to every model with a file field: when a save replaces or clears a file, or a row is deleted, the old file and its srcset copies are removed after the commit, unless another row still names the file. `manage.py clean_media` lists what was left behind before that (and by anything that bypasses signals, such as a queryset `.update()`); it only lists unless given `--delete`, skips files changed in the last hour, and refuses to delete when the database names no file at all.
 

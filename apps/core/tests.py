@@ -594,3 +594,93 @@ class CleanMediaCommandTests(MediaRootMixin, TestCase):
 
         self.assertTrue(os.path.exists(other))
         self.assertIn('1 files outside the upload folders were not looked at', out)
+
+
+class ConvertMediaToWebpCommandTests(MediaRootMixin, TestCase):
+    def _jpeg(self, name, size=900):
+        path = os.path.join(self.media, name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        Image.effect_noise((size, size), 60).convert('RGB').save(path, 'JPEG', quality=95)
+        return name
+
+    def _teacher(self, name):
+        teacher = Teacher(first_name='علی', last_name='شمس', biography='.')
+        teacher.save()
+        Teacher.objects.filter(pk=teacher.pk).update(profile_image=name)  # as a photo stored before WebP
+        return teacher
+
+    def _exists(self, name):
+        return os.path.exists(os.path.join(self.media, name))
+
+    def _run(self, *args):
+        out, err = StringIO(), StringIO()
+        call_command('convert_media_to_webp', *args, stdout=out, stderr=err)
+        return out.getvalue(), err.getvalue()
+
+    def test_it_only_lists_unless_told_to_convert(self):
+        teacher = self._teacher(self._jpeg('teachers/old.jpg'))
+
+        out, _ = self._run()
+
+        self.assertIn('teachers/old.jpg:', out)
+        self.assertIn('Nothing was changed', out)
+        self.assertEqual(os.listdir(os.path.join(self.media, 'teachers')), ['old.jpg'])
+        self.assertEqual(Teacher.objects.get(pk=teacher.pk).profile_image.name, 'teachers/old.jpg')
+
+    def test_convert_stores_the_photo_as_webp_at_the_same_size_and_removes_the_jpeg_and_its_copies(self):
+        teacher = self._teacher(self._jpeg('teachers/old.jpg'))
+        make_image_sizes(Teacher.objects.get(pk=teacher.pk).profile_image)
+        self.assertTrue(self._exists('sizes/teachers/old-900w.webp'))
+
+        out, _ = self._run('--convert')
+
+        photo = Teacher.objects.get(pk=teacher.pk).profile_image
+        self.assertEqual(photo.name, 'teachers/old.webp')
+        with Image.open(photo.path) as stored:
+            self.assertEqual((stored.format, stored.size), ('WEBP', (900, 900)))
+        self.assertFalse(self._exists('teachers/old.jpg'))
+        self.assertFalse(self._exists('sizes/teachers/old-900w.webp'))
+        self.assertEqual([width for _, width in image_sizes(photo)], [320, 480, 800, 900])
+        self.assertIn('1 photos', out)
+        self.assertIn('Converted', out)
+
+    def test_every_row_that_named_the_jpeg_names_the_webp(self):
+        name = self._jpeg('teachers/shared.jpg')
+        first, second = self._teacher(name), self._teacher(name)
+
+        self._run('--convert')
+
+        names = set(Teacher.objects.filter(pk__in=[first.pk, second.pk]).values_list('profile_image', flat=True))
+        self.assertEqual(names, {'teachers/shared.webp'})
+
+    def test_a_webp_name_already_taken_is_not_overwritten(self):
+        self._teacher(self._jpeg('teachers/a.jpg'))
+        taken = os.path.join(self.media, 'teachers/a.webp')
+        Image.new('RGB', (10, 10), 'red').save(taken, 'WEBP')
+        other = self._teacher('teachers/a.webp')
+
+        self._run('--convert')
+
+        with Image.open(taken) as untouched:
+            self.assertEqual(untouched.size, (10, 10))
+        self.assertEqual(Teacher.objects.get(pk=other.pk).profile_image.name, 'teachers/a.webp')
+
+    def test_a_missing_photo_is_reported_and_the_rest_are_converted(self):
+        self._teacher('teachers/gone.jpg')
+        kept = self._teacher(self._jpeg('teachers/here.jpg'))
+
+        out, err = self._run('--convert')
+
+        self.assertIn('teachers/gone.jpg: could not be read', err)
+        self.assertEqual(Teacher.objects.get(pk=kept.pk).profile_image.name, 'teachers/here.webp')
+        self.assertIn('Could not read 1', out)
+
+    def test_a_photo_whose_webp_would_not_be_lighter_is_left_as_it_is(self):
+        teacher = self._teacher(self._jpeg('teachers/tiny.jpg'))
+
+        with patch('apps.core.management.commands.convert_media_to_webp.os.path.getsize', return_value=1):
+            out, _ = self._run('--convert')
+
+        self.assertIn('left as it is', out)
+        self.assertEqual(Teacher.objects.get(pk=teacher.pk).profile_image.name, 'teachers/tiny.jpg')
+        self.assertEqual(os.listdir(os.path.join(self.media, 'teachers')), ['tiny.jpg'])
