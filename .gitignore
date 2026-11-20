@@ -8,6 +8,7 @@ venv/
 .env
 .DS_Store
 static_dev/
+instruments-pics/
 INTERVIEW_PREP_FA.md
 INTERVIEW_PREP.md
 # Claude Code third-party skills and agents (installed locally)

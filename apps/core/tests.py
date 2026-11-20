@@ -434,6 +434,22 @@ class StoredAsWebpTests(MediaRootMixin, TestCase):
             red, _, blue = stored.convert('RGB').getpixel((10, 10))
         self.assertGreater(red, blue)
 
+    def test_a_phone_photo_is_stored_the_way_up_the_phone_showed_it(self):
+        # Phones store the pixels landscape and say in EXIF how to turn them (6: a quarter turn clockwise). Left red,
+        # right blue on the sensor is red on top, blue below on the phone's screen.
+        sensor = Image.new('RGB', (400, 400), 'blue')
+        sensor.paste(Image.new('RGB', (200, 400), 'red'), (0, 0))
+        exif = Image.Exif()
+        exif[0x0112] = 6
+        buffer = BytesIO()
+        sensor.save(buffer, 'JPEG', exif=exif)
+        teacher = self._teacher(profile_image=SimpleUploadedFile('phone.jpg', buffer.getvalue(), 'image/jpeg'))
+
+        with Image.open(teacher.profile_image.path) as stored:
+            top, bottom = stored.convert('RGB').getpixel((300, 50)), stored.convert('RGB').getpixel((300, 550))
+        self.assertGreater(top[0], top[2])
+        self.assertGreater(bottom[2], bottom[0])
+
     def test_a_link_preview_of_a_webp_upload_says_it_is_webp(self):
         teacher = self._teacher(profile_image=_upload())
 

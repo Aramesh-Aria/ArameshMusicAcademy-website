@@ -4,7 +4,7 @@ import queue
 import threading
 
 from django.db import transaction
-from PIL import Image
+from PIL import Image, ImageOps
 
 # Every upload is stored as WebP: a third lighter than the JPEG it replaced, and read by every browser since 2020.
 # Photos stored before this (JPEG) stay as they are until they are replaced.
@@ -29,7 +29,8 @@ def process_image(field_file, width, height, crop=False, quality=82):
         return rel_name
 
     with Image.open(abs_path) as upload:
-        img = upload
+        # A phone stores its pixels sideways and says in EXIF which way is up; the WebP keeps no EXIF, so turn them now.
+        img = ImageOps.exif_transpose(upload)
         # Normalize to RGB — handles PNG transparency, CMYK camera exports, palette images, etc.
         if img.mode != 'RGB':
             if img.mode in ('RGBA', 'LA'):

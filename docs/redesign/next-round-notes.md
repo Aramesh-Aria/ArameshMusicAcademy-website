@@ -36,6 +36,8 @@ The owner listed issues one by one; these notes were the build prompt.
 
 ## 4. Instrument photos: workflow
 
+**Done (2026-11-20):** the owner shot the instruments; 13 finished photos are in `instruments-pics/final/<slug>.jpg`, 3:2 at up to 2400×1600 (not 16:9: `Instrument.save()` centre-crops every upload to 1200×800), one shared light grade, orientation baked in, EXIF (GPS) stripped. The owner uploads them in the admin. The electric guitar is a body-and-amp crop from the owner's own crop of the two-guitar shot (the whole guitar won't fit 3:2 without the C40 beside it); a solo landscape reshoot would be better. Accordion, cajón and harmonica come from Wikimedia Commons; the accordion and cajón are CC BY-SA and need a credit on the site (`instruments-pics/final/CREDITS.md`). No photo for آواز. `process_image` now applies EXIF orientation, so phone portraits are stored the way up the phone showed them.
+
 **On hold (2026-10-28):** build this after the owner has photographed the instruments. Nothing here can start without the originals.
 
 
